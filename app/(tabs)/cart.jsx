@@ -8,6 +8,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -44,28 +45,54 @@ const CartScreen = () => {
   };
 
   const renderItem = ({ item }) => (
-    <View className="flex-row justify-between items-center mb-3 bg-white p-3 rounded-xl shadow">
-     <Text className="text-sm text-gray-700 font-semibold">
-  {item.name} ({item.selectedSize?.size})
-</Text>
+    
+    <View className="flex-row gap-3   bg-white p-4 border-b border-b-gray-100  shadow">
+      <View className="flex-row items-center  border border-gray-200 p-1 rounded-lg ">
+        <Image className=" w-28 h-28 rounded-lg "
+      source={{ uri: item.image }}/>
 
-<Text className="text-sm text-green-600 font-bold">
-  ₹{item.price} x {item.quantity} = ₹{item.price * item.quantity}
-</Text>
-
-      <View className="flex-row items-center">
-        <TouchableOpacity onPress={() => decrement(item.id, item.selectedSize?.size)}>
-          <Text className="px-2 text-lg">−</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => increment(item.id, item.selectedSize?.size)}>
-          <Text className="px-2 text-lg">+</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => removeFromCart(item.id, item.selectedSize?.size)}>
-          <Text className="px-2 text-red-500">🗑</Text>
-        </TouchableOpacity>
       </View>
+      <View className="">
+         <Text className="text-sm text-gray-600 font-semibold">
+  {item.name}
+</Text>
+         <Text className="text-xs text-gray-400 font-semibold">
+  {item.selectedSize?.size} {item.selectedSize?.option}
+</Text>
+<View className="flex-row gap-24 justify-between items-end mt-2">
+  <View className='w-10' >
+ <Text className="text-lg text-black font-extrabold">
+  ₹ {item.selectedSize?.sellPrice}
+</Text>
+         <Text className="text-xs line-through text-gray-500 font-semibold">
+  ₹{item.selectedSize?.costPrice}
+</Text>
+  </View>
+  <View>
+ <View className="flex-row items-center justify-between   bg-green-600 rounded-lg px-3 py-1 w-[100px] ">
+  <TouchableOpacity onPress={() => decrement(item.id)}>
+    <Ionicons name="remove" size={22} color="#fff" />
+  </TouchableOpacity>
+
+  <Text className="text-base font-semibold text-white">{item.quantity}</Text>
+
+  <TouchableOpacity onPress={() => increment(item.id)}>
+    <Ionicons name="add" size={22} color="#fff" />
+  </TouchableOpacity>
+</View>
+  </View>
+ 
+
+</View>
+        
+
+      </View>
+    
     </View>
   );
+
+  
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY }}>
@@ -74,10 +101,10 @@ const CartScreen = () => {
         style={{ flex: 1 }}
       >
         <FlatList
-          data={cart}
+          data={cart} 
           keyExtractor={(item, index) => `${item.id}-${item.selectedSize?.size}-${index}`}
-          renderItem={renderItem}
-          contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+          renderItem={renderItem }
+          contentContainerStyle={{ padding: 16, paddingBottom: 25, }}
           ListHeaderComponent={() => (
             <>
               <View className="flex flex-row w-full justify-between px-2 mb-4">
@@ -87,8 +114,7 @@ const CartScreen = () => {
                 </View>
               </View>
 
-              <Text className="text-xl font-bold mb-4">🛒 Your Cart</Text>
-
+             
               {cart.length === 0 && (
                 <Text className="text-center text-gray-500 mt-20">
                   Your cart is empty 🛒
@@ -99,12 +125,9 @@ const CartScreen = () => {
           ListFooterComponent={() =>
             cart.length > 0 && (
               <>
-                {/* Offer Section */}
-                <View className="bg-yellow-100 p-3 rounded-xl mt-4">
-                  <Text className="text-yellow-800 font-semibold">
-                    🎉 Special Offer: ₹100 OFF on orders above ₹1000!
-                  </Text>
-                </View>
+
+
+                
 
                 {/* Order Summary */}
                 <View className="bg-white mt-4 p-4 rounded-xl shadow">
@@ -114,37 +137,11 @@ const CartScreen = () => {
                   <Text className="font-bold mt-2">Final: ₹{finalAmount}</Text>
                 </View>
 
-                {/* Order Form */}
-                <View className="mt-4">
-                  <Text className="font-semibold text-base mb-2">Enter your details</Text>
-                  <TextInput
-                    placeholder="Full Name"
-                    value={name}
-                    onChangeText={setName}
-                    className="bg-white p-3 rounded-xl mb-3"
-                  />
-                  <TextInput
-                    placeholder="Mobile Number"
-                    value={mobile}
-                    onChangeText={setMobile}
-                    keyboardType="phone-pad"
-                    className="bg-white p-3 rounded-xl mb-3"
-                  />
-                </View>
+                
 
-                <TouchableOpacity
-                  className="bg-green-600 py-3 rounded mt-4"
-                  onPress={handleOrder}
-                >
-                  <Text className="text-white text-center font-bold">📦 Place Order</Text>
-                </TouchableOpacity>
+             
 
-                <TouchableOpacity
-                  className="bg-red-500 py-3 rounded mt-2"
-                  onPress={clearCart}
-                >
-                  <Text className="text-white text-center font-bold">🧹 Clear Cart</Text>
-                </TouchableOpacity>
+             
               </>
             )
           }

@@ -32,7 +32,7 @@ export default function Products({
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["#10b981"]} // tailwind's green-500
+          colors={["#10b981"]} 
         />
       }
     />

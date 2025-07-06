@@ -12,37 +12,48 @@ import { Colors } from "../../assets/Colors";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Formik } from "formik";
-import { Ionicons } from "@expo/vector-icons"; 
-import { SignupSchema } from "../../utils/AuthSchema";
+import { useMutation } from "@tanstack/react-query";
+import { useForm, Controller } from "react-hook-form";
+import axios from "axios";
+
+import { BackendUrl } from "../../utils/Constants";
+import OtpSignupScreen from "../../components/OtpSignupScreen";
 
 const Signup = () => {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
+  const [userData, setuserData] = useState("");
+  const [showOtp, setshowOtp] = useState(false);
 
- const handleSignup = async (values, { resetForm }) => {
-  // try {
-  //   const response = await axios.post("https://your-api.com/api/signup", {
-  //     email: values.email,
-  //     mobile: values.number,
-  //     password: values.password,
-  //   });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      phone: "",
+    },
+  });
 
-  //   if (response.status === 200 || response.status === 201) {
-  //     // Success
-  //     alert("Signup successful!");
-  //     resetForm(); // Reset form after successful submission
-  //     // Optionally navigate
-  //     // router.push("/login");
-  //   } else {
-  //     alert("Something went wrong!");
-  //   }
-  // } catch (error) {
-  //   console.error("Signup error:", error.response?.data || error.message);
-  //   alert(error.response?.data?.message || "Signup failed. Please try again.");
-  // }
-};
+  const SignupMutation = useMutation({
+    mutationFn: async (data) => {
+      const response = await axios.post(`${BackendUrl}/api/signup`, data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log("Signup successful:", data);
+      setshowOtp(true);
+    },
+  });
 
+  const onSubmit = (data) => {
+    const payload = {
+      name: data.name,
+      phone: data.phone,
+    };
+    setuserData(payload);
+    SignupMutation.mutate(payload);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-secondary">
@@ -51,134 +62,105 @@ const Signup = () => {
         <View className="flex-1 px-6 pt-16 pb-10 items-center">
           <Image
             source={logo}
-            style={{
-              width: 180,
-              height: 180,
-              resizeMode: "contain",
-            }}
+            style={{ width: 180, height: 180, resizeMode: "contain" }}
           />
 
-        
-
-          <View className="w-full max-w-md">
-            <Formik
-              initialValues={{ email: "", number: "", password: "" }}
-              validationSchema={SignupSchema}
-              onSubmit={handleSignup}
-            >
-              {({
-                handleChange,
-                handleBlur,
-                handleSubmit,
-                values,
-                errors,
-                touched,
-              }) => (
-                <View className="space-y-4">
-                  {/* Email */}
-                  <View  className="mb-4">
-                    <Text className="text-base font-semibold text-black mb-2">
-                      Email
-                    </Text>
+          {showOtp ? (
+            <OtpSignupScreen userData={userData} />
+          ) : (
+            <View className="w-full max-w-md space-y-4">
+          
+              <View>
+                <Text className="text-base font-semibold text-black mb-2">Full Name</Text>
+                <Controller
+                  control={control}
+                  name="name"
+                  rules={{ required: "Name is required" }}
+                  render={({ field: { onChange, value } }) => (
                     <TextInput
                       className="h-14 px-4 rounded-lg shadow-2xl bg-white text-gray-900"
-                      onChangeText={handleChange("email")}
-                      onBlur={handleBlur("email")}
-                      value={values.email}
-                      keyboardType="email-address"
-                      placeholder="you@example.com"
+                      placeholder="John Doe"
                       placeholderTextColor="#9ca3af"
+                      onChangeText={onChange}
+                      value={value}
                     />
-                    {errors.email && touched.email && (
-                      <Text className="text-red-500 text-xs mt-1">
-                        {errors.email}
-                      </Text>
-                    )}
-                  </View>
+                  )}
+                />
+                {errors.name && (
+                  <Text className="text-red-500 text-xs mt-1">{errors.name.message}</Text>
+                )}
+              </View>
 
-                  {/* Mobile Number */}
-                <View  className="mb-4">
-                    <Text className="text-base font-semibold text-black mb-2">
-                      Mobile Number
-                    </Text>
+       
+              <View>
+                <Text className="text-base font-semibold text-black mb-2">Phone Number</Text>
+                <Controller
+                  control={control}
+                  name="phone"
+                  rules={{
+                    required: "Phone number is required",
+                    pattern: {
+                      value: /^[0-9]{10}$/,
+                      message: "Enter a valid 10-digit phone number",
+                    },
+                  }}
+                  render={({ field: { onChange, value } }) => (
                     <TextInput
                       className="h-14 px-4 rounded-lg shadow-2xl bg-white text-gray-900"
-                      onChangeText={handleChange("number")}
-                      onBlur={handleBlur("number")}
-                      value={values.number}
-                      keyboardType="phone-pad"
                       placeholder="1234567890"
                       placeholderTextColor="#9ca3af"
+                      keyboardType="phone-pad"
+                      onChangeText={onChange}
+                      value={value}
                     />
-                    {errors.number && touched.number && (
-                      <Text className="text-red-500 text-xs mt-1">
-                        {errors.number}
-                      </Text>
-                    )}
-                  </View>
+                  )}
+                />
+                {errors.phone && (
+                  <Text className="text-red-500 text-xs mt-1">{errors.phone.message}</Text>
+                )}
+              </View>
 
-                  {/* Password */}
-                 <View  className="mb-4">
-                    <Text className="text-base font-semibold text-black mb-2">
-                      Password
-                    </Text>
-                    <View className="relative">
-                      <TextInput
-                        className="h-14 px-4 pr-12 rounded-lg shadow-2xl bg-white text-gray-900"
-                        onChangeText={handleChange("password")}
-                        onBlur={handleBlur("password")}
-                        value={values.password}
-                        secureTextEntry={!showPassword}
-                        placeholder="••••••••"
-                        placeholderTextColor="#9ca3af"
-                      />
-                      <TouchableOpacity
-                        className="absolute right-4 top-4"
-                        onPress={() => setShowPassword(!showPassword)}
-                      >
-                        <Ionicons
-                          name={showPassword ? "eye-off" : "eye"}
-                          size={22}
-                          color="#6b7280"
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    {errors.password && touched.password && (
-                      <Text className="text-red-500 text-xs mt-1">
-                        {errors.password}
-                      </Text>
-                    )}
-                  </View>
+        
+              <TouchableOpacity
+                onPress={handleSubmit(onSubmit)}
+                className="bg-primary rounded-lg py-3 mt-2"
+              >
+                <Text className="text-base text-white text-center">
+                  {SignupMutation.isPending ? "Signing Up ..." : "Signup"}
+                </Text>
+              </TouchableOpacity>
 
-                  {/* Submit Button */}
-                  <TouchableOpacity
-                    onPress={handleSubmit}
-                    className="bg-primary rounded-lg py-2 mt-8"
-                  >
-                    <Text className="text-base text-white  text-center">
-                      Sign Up
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+              {SignupMutation.isError && (
+                <Text className="text-red-500 text-xs mt-1">
+                  {SignupMutation.error.message}
+                </Text>
               )}
-            </Formik>
-             <TouchableOpacity onPress={()=>router.push('/signin')} className=" mt-4 flex flex-row gap-5 px-4 justify-center items-center">
-              <Text className="text-gray-700 font-semibold ">
-                Already a User? 
-              </Text>
-              <Text className="text-base text-primary font-bold text-center underline">Sign In</Text>
-            </TouchableOpacity>
-             <Text className=" w-full text-center text-base font-semibold my-4 text-gray-700 flex gap-4 justify-center">
-              <View className=" border-b-2 border-primary mb-1 w-20" />{"  "}or{"  "}
-              <View className=" border-b-2 border-primary mb-1 w-20" />
-            </Text>
-             <TouchableOpacity onPress={()=>router.push('/home')} className="flex flex-row gap-5  justify-center items-center">
-              <Text className="text-gray-700 font-semibold -mr-2">
-                Be a
-              </Text>
-              <Text className="text-base text-primary font-bold text-center underline">Guest User</Text>
-            </TouchableOpacity>
-          </View>
+
+              <TouchableOpacity
+                onPress={() => router.push("/signin")}
+                className="mt-4 flex-row justify-center items-center"
+              >
+                <Text className="text-gray-700 font-semibold">Already a User? </Text>
+                <Text className="text-base text-primary font-bold underline">Sign In</Text>
+              </TouchableOpacity>
+
+              {/* OR Divider */}
+              <View className="w-full flex-row items-center justify-center my-4 gap-2">
+                <View className="border-b-2 border-primary w-20" />
+                <Text className="text-base font-semibold text-gray-700 mx-2">OR</Text>
+                <View className="border-b-2 border-primary w-20" />
+              </View>
+
+              {/* Guest User */}
+              <TouchableOpacity
+                onPress={() => router.push("/home")}
+                className="flex-row justify-center items-center"
+              >
+                <Text className="text-gray-700 font-semibold ">Be a </Text>
+                <Text className="text-base text-primary font-bold underline">Guest User</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
