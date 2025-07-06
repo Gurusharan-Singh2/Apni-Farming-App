@@ -16,12 +16,6 @@ import useAuthStore from "../Store/AuthStore";
 import '../utils/firebaseConfig';
 
 
-// ⬇️ Import your notification functions
-import {
-  handleBackgroundNotificationNavigation,
-  handleForegroundMessages,
-  requestPermissionAndGetToken,
-} from "../utils/notification";
 
 export default function App() {
   const router = useRouter();
@@ -31,6 +25,8 @@ export default function App() {
   useEffect(() => {
     const initializeApp = async () => {
       setLoading(true);
+      
+      
 
       // ⬇️ Step 1: Check auth
       const result = await isAuthenticated();
@@ -39,14 +35,6 @@ export default function App() {
         return;
       }
 
-      // ⬇️ Step 2: Ask for permission and get token
-      await requestPermissionAndGetToken();
-
-      // ⬇️ Step 3: Handle foreground notification display
-      const unsubscribe = handleForegroundMessages();
-
-      // ⬇️ Step 4: Handle navigation when notification tapped
-      handleBackgroundNotificationNavigation(router);
 
       setLoading(false);
 

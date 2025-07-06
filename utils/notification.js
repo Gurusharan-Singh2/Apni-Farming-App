@@ -1,7 +1,7 @@
 // utils/notificationService.js
-import messaging from "@react-native-firebase/messaging";
 import notifee, { AndroidImportance, AndroidStyle } from "@notifee/react-native";
-import { Platform, PermissionsAndroid } from "react-native";
+import messaging from "@react-native-firebase/messaging";
+import { PermissionsAndroid, Platform } from "react-native";
 
 export const requestPermissionAndGetToken = async () => {
   try {

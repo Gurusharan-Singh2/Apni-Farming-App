@@ -1,7 +1,7 @@
 const tinyColorLight="#0a7ea4";
 const tinyColorDark="#fff";
 const primary="#00750c";
-const secondary="#FED16A";
+const secondary="#f0d699a3";
 
 export const Colors={
   light:{

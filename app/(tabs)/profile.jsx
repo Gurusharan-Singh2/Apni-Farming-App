@@ -1,9 +1,8 @@
-import { View, Text, TouchableOpacity, ScrollView, StatusBar } from "react-native";
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import useAuthStore from "../../Store/AuthStore";
 import { useRouter } from "expo-router";
+import { ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../assets/Colors";
+import useAuthStore from "../../Store/AuthStore";
 
 const Profile = () => {
   const { user, logout } = useAuthStore();
@@ -13,6 +12,8 @@ const Profile = () => {
     logout();              // Clear auth store
     router.replace("/");   // Redirect to landing screen
   };
+  console.log(user);
+  
 
   return (
     <SafeAreaView className="bg-[#f0d699a3] flex-1">
