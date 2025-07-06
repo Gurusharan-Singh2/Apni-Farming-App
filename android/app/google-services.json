@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "909744377218",
+    "project_id": "apni-farming",
+    "storage_bucket": "apni-farming.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909744377218:android:5e3799c20f83541ce9139b",
+        "android_client_info": {
+          "package_name": "com.gurusharan.apnifarming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbjLsoWuEMLzqnxguSmGOsR8qd34vaKGo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

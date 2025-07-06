@@ -1,24 +1,26 @@
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StatusBar,
   Text,
   TouchableOpacity,
-  StatusBar,
-  ScrollView,
-  Image,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useState } from "react";
-import logo from "../assets/images/logo-final.png";
 import { Colors } from "../assets/Colors";
+import logo from "../assets/images/logo-final.png";
 import useAuthStore from "../Store/AuthStore";
+import '../utils/firebaseConfig';
+
 
 // ⬇️ Import your notification functions
 import {
-  requestPermissionAndGetToken,
-  handleForegroundMessages,
   handleBackgroundNotificationNavigation,
+  handleForegroundMessages,
+  requestPermissionAndGetToken,
 } from "../utils/notification";
 
 export default function App() {
