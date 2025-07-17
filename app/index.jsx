@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../assets/Colors";
 import logo from "../assets/images/logo-final.png";
 import useAuthStore from "../Store/AuthStore";
-import '../utils/firebaseConfig';
+
 
 
 

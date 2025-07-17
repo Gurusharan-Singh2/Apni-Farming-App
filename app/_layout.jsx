@@ -1,29 +1,49 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { Text as DefaultText} from "react-native";
 import { Stack } from "expo-router";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import * as Font from "expo-font";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from 'react-native-toast-message';
 
 import "../global.css";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 10, // 10 minutes
-      refetchOnWindowFocus: true, // Avoid refetching on tab focus
-      retry: 4, // Retry failed queries once
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-export default function RootLayout() {
+export default function Layout() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      await Font.loadAsync({
+        BebasNeue: require("../assets/fonts/Poppins-Regular.ttf"),
+      });
+
+      // ✅ GLOBAL FONT PATCH FOR ALL <Text>
+      const oldRender = DefaultText.render;
+      DefaultText.render = function (...args) {
+        const origin = oldRender.call(this, ...args);
+        return {
+          ...origin,
+          props: {
+            ...origin.props,
+            style: [{ fontFamily: "Poppins" }, origin.props?.style],
+          },
+        };
+      };
+
+      setFontsLoaded(true);
+    })();
+  }, []);
+
+  if (!fontsLoaded) return null;
+
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" />
-        </Stack>
+        
+          <Stack screenOptions={{ headerShown: false }} />
+         <Toast />
       </SafeAreaProvider>
     </QueryClientProvider>
   );

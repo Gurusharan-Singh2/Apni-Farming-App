@@ -1,11 +1,23 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Tabs } from 'expo-router'
 import { Colors } from '../../assets/Colors'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Platform } from "react-native";
+import * as Font from "expo-font";
 
 const TabLayout = () => {
+const [fontsLoaded, setFontsLoaded] = useState(false);
+   useEffect(() => {
+    (async () => {
+      await Font.loadAsync({
+        BebasNeue: require("../../assets/fonts/BebasNeue-Regular.ttf"),
+      });
+      setFontsLoaded(true);
+    })();
+  }, []);
+
+  if (!fontsLoaded) return null;
   return (
     <Tabs
       screenOptions={{
@@ -18,10 +30,12 @@ const TabLayout = () => {
           paddingBottom: Platform.OS === "ios" ? 20 : 5, // handle safe area for iOS
           borderTopWidth: 0, // removes default border
           elevation: 0,      // removes Android shadow
+          
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "bold",
+           fontFamily: "BebasNeue"
         },
       }}
     >
@@ -34,21 +48,13 @@ const TabLayout = () => {
           ),
         }}
       />
+      
       <Tabs.Screen
-        name="cart"
+        name="whishlist"
         options={{
-          title: "Cart",
+          title: "Whishlist",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="cart" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="person" size={24} color={color} />
+            <Ionicons name="heart" size={24} color={color} />
           ),
         }}
       />

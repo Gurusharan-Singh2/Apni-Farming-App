@@ -7,22 +7,48 @@ const useCartStore = create(
   persist(
     immer((set, get) => ({
       cart: [],
+      totalAmount: 0,
+      discount: 0,
+      finalAmount: 0,
+
+      calculateTotals: () => {
+  const { cart } = get();
+  const total = cart.reduce((sum, item) => sum + (item.costPrice || 0) * item.quantity, 0);
+  const discount = cart.reduce((sum, item) => sum + (item.discount || 0) * item.quantity, 0);
+  const final = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+
+  set((state) => {
+    state.totalAmount = total;
+    state.discount = discount;
+    state.finalAmount = final;
+  });
+},
+
 
       addToCart: (item) => {
         set((state) => {
-          const existingItem = state.cart.find(i => i.id === item.id);
+          const existingItem = state.cart.find(i => i.id === item.id && i.selectedSize?.size === item.selectedSize?.size);
+
+          const costPrice = item.selectedSize?.costPrice || 0;
+          const sellPrice = item.selectedSize?.sellPrice || 0;
+          const discount = costPrice - sellPrice;
 
           if (existingItem) {
             existingItem.selectedSize = item.selectedSize;
-            existingItem.price = item.selectedSize.sellPrice;
+            existingItem.price = sellPrice;
+            existingItem.costPrice = costPrice;
+            existingItem.discount = discount;
           } else {
             state.cart.push({
               ...item,
               quantity: 1,
-              price: item.selectedSize.sellPrice,
+              price: sellPrice,
+              costPrice,
+              discount,
             });
           }
         });
+        get().calculateTotals();
       },
 
       removeFromCart: (id, size) => {
@@ -31,6 +57,7 @@ const useCartStore = create(
             item => !(item.id === id && item.selectedSize?.size === size)
           );
         });
+        get().calculateTotals();
       },
 
       increment: (id) => {
@@ -40,6 +67,7 @@ const useCartStore = create(
             item.quantity += 1;
           }
         });
+        get().calculateTotals();
       },
 
       decrement: (id) => {
@@ -53,12 +81,14 @@ const useCartStore = create(
             }
           }
         });
+        get().calculateTotals();
       },
 
       clearCart: () => {
         set((state) => {
           state.cart = [];
         });
+        get().calculateTotals();
       },
     })),
     {

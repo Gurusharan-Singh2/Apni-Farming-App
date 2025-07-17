@@ -19,7 +19,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import useAddressStore from '../Store/useAddressStore'; 
 import Toast from 'react-native-toast-message';
 
-const LocationIcon = () => {
+const ChangedAddress = () => {
   const {
     addresses,
     selectedAddress,
@@ -79,10 +79,10 @@ const LocationIcon = () => {
 
  const handleSelectAddress = (addressOrIndex) => {
     if (typeof addressOrIndex === 'number') {
-      
+      // If passed an index
       setSelectedAddress(addresses[addressOrIndex]);
     } else {
-    
+      // If passed an address object
       setSelectedAddress(addressOrIndex);
     }
   };
@@ -153,18 +153,14 @@ const LocationIcon = () => {
   };
 
   return (
-    <View className="items-start">
+    <View className="items-start  mt-4">
       <TouchableOpacity onPress={openDrawer}>
-        <View className="flex-row items-center space-x-1">
-          <SimpleLineIcons name="location-pin" size={20} />
-          <Text className="font-bold text-base">Address</Text>
-          <MaterialIcons name="arrow-drop-down" size={24} color="black" />
+        <View className="flex-row items-center space-x-1 px-2 py-1 border-green-500 border rounded-full bg-green-500">
+          
+          <Text className="text-white text-sm">Change Address</Text>
+         
         </View>
-        {selectedAddress && (
-          <Text className="text-gray-600 text-sm mt-1" numberOfLines={1}>
-            {selectedAddress.title || "Selected Address"}
-          </Text>
-        )}
+        
       </TouchableOpacity>
 
       <Modal visible={drawerVisible} animationType="slide" transparent={true}>
@@ -334,4 +330,4 @@ const LocationIcon = () => {
   );
 };
 
-export default LocationIcon;
+export default ChangedAddress;

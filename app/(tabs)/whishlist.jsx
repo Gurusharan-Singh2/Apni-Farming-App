@@ -18,6 +18,7 @@ import { Colors } from '../../assets/Colors';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import useAuthStore from '../../Store/AuthStore';
+import ProfileIcon from '../../components/ProfileIcon';
 
 
 const CartScreen = () => {
@@ -42,7 +43,7 @@ const CartScreen = () => {
 
   const renderItem = ({ item }) => (
     
-    <View className="flex-row gap-3   bg-white p-4 border-b border-b-gray-100  shadow">
+    <View className="flex-row gap-3   bg-white p-2 border-b border-b-gray-100  shadow">
       <View className="flex-row items-center  border border-gray-200 p-1 rounded-lg ">
         <Image className=" w-28 h-28 rounded-lg "
       source={{ uri: item.image }}/>
@@ -56,7 +57,7 @@ const CartScreen = () => {
   {item.selectedSize?.size} {item.selectedSize?.option}
 </Text>
 <View className="flex-row gap-24 justify-between items-end mt-2">
-  <View className='' >
+  <View className='w-14' >
  <Text className="text-lg text-black font-extrabold">
   ₹ {item.selectedSize?.sellPrice}
 </Text>
@@ -106,9 +107,7 @@ const CartScreen = () => {
             <>
               <View className="flex flex-row w-full justify-between px-2 mb-4">
                 <LocationIcon />
-                <View className="w-10 h-10 rounded-full border items-center justify-center">
-                  <Ionicons name="person-outline" size={20} color="black" />
-                </View>
+                 {isAuthenticated() && <ProfileIcon/> } 
               </View>
 
               {cart.length === 0 && (
@@ -158,7 +157,7 @@ const CartScreen = () => {
                 <View><Text className="font-extrabold text-lg">Total: ₹ {finalAmount} </Text></View>
                 <View className="flex-row bg-green-100 p-1"><AntDesign name="tags" size={20} color="#22c55e" /><Text className="text-green-500 text-xs font-semibold">Saved ₹{discount}</Text></View>
                 </View>
-              <View>{isAuthenticated() ?<TouchableOpacity className="bg-green-600 px-5 py-2 rounded-lg  " onPress={()=>router.push('/order')}><Text className="text-white font-semibold  text-base">Order Placed</Text></TouchableOpacity>:<TouchableOpacity className="bg-green-600 px-5 py-2 rounded-lg  " onPress={()=>router.push('/signup')}><Text className="text-white font-semibold  text-base">Login</Text></TouchableOpacity>}</View>
+              <View>{isAuthenticated() ?<TouchableOpacity className="bg-green-600 px-5 py-2 rounded-lg  " onPress={()=>router.push('/offers')}><Text className="text-white font-semibold  text-base">Order Placed</Text></TouchableOpacity>:<TouchableOpacity className="bg-green-600 px-5 py-2 rounded-lg  " onPress={()=>router.push('/signin')}><Text className="text-white font-semibold  text-base">Login</Text></TouchableOpacity>}</View>
               
 
           </View>

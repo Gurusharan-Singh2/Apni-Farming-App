@@ -2,7 +2,7 @@
   "expo": {
     "name": "ApniFarming",
     "slug": "apni-farming",
-    "version": "1.0.0",       
+    "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "apnifarming",
     "userInterfaceStyle": "automatic",
@@ -12,7 +12,7 @@
     },
     "icon": "./assets/images/logo-final.png",
     "android": {
-      "versionCode": 1,       
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
@@ -32,7 +32,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
