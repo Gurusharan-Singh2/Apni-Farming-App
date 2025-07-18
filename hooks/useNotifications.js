@@ -8,11 +8,12 @@ import {
 } from "../utils/notification";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { BackendUrl } from "../utils/Constants";
 import notifee, { EventType } from '@notifee/react-native';
 
 
 const registerToken = async ({ userId, token }) => {
-  const res = await axios.post("https://apni-farming-backend.onrender.com/api/admin/register-token", {
+  const res = await axios.post(`${BackendUrl}/api/admin/register-token`, {
     userId,
     token,
   });

@@ -10,24 +10,28 @@ const useCartStore = create(
       totalAmount: 0,
       discount: 0,
       finalAmount: 0,
+      totalItems: 0, // ✅ NEW STATE
 
       calculateTotals: () => {
-  const { cart } = get();
-  const total = cart.reduce((sum, item) => sum + (item.costPrice || 0) * item.quantity, 0);
-  const discount = cart.reduce((sum, item) => sum + (item.discount || 0) * item.quantity, 0);
-  const final = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+        const { cart } = get();
+        const total = cart.reduce((sum, item) => sum + (item.costPrice || 0) * item.quantity, 0);
+        const discount = cart.reduce((sum, item) => sum + (item.discount || 0) * item.quantity, 0);
+        const final = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0); // ✅ Total items count
 
-  set((state) => {
-    state.totalAmount = total;
-    state.discount = discount;
-    state.finalAmount = final;
-  });
-},
-
+        set((state) => {
+          state.totalAmount = total;
+          state.discount = discount;
+          state.finalAmount = final;
+          state.totalItems = totalItems;
+        });
+      },
 
       addToCart: (item) => {
         set((state) => {
-          const existingItem = state.cart.find(i => i.id === item.id && i.selectedSize?.size === item.selectedSize?.size);
+          const existingItem = state.cart.find(
+            i => i.id === item.id && i.selectedSize?.size === item.selectedSize?.size
+          );
 
           const costPrice = item.selectedSize?.costPrice || 0;
           const sellPrice = item.selectedSize?.sellPrice || 0;

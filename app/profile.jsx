@@ -13,8 +13,8 @@ const ProfileScreen = () => {
   
   
     const handleLogout = () => {
-      logout();              // Clear auth store
-      router.replace("/");   // Redirect to landing screen
+      logout();              
+      router.replace("/");   
     };
   
     

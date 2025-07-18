@@ -1,64 +1,47 @@
 import React, { useRef } from "react";
-import { View, TextInput } from "react-native";
+import { View, TextInput, Text, TouchableOpacity } from "react-native";
 
 const OtpInput = ({ length = 6, value = "", onChange }) => {
-  const inputs = useRef([]);
+  const inputRef = useRef(null);
 
-  const handleVisibleChange = (text, index) => {
-    const digits = text.replace(/[^0-9]/g, "");
-    let newValue = value.split("");
-
-    newValue[index] = digits[0] || "";
-    onChange(newValue.join("").slice(0, length));
-
-    if (digits && index < length - 1) {
-      inputs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleBackspace = (e, index) => {
-    if (e.nativeEvent.key === "Backspace" && !value[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleHiddenInputChange = (text) => {
+  const handleChange = (text) => {
     const clean = text.replace(/[^0-9]/g, "").slice(0, length);
     onChange(clean);
   };
 
   return (
-    <View className="items-center">
-      {/* Hidden input for autofill */}
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={() => inputRef.current?.focus()}
+      className="items-center"
+    >
+      {/* Hidden real input for typing & autofill */}
       <TextInput
-        className="absolute opacity-0 h-0 w-0"
+        ref={inputRef}
         value={value}
-        onChangeText={handleHiddenInputChange}
+        onChangeText={handleChange}
         keyboardType="number-pad"
         textContentType="oneTimeCode"
         autoComplete="sms-otp"
         importantForAutofill="yes"
         autoFocus
+        className="absolute opacity-0 w-0 h-0"
       />
 
-      {/* Visible OTP boxes */}
+      {/* Render OTP digits in boxes */}
       <View className="flex-row space-x-3">
         {Array.from({ length }).map((_, i) => (
-          <TextInput
+          <View
             key={i}
-            ref={(ref) => (inputs.current[i] = ref)}
-            className="w-12 h-14 text-xl text-center border border-gray-300 rounded-lg bg-white"
-            maxLength={1}
-            keyboardType="number-pad"
-            value={value[i] || ""}
-            onChangeText={(text) => handleVisibleChange(text, i)}
-            onKeyPress={(e) => handleBackspace(e, i)}
-            caretHidden={true}
-            selectTextOnFocus={false}
-          />
+            className="w-12 h-14 border border-gray-300 rounded-lg bg-white items-center justify-center"
+          >
+            <Text className="text-xl font-semibold text-gray-800">
+              {value[i] || ""}
+            </Text>
+          </View>
         ))}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

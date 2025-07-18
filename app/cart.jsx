@@ -13,16 +13,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import useCartStore from '../Store/CartStore';;
-import LocationIcon from '../components/LocationIcon';
 import { Colors } from '../assets/Colors';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import useAuthStore from '../Store/AuthStore';
-import ProfileIcon from '../components/ProfileIcon';
 
 
 const CartScreen = () => {
-const { cart, totalAmount, discount, finalAmount,decrement, increment } = useCartStore();
+const { cart, discount, finalAmount,decrement, increment } = useCartStore();
 
   const {isAuthenticated}= useAuthStore();
  

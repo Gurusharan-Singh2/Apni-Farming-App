@@ -17,6 +17,7 @@ import useAuthStore from "../Store/AuthStore";
 
 
 
+
 export default function App() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
@@ -25,10 +26,7 @@ export default function App() {
   useEffect(() => {
     const initializeApp = async () => {
       setLoading(true);
-      
-      
-
-      // ⬇️ Step 1: Check auth
+  
       const result = await isAuthenticated();
       if (result) {
         router.replace("/home");
@@ -38,7 +36,7 @@ export default function App() {
 
       setLoading(false);
 
-      // ⬇️ Step 5: Cleanup listener on unmount
+  
       return () => unsubscribe();
     };
 
@@ -57,6 +55,7 @@ export default function App() {
     <SafeAreaView className="bg-[#f0d699a3]">
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
       <ScrollView contentContainerStyle={{ height: "100%" }}>
+ 
         <View className="m-2 flex flex-col justify-between gap-5 pt-14 items-center px-4">
           <Image
             source={logo}

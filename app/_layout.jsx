@@ -5,6 +5,7 @@ import * as Font from "expo-font";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from 'react-native-toast-message';
+import {toastConfig} from '../hooks/toastConfig'
 
 import "../global.css";
 
@@ -43,7 +44,7 @@ export default function Layout() {
       <SafeAreaProvider>
         
           <Stack screenOptions={{ headerShown: false }} />
-         <Toast />
+        <Toast config={toastConfig} />
       </SafeAreaProvider>
     </QueryClientProvider>
   );

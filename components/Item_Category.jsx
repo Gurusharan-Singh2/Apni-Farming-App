@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { BackendUrl } from '../utils/Constants';
 
 const fetchCategories = async () => {
-  const { data } = await axios.get('https://apni-farming-backend.onrender.com/api/categories');
-  return [{ id: '0', name: 'All', image: 'https://img.icons8.com/ios-filled/50/shop.png' }, ...data]; // add 'All' category
+  const { data } = await axios.get(`${BackendUrl}/api/categories`);
+  return [{ id: '0', name: 'All', image: 'https://img.icons8.com/ios-filled/50/shop.png' }, ...data]; 
 };
 
 const CategoryItem = ({ setCategoryId }) => {
@@ -38,13 +39,13 @@ const CategoryItem = ({ setCategoryId }) => {
           keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 8,  }}
           renderItem={({ item }) => {
             const isSelected = item.id === selectedCategory;
             return (
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.id)}
-                className={`items-center mx-2 w-20 ${isSelected ? 'bg-green-100 rounded-xl' : ''}`}
+                className={`items-center mx-2 border border-gray-200 p-2 rounded-xl w-20 ${isSelected ? 'bg-green-100 rounded-xl' : ''}`}
               >
                 <Image
                   source={{ uri: item.image }}

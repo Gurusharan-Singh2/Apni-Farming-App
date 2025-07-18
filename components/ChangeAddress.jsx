@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as Location from "expo-location";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";

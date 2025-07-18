@@ -157,14 +157,10 @@ const LocationIcon = () => {
       <TouchableOpacity onPress={openDrawer}>
         <View className="flex-row items-center space-x-1">
           <SimpleLineIcons name="location-pin" size={20} />
-          <Text className="font-bold text-base">Address</Text>
+          <Text className="font-bold text-base">{selectedAddress ?`${selectedAddress.title}`: "Address"}</Text>
           <MaterialIcons name="arrow-drop-down" size={24} color="black" />
         </View>
-        {selectedAddress && (
-          <Text className="text-gray-600 text-sm mt-1" numberOfLines={1}>
-            {selectedAddress.title || "Selected Address"}
-          </Text>
-        )}
+        
       </TouchableOpacity>
 
       <Modal visible={drawerVisible} animationType="slide" transparent={true}>

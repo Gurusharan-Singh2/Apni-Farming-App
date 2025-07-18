@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../assets/Colors";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import BannerCarousel from "../../components/Banner";
 import CategoryItem from "../../components/Item_Category";
 import LocationIcon from "../../components/LocationIcon";
@@ -16,6 +15,7 @@ import useAuthStore from "../../Store/AuthStore";
 import { useRouter } from "expo-router";
 import { handleBackgroundNotificationNavigation } from "../../utils/notification";
 import CartIconWithBadge from "../../components/Carticon";
+import { BackendUrl } from "../../utils/Constants";
 
 export default function Home() {
   const router = useRouter();
@@ -43,8 +43,8 @@ export default function Home() {
     queryFn: async () => {
       const url =
         categoryId === "0"
-          ? "https://apni-farming-backend.onrender.com/api/products"
-          : `https://apni-farming-backend.onrender.com/api/categories/${categoryId}/products`;
+          ? `${BackendUrl}/api/products`
+          : `${BackendUrl}/api/categories/${categoryId}/products`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Network error");
       return res.json();
@@ -60,7 +60,7 @@ export default function Home() {
   } = useQuery({
     queryKey: ["banners"],
     queryFn: async () => {
-      const res = await fetch("https://apni-farming-backend.onrender.com/api/banner");
+      const res = await fetch(`${BackendUrl}/api/banner`);
       if (!res.ok) throw new Error("Banner fetch error");
       return res.json();
     },
@@ -78,13 +78,19 @@ export default function Home() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY }}>
+      <View className="mb-1"> 
       <View className="flex flex-row w-full justify-between px-6 my-3">
         <LocationIcon />
         <View className="flex flex-row items-center gap-2">
         <CartIconWithBadge/>
 {isAuthenticated() && <ProfileIcon />}
         </View>
-        
+        </View>
+         <SearchBar
+              query={query}
+              onChange={setQuery}
+              onSubmit={handleSearch}
+            />
       </View>
 
       <Products
@@ -95,11 +101,7 @@ export default function Home() {
         onRefresh={handleRefresh}
         ListHeaderComponent={
           <>
-            <SearchBar
-              query={query}
-              onChange={setQuery}
-              onSubmit={handleSearch}
-            />
+           
             <BannerCarousel
               banners={banners}
               isLoading={bannersLoading}

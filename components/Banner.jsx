@@ -64,7 +64,7 @@ const BannerCarousel = ({ banners = [], isLoading, isError }) => {
         ))}
       </ScrollView>
 
-      <View className="absolute bottom-3 left-0 right-0 flex-row justify-center space-x-2">
+      {/* <View className="absolute bottom-3 left-0 right-0 flex-row justify-center space-x-2">
         {banners.map((_, index) => (
           <View
             key={index}
@@ -73,7 +73,7 @@ const BannerCarousel = ({ banners = [], isLoading, isError }) => {
             }`}
           />
         ))}
-      </View>
+      </View> */}
     </View>
   );
 };
