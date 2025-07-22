@@ -1,4 +1,3 @@
-// src/Store/wishlistStore.js
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -9,26 +8,31 @@ const useWishlistStore = create(
     immer((set) => ({
       wishlist: [],
 
-      setWishlist: (ids) => {
+      // Set full wishlist (array of product objects)
+      setWishlist: (items) => {
         set((state) => {
-          state.wishlist = ids;
+          state.wishlist = items;
         });
       },
 
-      addToWishlist: (id) => {
+      // Add product object to wishlist
+      addToWishlist: (product) => {
         set((state) => {
-          if (!state.wishlist.includes(id)) {
-            state.wishlist.push(id);
+          const exists = state.wishlist.some((item) => item.id === product.id);
+          if (!exists) {
+            state.wishlist.push(product);
           }
         });
       },
 
+      // Remove product object from wishlist by id
       removeFromWishlist: (id) => {
         set((state) => {
-          state.wishlist = state.wishlist.filter((i) => i !== id);
+          state.wishlist = state.wishlist.filter((item) => item.id !== id);
         });
       },
 
+      // Clear all wishlist items
       clearWishlist: () => {
         set((state) => {
           state.wishlist = [];

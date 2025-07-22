@@ -8,25 +8,28 @@ const useAddressStore = create(
   persist(
     immer((set) => ({
       addresses: [
-        {
-          id: '1', // Add unique IDs
-          title: "Home",
-          name: "Gurusharan Singh",
-          street: "123 Main Street",
-          city: "Amritsar", 
-          state: "Punjab",
-          zip: "143001",
-        },
-        {
-          id: '2', // Add unique IDs
-          title: "Work",
-          name: "Priya Sharma",
-          street: "456 MG Road",
-          city: "Delhi",
-          state: "Delhi",
-          zip: "110001",
-        },
-      ],
+  // {
+  //   id: '1',
+  //   title: "Home",
+  //   name: "Gurusharan Singh",
+  //   street: "123 Main Street",
+  //   landmark: "Near Golden Temple", 
+  //   city: "Amritsar",
+  //   state: "Punjab",
+  //   zip: "143001",
+  // },
+  // {
+  //   id: '2',
+  //   title: "Work",
+  //   name: "Priya Sharma",
+  //   street: "456 MG Road",
+  //   landmark: "Opposite Metro Station", 
+  //   city: "Delhi",
+  //   state: "Delhi",
+  //   zip: "110001",
+  // },
+],
+
       selectedAddress: null,
 
       setAddresses: (addresses) => {

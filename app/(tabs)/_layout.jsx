@@ -5,8 +5,10 @@ import { Colors } from '../../assets/Colors'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Platform } from "react-native";
 import * as Font from "expo-font";
+import useWishlistStore from '../../Store/WishlistStore';
 
 const TabLayout = () => {
+  const { wishlist } = useWishlistStore();
 const [fontsLoaded, setFontsLoaded] = useState(false);
    useEffect(() => {
     (async () => {
@@ -44,7 +46,7 @@ const [fontsLoaded, setFontsLoaded] = useState(false);
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="home" size={24} color={color} />
+            <Ionicons name="home" size={21} color={color} />
           ),
         }}
       />
@@ -54,8 +56,22 @@ const [fontsLoaded, setFontsLoaded] = useState(false);
         options={{
           title: "Whishlist",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="heart" size={24} color={color} />
+            <Ionicons name="heart" size={22} color={color} />
           ),
+            tabBarBadge: wishlist.length > 0 ? wishlist.length : null, 
+          tabBarBadgeStyle: {
+            backgroundColor: '#ef4444',
+            color: 'white',
+            borderRadius: 25,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 10,
+            fontWeight: 'bold',
+            width: 14,
+            
+          },
         }}
       />
     </Tabs>

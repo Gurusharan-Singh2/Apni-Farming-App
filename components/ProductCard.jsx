@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import useAuthStore from '../Store/AuthStore';
 import useWishlistStore from '../Store/WishlistStore';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import { BackendUrl } from '../utils/Constants';
+import { BackendUrl2 } from '../utils/Constants';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 const ProductCard = ({ item }) => {
@@ -24,53 +24,96 @@ const ProductCard = ({ item }) => {
     setWishlist,
     addToWishlist,
     removeFromWishlist,
+    clearWishlist
   } = useWishlistStore();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSize, setSelectedSize] = useState(item?.sizes?.[0] || {});
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+
   const { addToCart, cart, increment, decrement } = useCartStore();
   const quantity = cart.find(i => i.id === item.id)?.quantity || 0;
 
-  const isWishlisted = wishlist.includes(item.id);
 
-  // Fetch wishlist on mount
-  useQuery({
-    queryKey: ['wishlist', customer_id],
-    queryFn: async () => {
-      const res = await axios.get(`${BackendUrl}/api/wishlists/${customer_id}`);
-      const ids = res.data.map(w => w.product_id);
-      setWishlist(ids); // update Zustand
-      return ids;
-    },
-    enabled: !!customer_id,
-  });
+const isWishlisted = useMemo(() => {
+  return wishlist?.some(w => w.id === item.id);
+}, [wishlist, item.id]);
 
-  // Add to backend wishlist
+
+const {
+  data: wishlistData,
+  refetch: refetchWishlist
+} = useQuery({
+  queryKey: ['wishlist', customer_id],
+  queryFn: async () => {
+    if (!customer_id) return [];
+    const res = await axios.get(`https://api.apnifarming.com/user/wishlists/wishlist.php?action=list&customer_id=${customer_id}`);
+    return res.data.data;
+  },
+  onSuccess: (wishlistData) => {
+    setWishlist(wishlistData);
+  },
+  onError: (error) => {
+    console.error('Error fetching wishlist:', error.message);
+    Toast.show({ type: 'error', text1: 'Failed to load wishlist', text2: error.message,
+      visibilityTime: 1000,
+      autoHide: true,
+     });
+    clearWishlist();
+  },
+  enabled: !!customer_id,
+  staleTime: 1000 * 60 * 5, 
+});
+
+
   const addToWishlistMutation = useMutation({
-    mutationFn: async () =>
-      await axios.post(`${BackendUrl}/api/wishlists`, {
+    mutationFn: async () =>{
+    const res =  await axios.post(`${BackendUrl2}/user/wishlists/wishlist.php?action=add`, {
         customer_id,
         product_id: item.id,
-      }),
-   
+      })
+    return res.data },
+   onSuccess: async (data) => {
+  addToWishlist(item); 
+  refetchWishlist(); 
+  Toast.show({ type: 'success', text1: 'Added to wishlist',
+    visibilityTime: 1000,
+    autoHide: true,
+   });
+},
+
+
     onError: (error) => {
-      Toast.show({ type: 'error', text1: 'Add failed', text2: error.message });
+      Toast.show({ type: 'error', text1: 'Add failed', text2: error.message,
+        visibilityTime: 1000,
+        autoHide: true,
+       });
     },
   });
 
   // Remove from backend wishlist
   const removeFromWishlistMutation = useMutation({
     mutationFn: async () =>
-      await axios.delete(`${BackendUrl}/api/wishlists`, {
-        data: { customer_id, product_id: item.id },
+      await axios.post(`${BackendUrl2}/user/wishlists/wishlist.php?action=remove`, {
+        customer_id,
+        product_id: item.id,
       }),
+   onSuccess: async () => {
+  removeFromWishlist(item.id); // local update
+  refetchWishlist(); // optional sync
+  Toast.show({ type: 'success', text1: 'Removed from wishlist' ,visibilityTime: 1000, autoHide: true});
+}
+,
    
     onError: (error) => {
-      Toast.show({ type: 'error', text1: 'Remove failed', text2: error.message });
+      Toast.show({ type: 'error', text1: 'Remove failed', text2: error.message ,
+        visibilityTime: 1000,
+        autoHide: true,
+      });
     },
   });
 
-  const handleWishlistToggle = () => {
+  const handleWishlistToggle = async () => {
     if (!customer_id) {
       Toast.show({
         type: 'error',
@@ -79,12 +122,18 @@ const ProductCard = ({ item }) => {
       return;
     }
 
-    if (isWishlisted) {
-      removeFromWishlist(item.id); // local
-      removeFromWishlistMutation.mutate(); // backend
-    } else {
-      addToWishlist(item.id); // local
-      addToWishlistMutation.mutate(); // backend
+    setWishlistLoading(true);
+    try {
+     if (isWishlisted) {
+  await removeFromWishlistMutation.mutateAsync(); // backend
+} else {
+  await addToWishlistMutation.mutateAsync(); // backend
+}
+
+    } catch (err) {
+      // Handled by mutation's onError
+    } finally {
+      setWishlistLoading(false);
     }
   };
 
@@ -98,6 +147,8 @@ const ProductCard = ({ item }) => {
       type: 'success',
       text1: 'Added to Cart!',
       text2: `${item.name} was added successfully.`,
+      visibilityTime: 1000,
+      autoHide: true,
     });
   };
 
@@ -115,9 +166,15 @@ const ProductCard = ({ item }) => {
           className="w-full h-[150px] mt-4 rounded-xl"
           resizeMode="contain"
         />
-        {isAuthenticated() &&
-          <TouchableOpacity
-            className="absolute top-0 right-0   bg-white rounded-full"
+        {isAuthenticated() && addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
+          <View style={{ position: 'absolute', top: 10, right: 10 }}>
+            <AntDesign name="loading1" size={20} color="#10b981" />
+          </View>)
+          :(
+        
+           <TouchableOpacity
+            disabled={wishlistLoading}
+            className="absolute top-0 right-0 bg-white rounded-full"
             onPress={handleWishlistToggle}
           >
             <AntDesign
@@ -126,7 +183,7 @@ const ProductCard = ({ item }) => {
               color={isWishlisted ? '#10b981' : 'gray'}
             />
           </TouchableOpacity>
-        }
+        )}
       </View>
 
       {/* Title */}
@@ -178,9 +235,9 @@ const ProductCard = ({ item }) => {
         >
           <View className="bg-white rounded-xl p-4 w-[80%]">
             <Text className="text-base font-semibold mb-3">Available Sizes</Text>
-            {item.sizes.map((sizeObj, index) => (
+            {item.sizes.map((sizeObj) => (
               <TouchableOpacity
-                key={index}
+                key={sizeObj.size}
                 className={`py-3 border-b border-gray-200 ${selectedSize.size === sizeObj.size ? 'bg-green-200' : ''}`}
                 onPress={() => handleSelectSize(sizeObj)}
               >

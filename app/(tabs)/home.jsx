@@ -15,7 +15,7 @@ import useAuthStore from "../../Store/AuthStore";
 import { useRouter } from "expo-router";
 import { handleBackgroundNotificationNavigation } from "../../utils/notification";
 import CartIconWithBadge from "../../components/Carticon";
-import { BackendUrl } from "../../utils/Constants";
+import { BackendUrl, BackendUrl2 } from "../../utils/Constants";
 
 export default function Home() {
   const router = useRouter();
@@ -43,8 +43,9 @@ export default function Home() {
     queryFn: async () => {
       const url =
         categoryId === "0"
-          ? `${BackendUrl}/api/products`
-          : `${BackendUrl}/api/categories/${categoryId}/products`;
+          ? `${BackendUrl2}/user/products/getAllProducts.php`
+          // : `${BackendUrl}/api/categories/${categoryId}/products`;l̥
+          : `${BackendUrl2}/user/categories/getProductsByCategory.php?id=${categoryId}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Network error");
       return res.json();
@@ -60,7 +61,8 @@ export default function Home() {
   } = useQuery({
     queryKey: ["banners"],
     queryFn: async () => {
-      const res = await fetch(`${BackendUrl}/api/banner`);
+      // const res = await fetch(`${BackendUrl}/api/banner`);
+      const res = await fetch(`${BackendUrl2}/user/banner/getAllBanners.php`);
       if (!res.ok) throw new Error("Banner fetch error");
       return res.json();
     },

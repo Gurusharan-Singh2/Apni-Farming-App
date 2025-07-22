@@ -15,6 +15,12 @@ module.exports = {
       fontFamily: {
         bebas: ["BebasNeue"], // ✅ Use className="font-bebas"
       },
+      fontSize: {
+        'basic': '11px', // ✅ Use className="text-xxs"
+        'heading-big': '14px',   // ✅ Use className="text-huge"
+        'heading-small': '12px',   // ✅ Use className="text-huge"
+      },
+      
     },
   },
   plugins: [],

@@ -39,7 +39,7 @@ const BannerCarousel = ({ banners = [], isLoading, isError }) => {
   }
 
   return (
-    <View className="mt-4 mb-2">
+    <View>
       <ScrollView
         horizontal
         pagingEnabled

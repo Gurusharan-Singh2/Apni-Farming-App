@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { BackendUrl } from '../utils/Constants';
+import { BackendUrl, BackendUrl2 } from '../utils/Constants';
 
 const fetchCategories = async () => {
-  const { data } = await axios.get(`${BackendUrl}/api/categories`);
-  return [{ id: '0', name: 'All', image: 'https://img.icons8.com/ios-filled/50/shop.png' }, ...data]; 
+  // const { data } = await axios.get(`${BackendUrl}/api/categories`);
+  const { data } = await axios.get(`${BackendUrl2}/user/categories/getAllCategories.php`);
+  return [{ id: '0', name: 'All', image: 'https://jobdsco.s3.ap-south-1.amazonaws.com/public/s550_4xb7_231012.jpg' }, ...data]; 
 };
 
 const CategoryItem = ({ setCategoryId }) => {
@@ -39,21 +40,21 @@ const CategoryItem = ({ setCategoryId }) => {
           keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 8,  }}
+          
           renderItem={({ item }) => {
             const isSelected = item.id === selectedCategory;
             return (
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.id)}
-                className={`items-center mx-2 border border-gray-200 p-2 rounded-xl w-20 ${isSelected ? 'bg-green-100 rounded-xl' : ''}`}
+                className={`items-center mx-1 pb-0    w-[90px] min-h-[112px] ${isSelected ? 'border rounded-lg border-green-500 ' : ''}`}
               >
                 <Image
                   source={{ uri: item.image }}
-                  className={`w-16 h-16 rounded-full ${isSelected ? 'border-2 border-green-600' : ''} bg-gray-100`}
+                  className={`w-full h-24  rounded-lg   `}
                   resizeMode="cover"
                 />
-                <Text className={`text-center text-xs mt-1 ${isSelected ? 'text-green-600 font-semibold' : ''}`}>
-                  {item.name?.length > 12 ? item.name.slice(0, 11) + '…' : item.name}
+                <Text className={`text-center text-[10px] mt-1 mb-0 ${isSelected ? 'text-green-600 font-semibold' : ''}`}>
+                  { item.name}
                 </Text>
               </TouchableOpacity>
             );
