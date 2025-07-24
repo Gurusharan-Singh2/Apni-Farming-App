@@ -19,7 +19,8 @@ import { BackendUrl, BackendUrl2 } from "../../utils/Constants";
 
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated,user } = useAuthStore();
+
 
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("0");
@@ -48,6 +49,8 @@ export default function Home() {
           : `${BackendUrl2}/user/categories/getProductsByCategory.php?id=${categoryId}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Network error");
+     
+      
       return res.json();
     },
   });

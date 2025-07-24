@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const useCartStore = create(
   persist(
@@ -169,16 +170,23 @@ const useCartStore = create(
       cart_total: finalAmount,
     };
 
-    const data = await applyCouponFn(payload);
+    const data = await applyCouponFn.mutateAsync(payload);
 
-    if (data && data.status === 'success') {
-      get().applyCouponFromBackend(data.data); // ✅ reapply
+    if (data?.success === true || data?.success === 'true')
+ {
+      get().applyCouponFromBackend(data); // ✅ reapply
     } else {
-      get().removeCoupon(); // ❌ remove invalid coupon
+      get().removeCoupon();
+       Toast.show({
+                  type: 'error',
+                  text1: data.error,
+                  visibilityTime: 400,
+                  
+                }); // ❌ remove invalid coupon
     }
   } catch (err) {
     console.error('Coupon revalidation failed:', err);
-    get().removeCoupon(); // fallback
+    
   }
 },
 

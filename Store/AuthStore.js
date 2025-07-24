@@ -8,6 +8,7 @@ const useAuthStore = create(
     immer((set, get) => ({
       user: null,
       token: null,
+      phone:null,
 
       // Set user and token
       login: (data) => {
@@ -16,6 +17,7 @@ const useAuthStore = create(
             name: data.name,
             userId: data.userId,
             email: data.email,
+            phone:data.phone
           };
           state.token = data.token;
         });
@@ -26,6 +28,7 @@ const useAuthStore = create(
         set((state) => {
           state.user = null;
           state.token = null;
+          state.phone=null;
         });
       },
 

@@ -1,6 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 
+// Convert 24-hour format to 12-hour format with AM/PM
+const formatTo12Hour = (timeStr) => {
+  const [hour, minute] = timeStr.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+};
+
 // Check if slot time is in the past (today only)
 const isPastTime = (dateStr, timeStr) => {
   const [h, m, s] = timeStr.split(':').map(Number);
@@ -47,7 +55,7 @@ const DeliverySlotSelector = ({ slots, selectedDate, selectedSlotId, onSelect })
             : "All slots for selected date have passed. Please choose another date."}
         </Text>
       ) : (
-        <View className="flex-row justify-between">
+        <View className="flex-row justify-between flex-wrap gap-3">
           {availableSlots.map((slot) => (
             <TouchableOpacity
               key={slot.id}
@@ -64,10 +72,9 @@ const DeliverySlotSelector = ({ slots, selectedDate, selectedSlotId, onSelect })
                     {slot.title}
                   </Text>
                   <Text className="text-basic text-gray-600">
-                    {slot.start_time} - {slot.end_time}
+                    {formatTo12Hour(slot.start_time)} - {formatTo12Hour(slot.end_time)}
                   </Text>
                 </View>
-              
               </View>
             </TouchableOpacity>
           ))}

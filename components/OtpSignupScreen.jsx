@@ -21,11 +21,14 @@ const OtpSignupScreen = ({ length = 6, userData }) => {
       return response.data;
     },
     onSuccess: (data) => {
+      console.log(data);
+      
       useAuthStore.getState().login({
         name: data.name,
         userId: data.userId,
         email: userData.email,
         token: data.token,
+        phone:data.phone
       });
       router.push("/home");
     },

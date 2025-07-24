@@ -4,34 +4,80 @@ import { Ionicons } from '@expo/vector-icons';
 
 export const toastConfig = {
   success: ({ text1, text2 }) => (
-    <View className="flex-row  items-center flex-2 bg-green-100 border-l-4 border-green-500 px-4 py-3 rounded-full shadow-lg mx-4 mt-2">
-      <Ionicons name="checkmark-circle" size={24} color="#059669" className="mr-3" />
-      <View className="flex-1">
-        <Text className="text-green-900 font-semibold text-sm">{text1}</Text>
-        {text2 ? <Text className="text-green-800 text-xs">{text2}</Text> : null}
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#bbf7d0',
+        paddingVertical:3,
+        paddingHorizontal: 6,
+        borderRadius: 25, 
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        marginHorizontal: 32,
+        marginTop: 8,
+
+      }}
+    >
+      <Ionicons name="checkmark-circle" size={18} color="#059669" style={{ marginRight: 12 }} />
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: '#065f46', fontWeight: '600', fontSize: 13 }}>{text1}</Text>
+        {text2 ? <Text style={{ color: '#047857', fontSize: 11 }}>{text2}</Text> : null}
       </View>
     </View>
   ),
 
   error: ({ text1, text2 }) => (
-
-      <View className="flex-row  items-center flex-2 bg-red-400 border-l-4 border-red-500 px-4 py-3 rounded-full shadow-lg mx-4 mt-8">
-       <Ionicons name="close-circle" size={24} color="#dc2626" className="mr-3" />
-      <View className="flex-1">
-        <Text className="text-white font-semibold text-sm">{text1}</Text>
-        {text2 ? <Text className="text-white text-xs">{text2}</Text> : null}
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#7f1d1d', 
+       
+        paddingVertical: 3,
+        paddingHorizontal: 6,
+        borderRadius: 25,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        marginHorizontal: 16,
+        marginTop: 32,
+       
+      }}
+    >
+      <Ionicons name="close-circle" size={18} color="#dc2626" style={{ marginRight: 12 }} />
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{text1}</Text>
+        {text2 ? <Text style={{ color: '#fca5a5', fontSize: 11 }}>{text2}</Text> : null}
       </View>
     </View>
-  
-    
   ),
 
   info: ({ text1, text2 }) => (
-    <View className="flex-row items-center  bg-blue-100 border-l-4 border-blue-500 px-4 py-3 rounded-2xl shadow-lg mx-auto mt-2 ">
-      <Ionicons name="information-circle" size={24} color="#3b82f6" className="mr-3" />
-      <View className="flex-1">
-        <Text className="text-blue-900 font-semibold text-base">{text1}</Text>
-        {text2 ? <Text className="text-blue-800 text-sm">{text2}</Text> : null}
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#dbeafe', // blue-100
+        
+        paddingVertical: 3,
+        paddingHorizontal: 6,
+        borderRadius: 25, // rounded-2xl
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        marginHorizontal: 20,
+        marginTop: 8,
+      }}
+    >
+      <Ionicons name="information-circle" size={18} color="#3b82f6" style={{ marginRight: 12 }} />
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: '#1e3a8a', fontWeight: '600', fontSize: 12 }}>{text1}</Text>
+        {text2 ? <Text style={{ color: '#1d4ed8', fontSize: 11 }}>{text2}</Text> : null}
       </View>
     </View>
   ),

@@ -14,20 +14,7 @@ export default function Products({
   refreshing,
   onRefresh,
 }) {
-  const { user } = useAuthStore();
-  const customer_id = user?.userId;
 
-  const {
-    data: wishlistData = [],
-    isLoading: wishlistLoading,
-  } = useQuery({
-    queryKey: ['wishlist', customer_id],
-    queryFn: async () => {
-      const res = await axios.get(`${BackendUrl}/api/wishlists/${customer_id}`);
-      return res.data.map(item => item.product_id); // Only product IDs
-    },
-    enabled: !!customer_id,
-  });
 
   if (loading && !refreshing) {
     return <Text className="px-5 py-4">Loading products...</Text>;
@@ -37,6 +24,7 @@ export default function Products({
     return <Text className="px-5 text-red-500 py-4">Failed to load products</Text>;
   }
 
+  
   return (
     <FlatList
       data={data}

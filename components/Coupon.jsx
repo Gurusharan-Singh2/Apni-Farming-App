@@ -38,6 +38,9 @@ const Coupon = () => {
   const ApplyCouponMutation = useMutation({
     mutationFn: async (payload) => {
       const res = await axios.post('https://api.apnifarming.com/user/coupon/apply.php', payload);
+      
+      
+      
       return res.data;
     },
   });
@@ -56,13 +59,13 @@ const Coupon = () => {
           Toast.show({
             type: 'success',
             text1: 'Coupon applied successfully',
-            visibilityTime: 500,
+            visibilityTime: 800,
           });
         } else {
           Toast.show({
             type: 'error',
             text1: data.error,
-            visibilityTime: 2000,
+            visibilityTime: 800,
           });
           setModalVisible(false);
         }
@@ -187,6 +190,7 @@ const Coupon = () => {
           </View>
         </View>
       </Modal>
+      
     </>
   );
 };
