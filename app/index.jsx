@@ -52,7 +52,7 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="bg-[#f0d699a3]">
+    <SafeAreaView className="bg-white">
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
       <ScrollView contentContainerStyle={{ height: "100%" }}>
  

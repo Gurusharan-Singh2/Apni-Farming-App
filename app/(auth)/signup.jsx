@@ -56,7 +56,7 @@ const Signup = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-secondary">
+    <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 px-6 pt-16 pb-10 items-center">

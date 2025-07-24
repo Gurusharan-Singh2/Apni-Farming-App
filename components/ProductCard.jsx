@@ -36,8 +36,9 @@ const ProductCard = ({ item }) => {
 
 
 const isWishlisted = useMemo(() => {
-  return wishlist?.some(w => w.id === item.id);
+  return wishlist?.some(w => w.product_id == item.id); 
 }, [wishlist, item.id]);
+
 
 
 const {
@@ -48,6 +49,9 @@ const {
   queryFn: async () => {
     if (!customer_id) return [];
     const res = await axios.get(`https://api.apnifarming.com/user/wishlists/wishlist.php?action=list&customer_id=${customer_id}`);
+  
+    
+    setWishlist(res.data.data)
     return res.data.data;
   },
   onSuccess: (wishlistData) => {
@@ -64,6 +68,9 @@ const {
   enabled: !!customer_id,
   staleTime: 1000 * 60 * 5, 
 });
+
+
+
 
 
   const addToWishlistMutation = useMutation({
@@ -166,7 +173,8 @@ const {
           className="w-full h-[150px] mt-4 rounded-xl"
           resizeMode="contain"
         />
-        {isAuthenticated() && addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
+
+{isAuthenticated() ?  addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
           <View style={{ position: 'absolute', top: 10, right: 10 }}>
             <AntDesign name="loading1" size={20} color="#10b981" />
           </View>)
@@ -183,7 +191,9 @@ const {
               color={isWishlisted ? '#10b981' : 'gray'}
             />
           </TouchableOpacity>
-        )}
+        ):""}
+
+      
       </View>
 
       {/* Title */}

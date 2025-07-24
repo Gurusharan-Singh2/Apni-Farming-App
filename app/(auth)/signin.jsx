@@ -22,7 +22,7 @@ import OtpSignupScreen from "../../components/OtpSignupScreen";
 const Signin = () => {
   const router = useRouter();
   const [userData, setuserData] = useState("");
-  const [showOtp, setshowOtp] = useState(true);
+  const [showOtp, setshowOtp] = useState(false);
 
   const {
     control,
@@ -51,7 +51,7 @@ const Signin = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-secondary">
+    <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 px-6 pt-16 pb-10 items-center">
@@ -79,7 +79,7 @@ const Signin = () => {
                 }}
                 render={({ field: { onChange, value } }) => (
                   <TextInput
-                    className="h-14 px-4 rounded-lg shadow-2xl bg-white text-gray-900"
+                    className="h-14 px-4 rounded-lg shadow-lg bg-white text-gray-900"
                     placeholder="1234567890"
                     placeholderTextColor="#9ca3af"
                     keyboardType="phone-pad"

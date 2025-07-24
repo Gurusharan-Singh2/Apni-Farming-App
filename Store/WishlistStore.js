@@ -9,11 +9,12 @@ const useWishlistStore = create(
       wishlist: [],
 
       // Set full wishlist (array of product objects)
-      setWishlist: (items) => {
-        set((state) => {
-          state.wishlist = items;
-        });
-      },
+     setWishlist: (items) => {
+  set((state) => {
+    state.wishlist = [...items]; // ✅ ensures a new array
+  });
+},
+
 
       // Add product object to wishlist
       addToWishlist: (product) => {

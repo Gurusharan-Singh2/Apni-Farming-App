@@ -64,20 +64,28 @@ const LocationIcon = () => {
       const res = await axios.post(`${BackendUrl2}/user/address/address.php`, data);
       return res.data;
     },
-    onSuccess: (data) => {
-      const formatted = (data?.data || []).map((item) => ({
-        id: item.id,
-        uid: item.uid,
-        street: item.street_address,
-        landmark: item.landmark,
-        city: item.city,
-        state: item.state,
-        zip: item.pincode,
-        title: item.address_title,
-        default_address: item.default_address,
-      }));
-      setAddresses(formatted);
-    },
+   onSuccess: (data) => {
+  const formatted = (data?.data || []).map((item) => ({
+    id: item.id,
+    uid: item.uid,
+    street: item.street_address,
+    landmark: item.landmark,
+    city: item.city,
+    state: item.state,
+    zip: item.pincode,
+    title: item.address_title,
+    default_address: item.default_address,
+  }));
+
+  setAddresses(formatted);
+
+  // ✅ Set default or first address immediately
+  if (formatted.length > 0) {
+    const defaultAddr = formatted.find((addr) => addr.default_address === 1);
+    setSelectedAddress(defaultAddr || formatted[0]);
+  }
+}
+,
     onError: (error) => {
       console.log(error);
     },
@@ -148,41 +156,22 @@ const LocationIcon = () => {
     },
   });
 
-  useEffect(() => {
-    let isMounted = true;
+ useEffect(() => {
+  let isMounted = true;
 
-    if (addresses.length > 0 && !selectedAddress && isMounted) {
-      setSelectedAddress(addresses[0]);
-    }
-
-    if (customer_id) {
-      const payload = {
-        action: "get_address_list",
-        uid: customer_id,
-      };
-      Getdata.mutate(payload, {
-        onSuccess: (data) => {
-          if (!isMounted) return;
-          const formatted = (data?.data || []).map((item) => ({
-            id: item.id,
-            uid: item.uid,
-            street: item.street_address,
-            landmark: item.landmark,
-            city: item.city,
-            state: item.state,
-            zip: item.pincode,
-            title: item.address_title,
-            default_address: item.default_address,
-          }));
-          setAddresses(formatted);
-        },
-      });
-    }
-
-    return () => {
-      isMounted = false;
+  if (customer_id) {
+    const payload = {
+      action: "get_address_list",
+      uid: customer_id,
     };
-  }, [customer_id]);
+    Getdata.mutate(payload);
+  }
+
+  return () => {
+    isMounted = false;
+  };
+}, [customer_id]);
+
 
   const openDrawer = () => setDrawerVisible(true);
 

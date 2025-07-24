@@ -15,6 +15,7 @@ import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../Store/AuthStore';
 import { toastConfig } from '../hooks/toastConfig';
+import ThankYouCard from '../components/ThankYouCard';
 
 
 const OrderScreen = () => {
@@ -27,6 +28,8 @@ const OrderScreen = () => {
   const [delivey_instruction,setdelivery_instruction]=useState("");
   const[payment_Method,setpayment_Method]=useState("COD");
   const [showInput, setShowInput] = useState(true);
+  const [thank,setthank]=useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState(null);
 
   const {
     cart,
@@ -57,9 +60,22 @@ const ApplyCouponMutation = useMutation({
       );
       return res.data;
     },
-    onSuccess:(data)=>{
-      console.log("Data is success",data);
-    },
+    onSuccess: (data) => {
+  console.log("Checkout Success:", data);
+  if (data.success && data.order_id) {
+    setCreatedOrderId(data.order_id);
+    setthank(true);
+    useCartStore.getState().clearCart(); // optional: clear cart after order
+  } else {
+    Toast.show({
+      type: 'error',
+      text1: 'Order Failed',
+      text2: data?.message || 'Please try again.',
+    });
+  }
+},
+
+
     onError:(error)=>{
       console.log(error.message);
       
@@ -149,8 +165,9 @@ const ApplyCouponMutation = useMutation({
     if (!selectedSlotId) {
       Toast.show({
         type: 'error',
-        text1: 'Selection Required',
-        text2: 'Please select a delivery slot',
+        text1: 'Delivery Slot Required',
+        text2: 'Whoops! No slots left today — try tomorrow!',
+        visibilityTime:1000
       });
       return;
     }
@@ -159,7 +176,8 @@ const ApplyCouponMutation = useMutation({
       Toast.show({
         type: 'error',
         text1: 'Address Required',
-        text2: 'Please select a delivery address',
+        text2: 'Pick a delivery address',
+        visibilityTime:800
       });
       return;
     }
@@ -179,7 +197,7 @@ const orderPayload = {
   tax: gstAmount,
   shipping_price: deliveryCharge,
   coupon_code: couponCode || "Not Selected",
-  discount: discount,
+  discount: couponDiscount,
   shipping_address: selectedAddress.street,
   shipping_city: selectedAddress.city,
   shipping_postalcode: selectedAddress.zip,
@@ -195,7 +213,7 @@ const orderPayload = {
     product_id: Number(item.id),
     product_name: item.name,
     product_qty: item.quantity,
-    variant_size: item.selectedSize?.size+" "+item.selectedSize?.option || "",
+    variant_name: item.selectedSize?.size+" "+item.selectedSize?.option || "",
     variant_id:item.selectedSize?.id,
     mrp: item.costPrice,
     sale_price: item.price
@@ -209,6 +227,21 @@ const orderPayload = {
     
 
   };
+
+
+if (thank) {
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <ThankYouCard 
+        orderId={createdOrderId}
+        onOrderMore={() => {
+          setthank(false);
+          router.replace('/home'); 
+        }}
+      />
+    </SafeAreaView>
+  );
+}
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -404,10 +437,7 @@ const orderPayload = {
       <View className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
         <TouchableOpacity
           onPress={handleCheckout}
-          disabled={!selectedSlotId || !selectedAddress}
-          className={`bg-green-600 rounded-lg flex justify-between py-4 px-6 items-center ${
-            (!selectedSlotId || !selectedAddress) ? 'opacity-50' : ''
-          }`}
+          className={`bg-green-600 rounded-lg flex justify-between py-4 px-6 items-center `}
         >
           <View className="flex-row w-full justify-between">
 <Text className="text-white font-bold text-lg">{CheckoutMutation.isPending?"Proceeding ....":"Proceed to Payment"}</Text>
@@ -415,9 +445,6 @@ const orderPayload = {
             ₹{finalAmount.toFixed(2)} 
           </Text>
           </View>
-          
-          {!selectedSlotId && <Text  className="text-xs text-red-500 font-extrabold ">Warning: Please choose Delivery slot !!!!</Text>}
-          {!selectedAddress && <Text className="text-xs text-red-500 font-extrabold ">Warning: Please choose Delivery Address !!!!</Text>}
         </TouchableOpacity>
       </View>
 
