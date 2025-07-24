@@ -3,14 +3,26 @@ import axios from "axios";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
+import Toast from "react-native-toast-message";
 import { BackendUrl } from "../utils/Constants";
 import useAuthStore from "../Store/AuthStore";
 import OtpInput from "../components/OtpInput"; // adjust path as needed
+import { toastConfig } from "../hooks/toastConfig";
 
-const OtpSignupScreen = ({ length = 6, userData }) => {
+const OtpSignupScreen = ({ userData }) => {
   const [otpValue, setOtpValue] = useState("");
   const [timer, setTimer] = useState(60);
   const router = useRouter();
+
+  const showToast = (type, title, message) => {
+    Toast.show({
+      type,
+      text1: title,
+      text2: message,
+      position: "top",
+      visibilityTime: 3000,
+    });
+  };
 
   const VerifyMutation = useMutation({
     mutationFn: async ({ userData, otp }) => {
@@ -21,28 +33,27 @@ const OtpSignupScreen = ({ length = 6, userData }) => {
       return response.data;
     },
     onSuccess: (data) => {
-      console.log(data);
-      
       useAuthStore.getState().login({
         name: data.name,
         userId: data.userId,
         email: userData.email,
         token: data.token,
-        phone:data.phone
+        phone: data.phone,
       });
       router.push("/home");
     },
     onError: (error) => {
       console.error("Verification failed:", error);
-      Alert.alert("Error", "Invalid OTP or server error.");
+      showToast("error", "Verification Failed", "Invalid OTP or server error.");
     },
   });
 
   const onSubmit = () => {
-    if (otpValue.length !== length) {
-      Alert.alert("Error", `Please enter all ${length} digits`);
+    if (otpValue.length < 5) {
+      showToast("error", "Invalid OTP", "OTP must be at least 5 digits.");
       return;
     }
+
     VerifyMutation.mutate({ userData, otp: otpValue });
   };
 
@@ -58,13 +69,13 @@ const OtpSignupScreen = ({ length = 6, userData }) => {
       return response.data;
     },
     onSuccess: () => {
-      Alert.alert("Success", "OTP resent successfully");
+      showToast("success", "OTP Resent", "OTP resent successfully.");
       setTimer(60);
       setOtpValue(""); // Clear old OTP
     },
     onError: (error) => {
       console.error("Resend failed:", error);
-      Alert.alert("Error", "Failed to resend OTP. Please try again.");
+      showToast("error", "Resend Failed", "Please try again.");
     },
   });
 
@@ -80,7 +91,7 @@ const OtpSignupScreen = ({ length = 6, userData }) => {
       </Text>
 
       {/* OTP Input Field */}
-      <OtpInput length={length} value={otpValue} onChange={setOtpValue} />
+      <OtpInput value={otpValue} onChange={setOtpValue} />
 
       {/* Submit Button */}
       <TouchableOpacity
@@ -92,13 +103,6 @@ const OtpSignupScreen = ({ length = 6, userData }) => {
           {VerifyMutation.isPending ? "Verifying..." : "Verify OTP"}
         </Text>
       </TouchableOpacity>
-
-      {/* Error Message */}
-      {VerifyMutation.isError && (
-        <Text className="text-red-500 text-xs mt-1 text-center">
-          {VerifyMutation.error?.message || "Verification failed"}
-        </Text>
-      )}
 
       {/* Resend Timer */}
       {timer > 0 ? (
@@ -114,12 +118,7 @@ const OtpSignupScreen = ({ length = 6, userData }) => {
         </TouchableOpacity>
       )}
 
-      {/* Resend Error */}
-      {ResendMutation.isError && (
-        <Text className="text-red-500 text-xs mt-1 text-center">
-          {ResendMutation.error?.message || "Failed to resend OTP"}
-        </Text>
-      )}
+
     </View>
   );
 };

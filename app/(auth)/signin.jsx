@@ -22,7 +22,7 @@ import OtpSignupScreen from "../../components/OtpSignupScreen";
 const Signin = () => {
   const router = useRouter();
   const [userData, setuserData] = useState("");
-  const [showOtp, setshowOtp] = useState(false);
+  const [showOtp, setshowOtp] = useState(true);
 
   const {
     control,
@@ -143,6 +143,7 @@ const Signin = () => {
           )}
         </View>
       </ScrollView>
+      
     </SafeAreaView>
   );
 };
