@@ -84,11 +84,14 @@ const OtpSignupScreen = ({ userData }) => {
   };
 
   return (
-    <View className="w-full max-w-md space-y-6 p-4">
-      <Text className="text-xl font-bold text-gray-900 text-center">Enter OTP</Text>
+    <View className="flex gap-4 w-full max-w-md space-y-6 p-4">
+      <View>
+ <Text className="text-xl font-bold text-gray-900 text-center">Enter OTP</Text>
       <Text className="text-sm text-gray-600 text-center">
         We've sent an OTP to your provided contact
       </Text>
+      </View>
+     
 
       {/* OTP Input Field */}
       <OtpInput value={otpValue} onChange={setOtpValue} />
@@ -96,7 +99,7 @@ const OtpSignupScreen = ({ userData }) => {
       {/* Submit Button */}
       <TouchableOpacity
         onPress={onSubmit}
-        className="bg-primary rounded-lg py-3 mt-4"
+        className="bg-primary rounded-lg py-3  mt-4"
         disabled={VerifyMutation.isPending}
       >
         <Text className="text-white text-center text-base font-semibold">

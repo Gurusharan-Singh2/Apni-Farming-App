@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuthStore from '../Store/AuthStore';
 import { toastConfig } from '../hooks/toastConfig';
 import ThankYouCard from '../components/ThankYouCard';
+import DeliveryInstructions from '../components/DeliveryInstruction';
 
 
 const OrderScreen = () => {
@@ -221,7 +222,7 @@ const orderPayload = {
 };
 
    CheckoutMutation.mutate(orderPayload);
-   console.log(orderPayload);
+  //  console.log(delivey_instruction);
    
     
     
@@ -317,61 +318,10 @@ if (thank) {
         )}
 
 
-<View className="mb-1 px-6">
-  <Text className="text-heading-small font-semibold text-gray-800 mb-2">Delivery Instructions</Text>
-
-  {showInput ? (
-    <>
-      <TextInput
-        className="border border-gray-300 rounded-lg p-2 text-basic placeholder:text-gray-400"
-        placeholder="e.g. Leave at the door, call before arrival..."
-        value={delivey_instruction}
-        onChangeText={setdelivery_instruction}
-        multiline
-      />
-
-      <TouchableOpacity
-        onPress={() => {
-          if (delivey_instruction.trim()) {
-            setShowInput(false); // hide input
-            Toast.show({
-              type: 'success',
-              text1: 'Instruction Saved',
-              text2: 'Delivery instruction submitted',
-              visibilityTime:800
-            });
-          } else {
-            Toast.show({
-              type: 'info',
-              text1: 'Empty Instruction',
-              text2: 'Please enter something or cancel',
-              visibilityTime:800
-            });
-          }
-        }}
-        className="mt-3 bg-green-500 rounded-full py-2 px-4 self-start"
-      >
-        <Text className="text-white text-heading-small font-medium">Add</Text>
-      </TouchableOpacity>
-    </>
-  ) : (
-    <View className="bg-gray-100 flex-row justify-between p-3 rounded-md">
-      <View>
-   <Text className="text-basic text-gray-700 font-semibold mb-1">Your Note:</Text>
-      <Text className="text-basic text-gray-800 mb-2">{delivey_instruction}</Text>
-
-      </View>
-   
-
-      <TouchableOpacity
-        onPress={() => setShowInput(true)}
-        className="bg-blue-600 rounded-lg py-1 px-3 self-start"
-      >
-        <Text className="text-white text-sm">Edit</Text>
-      </TouchableOpacity>
-    </View>
-  )}
-</View>
+<DeliveryInstructions
+  delivey_instruction={delivey_instruction}
+  setdelivery_instruction={setdelivery_instruction}
+/>
 
 {/* Pament Method */}
 {/* <View className="mb-4 px-6">

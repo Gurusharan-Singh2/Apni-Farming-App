@@ -1,26 +1,36 @@
+import { useRouter } from 'expo-router';
 import React, { useRef, useState, useEffect } from 'react';
-import { View, ScrollView, Image, useWindowDimensions, ActivityIndicator, Text } from 'react-native';
+import { View, ScrollView, Image, useWindowDimensions, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 
 
-const BannerCarousel = ({ banners = [], isLoading, isError }) => {
+const BannerCarousel = ({ banners , isLoading, isError }) => {
   const scrollRef = useRef(null);
   const { width } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [linkType,setlinkType]=useState(null);
+  const [link,setlink]=useState(null);
 
-  useEffect(() => {
-    if (banners.length === 0) return;
-    const interval = setInterval(() => {
-      const nextIndex = (currentIndex + 1) % banners.length;
+  const router=useRouter();
+ useEffect(() => {
+  if (banners?.length === 0) return;
+  const interval = setInterval(() => {
+    setCurrentIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % banners.length;
       scrollRef.current?.scrollTo({ x: nextIndex * width, animated: true });
-      setCurrentIndex(nextIndex);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [currentIndex, width, banners]);
+      return nextIndex;
+    });
+  }, 5000);
+  return () => clearInterval(interval);
+}, [banners, width]);
+
 
   const handleScroll = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setCurrentIndex(index);
   };
+
+ 
+  
 
   if (isLoading) {
     return (
@@ -38,6 +48,8 @@ const BannerCarousel = ({ banners = [], isLoading, isError }) => {
     );
   }
 
+
+
   return (
     <View>
       <ScrollView
@@ -49,17 +61,34 @@ const BannerCarousel = ({ banners = [], isLoading, isError }) => {
         ref={scrollRef}
       >
         {banners.map((item, index) => (
+
           <View
             key={index}
             style={{ width }}
             className="items-center justify-center"
           >
-            <Image
+           <TouchableOpacity
+  onPress={() =>
+    router.push({
+      pathname: '/bannerView',
+      params: {
+        linkType: item.link_type,
+        link: item.link,
+        categoryId: item.category_id,
+        productId: item.product_id,
+      },
+    })
+  }
+>
+
+                <Image
               source={{ uri: item.image_path }}
               className="h-52 rounded-2xl"
               style={{ width: width - 32 }}
               resizeMode="contain"
             />
+            </TouchableOpacity>
+          
           </View>
         ))}
       </ScrollView>

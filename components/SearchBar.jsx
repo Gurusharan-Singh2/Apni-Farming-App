@@ -34,7 +34,7 @@ export default function SearchBar({ query, onChange, onSubmit }) {
       );
       return res.data.data || [];
     },
-    enabled: debouncedQuery.length > 0,
+    enabled: debouncedQuery.length >=2,
   });
 
   useEffect(() => {
@@ -86,76 +86,77 @@ export default function SearchBar({ query, onChange, onSubmit }) {
         )}
       </View>
 
-      {showSuggestions && data?.length > 0 && (
-        <FlatList
-          keyboardShouldPersistTaps="handled"
-          data={data}
-          keyExtractor={(item) => item.id}
-          className="bg-white mt-2 rounded-xl shadow-md min-h-[90%]"
-          renderItem={({ item }) => {
-            const selectedSize = getSelectedSize(item);
-            const cartItem = getCartItem(item.id);
-            const quantity = cartItem?.quantity || 0;
+     {showSuggestions && (
+  <FlatList
+    keyboardShouldPersistTaps="handled"
+    data={data}
+    keyExtractor={(item) => item.id}
+    className="bg-white mt-2 rounded-xl shadow-md min-h-[90%]"
+    renderItem={({ item }) => {
+      const selectedSize = getSelectedSize(item);
+      const cartItem = getCartItem(item.id);
+      const quantity = cartItem?.quantity || 0;
 
-            return (
-              <View className="flex-row items-center p-3">
-                <Image
-                  source={{ uri: item.image }}
-                  className="w-10 h-10 rounded mr-3"
-                  resizeMode="cover"
-                />
-                <View className="flex-1">
-                  <Text className="text-gray-900 font-semibold">
-                    {item.name}
-                  </Text>
-                  <Text className="text-gray-600 text-sm">
-                    ₹{selectedSize?.sellPrice} / {selectedSize?.size}
-                  </Text>
-                </View>
+      return (
+        <View className="flex-row items-center p-3">
+          <Image
+            source={{ uri: item.image }}
+            className="w-10 h-10 rounded mr-3"
+            resizeMode="cover"
+          />
+          <View className="flex-1">
+            <Text className="text-gray-900 font-semibold">{item.name}</Text>
+            <Text className="text-gray-600 text-sm">
+              ₹{selectedSize?.sellPrice} / {selectedSize?.size}
+            </Text>
+          </View>
 
-                {cartItem ? (
-                  <View className="flex-row items-center  bg-green-600 rounded-full px-2 py-[3px] gap-3">
-                             <View>
-                                <TouchableOpacity onPress={() => decrement(item.id)}>
-                               <Ionicons name="remove" size={22} color="#fff" />
-                             </TouchableOpacity>
-                               </View>
-                            
-                             <Text className="text-white text-basic font-semibold">{quantity}</Text>
-                             <View>
-                               <TouchableOpacity onPress={() => increment(item.id)}>
-                               <Ionicons name="add" size={22} color="#fff" />
-                             </TouchableOpacity>
-                             </View>
-                           </View>
-                ) : (
-                  <TouchableOpacity
-                    className="border border-green-500 px-8 py-[3px] rounded-full"
-                    onPress={() => {
-                      addToCart({
-                        ...item,
-                        selectedSize,
-                      });
-                      Toast.show({
-                        type: "success",
-                        text1: "Added to Cart!",
-                        text2: `${item.name} was added successfully.`,
-                        visibilityTime: 1000,
-                        autoHide: true,
-                      });
-                    }}
-                  >
-                    <Text className="text-green-500 text-basic">Add</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            );
-          }}
-          ItemSeparatorComponent={() => (
-            <View className="h-px bg-gray-200 mx-3" />
+          {cartItem ? (
+            <View className="flex-row items-center bg-green-600 rounded-full px-2 py-[3px] gap-3">
+              <TouchableOpacity onPress={() => decrement(item.id)}>
+                <Ionicons name="remove" size={22} color="#fff" />
+              </TouchableOpacity>
+
+              <Text className="text-white text-basic font-semibold">{quantity}</Text>
+
+              <TouchableOpacity onPress={() => increment(item.id)}>
+                <Ionicons name="add" size={22} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              className="border border-green-500 px-8 py-[3px] rounded-full"
+              onPress={() => {
+                addToCart({
+                  ...item,
+                  selectedSize,
+                });
+                Toast.show({
+                  type: "success",
+                  text1: "Added to Cart!",
+                  text2: `${item.name} was added successfully.`,
+                  visibilityTime: 1000,
+                  autoHide: true,
+                });
+              }}
+            >
+              <Text className="text-green-500 text-basic">Add</Text>
+            </TouchableOpacity>
           )}
-        />
-      )}
+        </View>
+      );
+    }}
+    ItemSeparatorComponent={() => (
+      <View className="h-px bg-gray-200 mx-3" />
+    )}
+    ListEmptyComponent={() => (
+      <View className="p-4 items-center justify-center">
+        <Text className="text-gray-600">Item not available, try another name</Text>
+      </View>
+    )}
+  />
+)}
+
     </View>
   );
 }

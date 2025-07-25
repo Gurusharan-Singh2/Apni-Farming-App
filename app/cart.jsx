@@ -111,17 +111,17 @@ const CartScreen = () => {
               <View className="mt-2">
                 {isAuthenticated() ? (
                   <TouchableOpacity
-                    className="bg-green-600 px-5 py-2 rounded-lg"
+                    className="bg-green-600 px-5 py-5 rounded-lg"
                     onPress={() => router.push('/order')}
                   >
-                    <Text className="text-white font-semibold text-sm">Order Placed</Text>
+                    <Text className="text-white font-semibold text-heading-big">Go to Checkout</Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
-                    className="bg-green-600 px-5 py-2 rounded-lg"
+                    className="bg-green-600 px-5 py-5 rounded-lg"
                     onPress={() => router.push('/signin')}
                   >
-                    <Text className="text-white font-semibold text-sm">Login</Text>
+                    <Text className="text-white font-semibold text-heading-big">Login</Text>
                   </TouchableOpacity>
                 )}
               </View>

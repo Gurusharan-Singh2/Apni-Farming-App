@@ -55,7 +55,7 @@ const DeliverySlotSelector = ({ slots, selectedDate, selectedSlotId, onSelect })
             : "All slots for selected date have passed. Please choose another date."}
         </Text>
       ) : (
-        <View className="flex-row justify-between flex-wrap gap-3">
+        <View className="flex-row  flex-wrap gap-3">
           {availableSlots.map((slot) => (
             <TouchableOpacity
               key={slot.id}

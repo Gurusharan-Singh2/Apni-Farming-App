@@ -2,9 +2,7 @@ import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import useWishlistStore from "../../Store/WishlistStore";
-import useCartStore from "../../Store/CartStore";
 import { Colors } from "../../assets/Colors";
-import LocationIcon from "../../components/LocationIcon";
 import CartIconWithBadge from "../../components/Carticon";
 import ProfileIcon from "../../components/ProfileIcon";
 import useAuthStore from "../../Store/AuthStore";
@@ -13,8 +11,8 @@ import WishListItem from "../../components/WishListItem";
 
 export default function Wishlist() {
   const { wishlist } = useWishlistStore();
-  const { cart, addToCart, increment, decrement } = useCartStore();
   const router = useRouter();
+ 
  
   
   const { isAuthenticated } = useAuthStore();

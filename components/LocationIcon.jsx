@@ -79,7 +79,7 @@ const LocationIcon = () => {
 
   setAddresses(formatted);
 
-  // ✅ Set default or first address immediately
+  
   if (formatted.length > 0) {
     const defaultAddr = formatted.find((addr) => addr.default_address === 1);
     setSelectedAddress(defaultAddr || formatted[0]);
@@ -93,19 +93,33 @@ const LocationIcon = () => {
   });
 
   const addMutation = useMutation({
-    mutationFn: async (data) =>
-      await axios.post(`${BackendUrl2}/user/address/address.php`, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries(["addresses", customer_id]);
-      Toast.show({
-        type: "success",
-        text1: "Address added successfully",
-        visibilityTime: 500,
-        autoHide: true,
-      });
-      addAddress({ id: Date.now(), ...variables }); // temporary id
-      closeDrawer();
+    mutationFn: async (data) =>{
+     const res= await axios.post(`${BackendUrl2}/user/address/address.php`, data);
+     return res.data;
+     
     },
+    onSuccess: (data, variables) => {
+  queryClient.invalidateQueries(["addresses", customer_id]);
+
+  const newAddress = { id: data.id, ...variables };
+
+  Toast.show({
+    type: "success",
+    text1: "Address added successfully",
+    visibilityTime: 500,
+    autoHide: true,
+  });
+
+  addAddress(newAddress);
+
+  // ✅ If this is the first address, set it as the selected one
+  if (addresses.length === 0) {
+    setSelectedAddress(newAddress);
+  }
+
+  closeDrawer();
+},
+
     onError: (error) => {
       Toast.show({ type: "error", text1: "Add failed", text2: error.message });
     },
@@ -150,6 +164,7 @@ const LocationIcon = () => {
         autoHide: true,
       });
       deleteAddress(index);
+      setSelectedAddress(null)
     },
     onError: (error) => {
       Toast.show({ type: "error", text1: "Delete failed", text2: error.message });

@@ -6,8 +6,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Platform } from "react-native";
 import * as Font from "expo-font";
 import useWishlistStore from '../../Store/WishlistStore';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TabLayout = () => {
+  const insets = useSafeAreaInsets(); // add this
   const { wishlist } = useWishlistStore();
 const [fontsLoaded, setFontsLoaded] = useState(false);
    useEffect(() => {
@@ -21,23 +23,25 @@ const [fontsLoaded, setFontsLoaded] = useState(false);
 
   if (!fontsLoaded) return null;
   return (
-    <Tabs
+    <SafeAreaProvider>
+
+   
+     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.PRIMARY,
         tabBarInactiveTintColor: Colors.dark.text,
         tabBarStyle: {
           backgroundColor: Colors.SECONDARY,
-          height: 60,
-          paddingBottom: Platform.OS === "ios" ? 20 : 5, // handle safe area for iOS
-          borderTopWidth: 0, // removes default border
-          elevation: 0,      // removes Android shadow
-          
+          height: 60 + insets.bottom, // add bottom inset
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8, // use inset padding
+          borderTopWidth: 0,
+          elevation: 0,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "bold",
-           fontFamily: "BebasNeue"
+          fontFamily: "BebasNeue",
         },
       }}
     >
@@ -50,7 +54,7 @@ const [fontsLoaded, setFontsLoaded] = useState(false);
           ),
         }}
       />
-      
+
       <Tabs.Screen
         name="whishlist"
         options={{
@@ -58,23 +62,19 @@ const [fontsLoaded, setFontsLoaded] = useState(false);
           tabBarIcon: ({ color }) => (
             <Ionicons name="heart" size={22} color={color} />
           ),
-            tabBarBadge: wishlist.length > 0 ? wishlist.length : null, 
+          tabBarBadge: wishlist.length > 0 ? wishlist.length : null,
           tabBarBadgeStyle: {
             backgroundColor: '#ef4444',
             color: 'white',
             borderRadius: 25,
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
             fontSize: 10,
             fontWeight: 'bold',
             width: 14,
-            
           },
         }}
       />
     </Tabs>
+     </SafeAreaProvider>
   );
 };
 

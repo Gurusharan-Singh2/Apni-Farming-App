@@ -24,6 +24,7 @@ export default function Home() {
 
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("0");
+  
 
   useEffect(() => {
     registerNotifeeListeners();
@@ -67,9 +68,14 @@ export default function Home() {
       // const res = await fetch(`${BackendUrl}/api/banner`);
       const res = await fetch(`${BackendUrl2}/user/banner/getAllBanners.php`);
       if (!res.ok) throw new Error("Banner fetch error");
+      
+      
       return res.json();
     },
   });
+
+  
+  
 
   // Pull-to-refresh: refetch both products and banners
   const handleRefresh = async () => {
@@ -109,6 +115,7 @@ export default function Home() {
            
             <BannerCarousel
               banners={banners}
+              
               isLoading={bannersLoading}
               isError={bannersError}
             />
