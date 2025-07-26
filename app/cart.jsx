@@ -25,7 +25,7 @@ const CartScreen = () => {
   const router = useRouter();
 
   const renderItem = ({ item }) => (
-    <View className="flex-row gap-3 bg-white p-2 border-b border-b-gray-100 shadow">
+    <View className="flex-row gap-3 mt-3 bg-white p-2 border-b border-b-gray-100 shadow">
       <View className="flex-row items-center border border-gray-200 p-1 rounded-lg">
         <Image className="w-28 h-28 rounded-lg" source={{ uri: item.image }} />
       </View>
@@ -78,11 +78,14 @@ const CartScreen = () => {
             contentContainerStyle={{ padding: 16 }}
             ListHeaderComponent={() => (
               <>
-                
-                  <TouchableOpacity onPress={() => router.back()}  className="flex-row items-center w-40 gap-3">
+                 <TouchableOpacity onPress={() => router.back()}  className="flex-row items-center w-40 gap-3">
+                 <View className="flex-row gap-2">
+                  
                     <Ionicons name="arrow-back" size={26} color="black" />
                       <Text className="text-heading-big font-semibold ml-2">Cart</Text>
-                  </TouchableOpacity>
+               
+                 </View>
+                    </TouchableOpacity>
                 
                 
 
@@ -96,7 +99,7 @@ const CartScreen = () => {
           />
 
           {cart.length > 0 && (
-            <View className="bg-white px-4 py-2 shadow-lg border-t border-gray-200">
+            <View className="bg-white px-4 py-2  shadow-lg border-t border-gray-200">
               <View className="flex flex-col gap-1 items-start">
                 <Text className="font-extrabold text-heading-small">Total: ₹ {finalAmount}</Text>
 

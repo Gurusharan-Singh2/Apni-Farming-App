@@ -34,6 +34,7 @@ const ProductCard = ({ item }) => {
   const { addToCart, cart, increment, decrement } = useCartStore();
   const quantity = cart.find(i => i.id === item.id)?.quantity || 0;
 
+  
 
 const isWishlisted = useMemo(() => {
   return wishlist?.some(w => w.product_id == item.id); 
@@ -54,8 +55,8 @@ const {
     setWishlist(res.data.data)
     return res.data.data;
   },
-  onSuccess: (wishlistData) => {
-    setWishlist(wishlistData);
+  onSuccess: (data) => {
+    setWishlist(data);
   },
   onError: (error) => {
     console.error('Error fetching wishlist:', error.message);
@@ -138,7 +139,7 @@ const {
 }
 
     } catch (err) {
-      // Handled by mutation's onError
+      
     } finally {
       setWishlistLoading(false);
     }
@@ -212,7 +213,7 @@ const {
         className="border border-gray-300 rounded-md px-2 py-1 mb-3 flex-row justify-between items-center"
         onPress={() => setModalVisible(true)}
       >
-        <Text className="text-gray-700 text-sm">{selectedSize.size}</Text>
+        <Text className="text-gray-700 text-sm">{selectedSize.size+" "+selectedSize.option.toLowerCase()}</Text>
         <Ionicons name="chevron-down" size={16} color="#6B7280" />
       </TouchableOpacity>
 
@@ -237,33 +238,48 @@ const {
       )}
 
       {/* Size Modal */}
-      <Modal transparent visible={modalVisible} animationType="fade">
-        <TouchableOpacity
-          className="flex-1 bg-black/30 justify-center items-center"
-          activeOpacity={1}
-          onPressOut={() => setModalVisible(false)}
-        >
-          <View className="bg-white rounded-xl p-4 w-[80%]">
-            <Text className="text-base font-semibold mb-3">Available Sizes</Text>
-            {item.sizes.map((sizeObj) => (
+       <Modal transparent visible={modalVisible} animationType="fade">
               <TouchableOpacity
-                key={sizeObj.size}
-                className={`py-3 border-b border-gray-200 ${selectedSize.size === sizeObj.size ? 'bg-green-200' : ''}`}
-                onPress={() => handleSelectSize(sizeObj)}
+                className="flex-1 bg-black/50 justify-center items-center"
+                activeOpacity={1}
+                onPressOut={() => setModalVisible(false)}
               >
-                <View className="flex-row px-2 justify-between items-center">
-                  <Text className={`text-gray-700 text-sm ${selectedSize.size === sizeObj.size ? 'font-bold text-green-600' : ''}`}>
-                    {sizeObj.size}
-                  </Text>
-                  <Text className={`text-sm ${selectedSize.size === sizeObj.size ? 'font-bold text-green-600' : 'text-gray-500'}`}>
-                    ₹{sizeObj.sellPrice}
-                  </Text>
+                <View className="bg-white rounded-xl p-4 w-[85%] max-w-[320px]">
+                  <Text className="text-lg font-bold mb-3 text-gray-800">Select Size</Text>
+                  {item.sizes?.map((sizeObj) => {
+                    const isSelected =
+                      selectedSize.size === sizeObj.size;
+      
+                    return (
+                      <TouchableOpacity
+                        key={sizeObj.id}
+                        className={`py-3 px-3 rounded-lg mb-2 ${
+                          isSelected ? 'bg-green-100 border border-green-400' : 'bg-gray-50'
+                        }`}
+                        onPress={() => handleSelectSize(sizeObj)}
+                      >
+                        <View className="flex-row justify-between items-center">
+                          <Text
+                            className={`text-sm ${
+                              isSelected ? 'text-green-800 font-bold' : 'text-gray-700'
+                            }`}
+                          >
+                            {sizeObj.size+" "+sizeObj.option?.toLowerCase()}
+                          </Text>
+                          <Text
+                            className={`text-sm ${
+                              isSelected ? 'text-green-800 font-bold' : 'text-gray-600'
+                            }`}
+                          >
+                            ₹{sizeObj.sellPrice}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+            </Modal>
     </View>
   );
 };

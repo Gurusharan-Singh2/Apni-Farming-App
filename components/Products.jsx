@@ -23,7 +23,6 @@ export default function Products({
   if (error) {
     return <Text className="px-5 text-red-500 py-4">Failed to load products</Text>;
   }
-
   
   return (
     <FlatList
@@ -35,8 +34,8 @@ export default function Products({
       keyExtractor={(item) => item.id.toString()}
       ListHeaderComponent={ListHeaderComponent}
       showsVerticalScrollIndicator={false}
-      columnWrapperStyle={{ justifyContent: "space-between", paddingHorizontal: 12 }}
-      contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
+      columnWrapperStyle={{ justifyContent: "space-between", paddingHorizontal: 6, paddingTop:10 }}
+      contentContainerStyle={{ paddingBottom: 10, paddingTop: 10 }}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

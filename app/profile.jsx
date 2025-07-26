@@ -24,7 +24,10 @@ const ProfileScreen = () => {
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity onPress={() => router.back()}>
+          <View className="px-3">
           <Ionicons name="arrow-back" size={26} color="black" />
+
+          </View>
         </TouchableOpacity>
         
       </View>

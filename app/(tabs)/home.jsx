@@ -15,11 +15,11 @@ import useAuthStore from "../../Store/AuthStore";
 import { useRouter } from "expo-router";
 import { handleBackgroundNotificationNavigation } from "../../utils/notification";
 import CartIconWithBadge from "../../components/Carticon";
-import { BackendUrl, BackendUrl2 } from "../../utils/Constants";
+import {  BackendUrl2 } from "../../utils/Constants";
 
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated,user } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
 
   const [query, setQuery] = useState("");
@@ -55,6 +55,8 @@ export default function Home() {
       return res.json();
     },
   });
+  // console.log(products);
+  
 
   // Fetch banners
   const {
@@ -88,7 +90,7 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY , paddingBottom:-30 }}>
       <View className="mb-1"> 
       <View className="flex flex-row w-full justify-between px-6 my-3">
         <LocationIcon />

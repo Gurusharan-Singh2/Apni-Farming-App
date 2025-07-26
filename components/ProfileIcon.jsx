@@ -7,12 +7,14 @@ import { useRouter } from 'expo-router';
 const ProfileIcon = () => {
   const router=useRouter();
   return (
-     <View className="w-8 h-8 rounded-full border items-center justify-center">
-      <TouchableOpacity onPress={()=> router.push("/profile")}>
+     <TouchableOpacity onPress={()=> router.push("/profile")}>
+     <View className="w-10 h-10 rounded-full border items-center justify-center">
+     
 <Ionicons name="person-outline" size={18} color="black" />
-      </TouchableOpacity>
+      
           
         </View>
+        </TouchableOpacity>
   )
 }
 

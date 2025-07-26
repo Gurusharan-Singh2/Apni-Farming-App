@@ -14,6 +14,7 @@ export default function Wishlist() {
   const router = useRouter();
  
  
+ 
   
   const { isAuthenticated } = useAuthStore();
 const renderItem = ({ item }) => {

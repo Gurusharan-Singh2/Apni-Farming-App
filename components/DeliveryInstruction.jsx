@@ -27,7 +27,7 @@ const DeliveryInstructions = ({
         placeholder="e.g. Leave at the door, call before arrival..."
         value={delivey_instruction}
         onChangeText={setdelivery_instruction}
-        onBlur={handleBlur} // 👈 Trigger toast on losing focus
+        onBlur={handleBlur} 
         multiline
         numberOfLines={4}
         textAlignVertical="top"

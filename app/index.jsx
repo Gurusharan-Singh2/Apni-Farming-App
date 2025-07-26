@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../assets/Colors";
 import logo from "../assets/images/logo-final.png";
 import useAuthStore from "../Store/AuthStore";
+import {checkFirstInstall} from '../utils/checkFirstInstall'
 
 
 
@@ -26,6 +27,7 @@ export default function App() {
   useEffect(() => {
     const initializeApp = async () => {
       setLoading(true);
+       await checkFirstInstall();
   
       const result = await isAuthenticated();
       if (result) {

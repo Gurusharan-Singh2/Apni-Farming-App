@@ -40,6 +40,9 @@ const CategoryItem = ({ setCategoryId }) => {
           keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingLeft:6
+          }}
           
           renderItem={({ item }) => {
             const isSelected = item.id === selectedCategory;
