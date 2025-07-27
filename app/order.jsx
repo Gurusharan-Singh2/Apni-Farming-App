@@ -17,6 +17,9 @@ import useAuthStore from '../Store/AuthStore';
 import { toastConfig } from '../hooks/toastConfig';
 import ThankYouCard from '../components/ThankYouCard';
 import DeliveryInstructions from '../components/DeliveryInstruction';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
 
 
 const OrderScreen = () => {
@@ -31,6 +34,7 @@ const OrderScreen = () => {
   const [showInput, setShowInput] = useState(true);
   const [thank,setthank]=useState(false);
   const [createdOrderId, setCreatedOrderId] = useState(null);
+  const insets = useSafeAreaInsets();
 
   const {
     cart,
@@ -79,6 +83,11 @@ const ApplyCouponMutation = useMutation({
 
     onError:(error)=>{
       console.log(error.message);
+      Toast.show({
+        type:"error",
+        text1:error?.message,
+        visibilityTime:900
+      })
       
     }
 
@@ -182,6 +191,16 @@ const ApplyCouponMutation = useMutation({
       });
       return;
     }
+    if(!user.userId){
+       Toast.show({
+        type: 'error',
+        text1: 'Address Required',
+        text2: 'Pick a delivery address',
+        visibilityTime:800
+      });
+      return;
+    }
+
 
     const selectedSlot = timeSlots.find(slot => slot.id === selectedSlotId);
 
@@ -189,7 +208,7 @@ const ApplyCouponMutation = useMutation({
     
 const orderPayload = {
   user_token:token,
-  user_id:user.userId,
+  user_id:user?.userId,
   phone:user.phone,
   first_name: user.name,
   payment_method:payment_Method,
@@ -384,19 +403,21 @@ if (thank) {
       </ScrollView>
 
       {/* Checkout Button */}
-      <View className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
-        <TouchableOpacity
-          onPress={handleCheckout}
-          className={`bg-green-600 rounded-lg flex justify-between py-4 px-6 items-center `}
-        >
-          <View className="flex-row w-full justify-between">
-<Text className="text-white font-bold text-lg">{CheckoutMutation.isPending?"Proceeding ....":"Proceed to Payment"}</Text>
-          <Text className="text-white text-sm mt-1">
-            ₹{finalAmount.toFixed(2)} 
-          </Text>
-          </View>
-        </TouchableOpacity>
+   {!thank && (
+  <View className="bg-white px-4 py-3 shadow-lg border-t border-gray-200">
+    <TouchableOpacity
+      onPress={handleCheckout}
+      className="bg-green-600 rounded-lg py-4 px-6 items-center"
+    >
+      <View className="flex-row w-full justify-between">
+        <Text className="text-white font-bold text-lg">
+          {CheckoutMutation.isPending ? 'Proceeding...' : 'Proceed to Payment'}
+        </Text>
+        <Text className="text-white text-sm mt-1">₹{finalAmount.toFixed(2)}</Text>
       </View>
+    </TouchableOpacity>
+  </View>
+)}
 
       <Toast config={toastConfig} />
     </SafeAreaView>

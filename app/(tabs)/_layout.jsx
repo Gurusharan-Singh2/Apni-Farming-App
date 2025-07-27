@@ -37,7 +37,7 @@ const TabLayout = () => {
             paddingRight:5,
             backgroundColor: Colors.SECONDARY,
             height: 60 + insets.bottom,
-            paddingBottom: Platform.OS === 'ios' ? insets.bottom : 4,
+            paddingBottom: Platform.OS === 'ios' ? insets.bottom : 1,
 
             borderTopWidth: 0,
             elevation: 0,

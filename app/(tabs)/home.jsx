@@ -90,7 +90,7 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY , paddingBottom:-30 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY , paddingBottom:-40 }}>
       <View className="mb-1"> 
       <View className="flex flex-row w-full justify-between px-6 my-3">
         <LocationIcon />

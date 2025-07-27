@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   TextInput,
@@ -46,22 +46,6 @@ export default function SearchBar({ query, onChange, onSubmit }) {
     setShowSuggestions(debouncedQuery.length >= 2);
   }, [debouncedQuery]);
 
-  useEffect(() => {
-    if (data) {
-      const initialSizes = {};
-      data.forEach(item => {
-        const defaultVariant = item.sizes?.[0] || {};
-        initialSizes[item.id] = {
-          size: defaultVariant.size,
-          option: defaultVariant.option,
-          costPrice: parseFloat(defaultVariant.costPrice || 0),
-          sellPrice: parseFloat(defaultVariant.sellPrice || 0),
-        };
-      });
-      setSelectedSizes(initialSizes);
-    }
-  }, [data]);
-
   const handleSubmit = (text) => {
     onSubmit(text);
     setShowSuggestions(false);
@@ -73,42 +57,48 @@ export default function SearchBar({ query, onChange, onSubmit }) {
     setShowSuggestions(false);
   };
 
-  const handleAddToCart = (item) => {
-    const selectedSize = selectedSizes[item.id];
-    addToCart({
-      id: item.id,
-      title: item.name,
-      image: item.image,
-      selectedSize,
-    });
-
-    Toast.show({
-      type: 'success',
-      text1: 'Added to Cart!',
-      text2: `${item.name} was added successfully.`,
-      visibilityTime: 1000,
-    });
-  };
-
   const handleSelectSize = (item, sizeObj) => {
-    setSelectedSizes(prev => ({
+    setSelectedSizes((prev) => ({
       ...prev,
       [item.id]: {
-        size: sizeObj.size,
-        option: sizeObj.option,
-        costPrice: parseFloat(sizeObj.costPrice || 0),
-        sellPrice: parseFloat(sizeObj.sellPrice || 0),
-      }
+        id: sizeObj?.id, // ✅ Include ID
+        size: sizeObj?.size,
+        option: sizeObj?.option,
+        costPrice: parseFloat(sizeObj?.costPrice || 0),
+        sellPrice: parseFloat(sizeObj?.sellPrice || 0),
+        discount: sizeObj?.discount,
+      },
     }));
     setModalVisible(false);
   };
 
-  const getCartItem = (item) => {
-    const selectedSize = selectedSizes[item.id];
-    return cart.find(
-      cartItem => cartItem.id === item.id && 
-      cartItem.selectedSize?.option?.trim().toLowerCase() === selectedSize?.option?.trim().toLowerCase()
-    );
+  const handleAddToCart = (item) => {
+    const selectedSize = selectedSizes[item.id] || item.sizes?.[0];
+
+    if (!selectedSize?.id) {
+      Toast.show({
+        type: "error",
+        text1: "Please select a size first",
+      });
+      return;
+    }
+
+    addToCart({
+      id: item.id,
+      title: item.name,
+      image: item.image,
+      selectedSize: {
+        ...selectedSize,
+        id: Number(selectedSize.id),
+      },
+    });
+
+    Toast.show({
+      type: "success",
+      text1: "Added to Cart!",
+      text2: `${item.name} was added successfully.`,
+      visibilityTime: 1000,
+    });
   };
 
   return (
@@ -139,75 +129,87 @@ export default function SearchBar({ query, onChange, onSubmit }) {
           keyExtractor={(item) => item.id}
           className="bg-white mt-2 rounded-xl shadow-md min-h-[90%]"
           renderItem={({ item }) => {
-            const selectedSize = selectedSizes[item.id];
-            const cartItem = getCartItem(item);
-            const quantity = cartItem?.quantity || 0;
+            const selectedSize = selectedSizes[item.id] || item.sizes?.[0];
+
+            const quantity =
+              cart.find(
+                (i) =>
+                  Number(i.id) === Number(item.id) &&
+                  Number(i.selectedSize?.id) === Number(selectedSize?.id)
+              )?.quantity || 0;
 
             return (
-              <>
-                <View className="flex-row items-center bg-white p-3 rounded-2xl shadow-sm mb-2 mx-2">
-                  <Image
-                    source={{ uri: item.image }}
-                    className="w-24 h-24 rounded-xl mr-3"
-                    resizeMode="cover"
-                  />
-          
-                  <View className="flex-1 flex-row justify-between items-center">
-                    <View className="flex-1 mr-2">
-                      <Text className="text-gray-900 font-semibold text-sm mb-1" numberOfLines={2}>
-                        {item.name}
-                      </Text>
-          
-                      <Text className="text-gray-600 text-sm mb-2">
-                        ₹{selectedSize?.sellPrice} / {selectedSize?.option?.toLowerCase()}
+              <View className="flex-row items-center bg-white p-3 rounded-2xl shadow-sm mb-2 mx-2">
+                <Image
+                  source={{ uri: item.image }}
+                  className="w-24 h-24 rounded-xl mr-3"
+                  resizeMode="cover"
+                />
+
+                <View className="flex-1 flex-row justify-between items-center">
+                  <View className="flex-1 mr-2">
+                    <Text className="text-gray-900 font-semibold text-[14px] mb-1" numberOfLines={2}>
+                      {item?.name}
+                    </Text>
+
+                    <Text className="text-heading-small mb-1 text-green-600 font-bold ">
+                      {selectedSize?.discount}
+                    </Text>
+
+                    <View className="flex-row self-start rounded-lg px-1 py-1 bg-[#D02127] justify-between items-center mb-2">
+                      {selectedSize?.discount && (
+                        <Text className="text-[13px] font-semibold py-1 px-1 rounded-l-lg bg-[#D02127] text-white line-through">
+                          ₹{selectedSize?.costPrice}
+                        </Text>
+                      )}
+                      <Text className="text-[14px] bg-white mx-1 px-2 py-1 rounded text-green-600 font-bold ">
+                        ₹{selectedSize?.sellPrice}
                       </Text>
                     </View>
-          
-                    {cartItem ? (
-                      <View className="flex-row items-center">
-                        <View className="flex-row items-center justify-between bg-green-600 rounded-full px-2 py-1 min-w-[100px]">
-                          <TouchableOpacity onPress={() => decrement(item.id, selectedSize)}>
-                            <Ionicons name="remove" size={18} color="#fff" />
-                          </TouchableOpacity>
-                          <Text className="text-white font-semibold px-2">{quantity}</Text>
-                          <TouchableOpacity onPress={() => increment(item.id, selectedSize)}>
-                            <Ionicons name="add" size={18} color="#fff" />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    ) : (
-                      <View className="items-end">
-                        {item.sizes && (
-                          <TouchableOpacity
-                            className="border border-gray-300 rounded-md px-4 py-1 flex-row items-center mb-2"
-                            onPress={() => {
-                              setSelectedProduct(item);
-                              setModalVisible(true);
-                            }}
-                          >
-                            <Text className="text-gray-700 text-xs mr-1">
-                              {selectedSize?.size + " " + selectedSize?.option?.toLowerCase()}
-                            </Text>
-                            <Ionicons name="chevron-down" size={14} color="#6B7280" />
-                          </TouchableOpacity>
-                        )}
-          
-                        <TouchableOpacity
-                          className="border border-green-500 px-8 py-[2px] rounded-full"
-                          onPress={() => handleAddToCart(item)}
-                        >
-                          <Text className="text-green-500 text-basic font-semibold">Add</Text>
+                  </View>
+
+                  {quantity > 0 ? (
+                    <View className="flex-row items-center">
+                      <View className="flex-row items-center justify-between bg-green-600 rounded-full px-2 py-2 min-w-[100px]">
+                        <TouchableOpacity onPress={() => decrement(item.id, selectedSize.id)}>
+                          <Ionicons name="remove" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        <Text className="text-white text-[14px] font-semibold px-2">{quantity}</Text>
+                        <TouchableOpacity onPress={() => increment(item.id, selectedSize.id)}>
+                          <Ionicons name="add" size={24} color="#fff" />
                         </TouchableOpacity>
                       </View>
-                    )}
-                  </View>
+                    </View>
+                  ) : (
+                    <View className="items-end">
+                      {item.sizes && (
+                        <TouchableOpacity
+                          className="border mb-4 border-gray-300 rounded-md px-4 py-1 flex-row items-center"
+                          onPress={() => {
+                            setSelectedProduct(item);
+                            setModalVisible(true);
+                          }}
+                        >
+                          <Text className="text-gray-700 text-[14px] mr-1">
+                            {selectedSize?.size + " " + selectedSize?.option?.toLowerCase()}
+                          </Text>
+                          <Ionicons name="chevron-down" size={14} color="#6B7280" />
+                        </TouchableOpacity>
+                      )}
+
+                      <TouchableOpacity
+                        className="border border-green-500 px-7 py-2 rounded-full"
+                        onPress={() => handleAddToCart(item)}
+                      >
+                        <Text className="text-green-500 text-[14px] font-bold">Add</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
-              </>
+              </View>
             );
           }}
-          ItemSeparatorComponent={() => (
-            <View className="h-px bg-gray-200 mx-3" />
-          )}
+          ItemSeparatorComponent={() => <View className="h-px bg-gray-200 mx-3 my-2" />}
           ListEmptyComponent={() => (
             <View className="p-4 items-center justify-center">
               <Text className="text-gray-600">Item not available, try another name</Text>
@@ -228,28 +230,28 @@ export default function SearchBar({ query, onChange, onSubmit }) {
               Select Size for {selectedProduct?.name}
             </Text>
             {selectedProduct?.sizes?.map((sizeObj) => {
-              const isSelected = 
+              const isSelected =
                 selectedSizes[selectedProduct.id]?.option === sizeObj.option;
 
               return (
                 <TouchableOpacity
                   key={sizeObj.id}
                   className={`py-3 px-3 rounded-lg mb-2 ${
-                    isSelected ? 'bg-green-100 border border-green-400' : 'bg-gray-50'
+                    isSelected ? "bg-green-100 border border-green-400" : "bg-gray-50"
                   }`}
                   onPress={() => handleSelectSize(selectedProduct, sizeObj)}
                 >
                   <View className="flex-row justify-between items-center">
                     <Text
                       className={`text-sm ${
-                        isSelected ? 'text-green-800 font-bold' : 'text-gray-700'
+                        isSelected ? "text-green-800 font-bold" : "text-gray-700"
                       }`}
                     >
                       {sizeObj.size + " " + sizeObj.option?.toLowerCase()}
                     </Text>
                     <Text
                       className={`text-sm ${
-                        isSelected ? 'text-green-800 font-bold' : 'text-gray-600'
+                        isSelected ? "text-green-800 font-bold" : "text-gray-600"
                       }`}
                     >
                       ₹{sizeObj.sellPrice}

@@ -29,7 +29,7 @@ const CategoryItem = ({ setCategoryId }) => {
 
   return (
     <View className="mt-4">
-      <Text className="text-sm font-semibold px-5 py-3">Shop By Category</Text>
+      <Text className="text-heading-big font-bold px-5 py-3">Shop By Category</Text>
 
       {isLoading && <Text className="px-5">Loading categories...</Text>}
       {error && <Text className="px-5 text-red-500">Failed to load categories</Text>}
@@ -56,7 +56,7 @@ const CategoryItem = ({ setCategoryId }) => {
                   className={`w-full h-24  rounded-lg   `}
                   resizeMode="cover"
                 />
-                <Text className={`text-center text-[10px] mt-1 mb-0 ${isSelected ? 'text-green-600 font-semibold' : ''}`}>
+                <Text className={`text-center font-bold text-[11px] mt-1 mb-0 ${isSelected ? 'text-green-600 ' : ''}`}>
                   { item.name}
                 </Text>
               </TouchableOpacity>

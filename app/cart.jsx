@@ -48,15 +48,15 @@ const CartScreen = () => {
 
           <View>
             <View className="flex-row items-center justify-between bg-green-600 rounded-lg px-3 py-1 w-[100px]">
-              <TouchableOpacity onPress={() => decrement(item.id)}>
+              <TouchableOpacity onPress={() => decrement(item.id, item.selectedSize?.id)}>
                 <Ionicons name="remove" size={22} color="#fff" />
               </TouchableOpacity>
 
               <Text className="text-basic font-semibold text-white">{item.quantity}</Text>
 
-              <TouchableOpacity onPress={() => increment(item.id)}>
-                <Ionicons name="add" size={22} color="#fff" />
-              </TouchableOpacity>
+              <TouchableOpacity onPress={() => increment(item.id, item.selectedSize?.id)}>
+  <Ionicons name="add" size={22} color="#fff" />
+</TouchableOpacity>
             </View>
           </View>
         </View>

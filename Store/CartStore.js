@@ -48,69 +48,85 @@ const useCartStore = create(
       },
 
       // ✅ Add to cart
-      addToCart: (item) => {
-        set((state) => {
-          const existingItem = state.cart.find(
-            i => i.id === item.id && i.selectedSize?.size === item.selectedSize?.size
-          );
+   addToCart: (item) => {
+  set((state) => {
+    const normalizedId = Number(item.id);
+    const sizeId = Number(item.selectedSize?.id);
 
-          const costPrice = item.selectedSize?.costPrice || 0;
-          const sellPrice = item.selectedSize?.sellPrice || 0;
-          const discount = costPrice - sellPrice;
+    const existingItem = state.cart.find(
+      (i) => Number(i.id) === normalizedId && Number(i.selectedSize?.id) === sizeId
+    );
 
-          if (existingItem) {
-            existingItem.selectedSize = item.selectedSize;
-            existingItem.price = sellPrice;
-            existingItem.costPrice = costPrice;
-            existingItem.discount = discount;
-          } else {
-            state.cart.push({
-              ...item,
-              quantity: 1,
-              price: sellPrice,
-              costPrice,
-              discount,
-            });
-          }
-        });
-        get().calculateTotals();
-      },
+    const costPrice = item.selectedSize?.costPrice || 0;
+    const sellPrice = item.selectedSize?.sellPrice || 0;
+    const discount = costPrice - sellPrice;
+
+    if (existingItem) {
+      existingItem.quantity += 1;
+      existingItem.selectedSize = { ...item.selectedSize, id: sizeId };
+      existingItem.price = sellPrice;
+      existingItem.costPrice = costPrice;
+      existingItem.discount = discount;
+    } else {
+      state.cart.push({
+        ...item,
+        id: normalizedId,
+        selectedSize: { ...item.selectedSize, id: sizeId },
+        quantity: 1,
+        price: sellPrice,
+        costPrice,
+        discount,
+      });
+    }
+  });
+  get().calculateTotals();
+},
+
 
       // ✅ Remove from cart
       removeFromCart: (id, size) => {
         set((state) => {
           state.cart = state.cart.filter(
-            item => !(item.id === id && item.selectedSize?.size === size)
+            item => !(item.id === id && item.selectedSize?.id === size)
+
           );
         });
         get().calculateTotals();
       },
+increment: (id, sizeId) => {
+  set((state) => {
+    const item = state.cart.find(
+      (i) => Number(i.id) === Number(id) && Number(i.selectedSize?.id) === Number(sizeId)
+    );
 
-      // ✅ Increment quantity
-      increment: (id) => {
-        set((state) => {
-          const item = state.cart.find(i => i.id === id);
-          if (item) {
-            item.quantity += 1;
-          }
-        });
-        get().calculateTotals();
-      },
+    if (item) {
+      item.quantity += 1;
+    }
+  });
+  get().calculateTotals();
+},
 
-      // ✅ Decrement quantity
-      decrement: (id) => {
-        set((state) => {
-          const index = state.cart.findIndex(i => i.id === id);
-          if (index !== -1) {
-            if (state.cart[index].quantity > 1) {
-              state.cart[index].quantity -= 1;
-            } else {
-              state.cart.splice(index, 1);
-            }
-          }
-        });
-        get().calculateTotals();
-      },
+
+decrement: (id, sizeId) => {
+  set((state) => {
+    const index = state.cart.findIndex(
+      (i) => Number(i.id) === Number(id) && Number(i.selectedSize?.id) === Number(sizeId)
+    );
+
+    if (index !== -1) {
+      const item = state.cart[index];
+      if (item.quantity > 1) {
+        item.quantity -= 1;
+      } else {
+        state.cart.splice(index, 1); // remove the item completely
+      }
+    }
+  });
+  get().calculateTotals();
+},
+
+
+
 
       // ✅ Clear cart
       clearCart: () => {

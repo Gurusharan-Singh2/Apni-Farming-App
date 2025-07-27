@@ -35,7 +35,7 @@ export default function Products({
       ListHeaderComponent={ListHeaderComponent}
       showsVerticalScrollIndicator={false}
       columnWrapperStyle={{ justifyContent: "space-between", paddingHorizontal: 6, paddingTop:10 }}
-      contentContainerStyle={{ paddingBottom: 10, paddingTop: 10 }}
+      contentContainerStyle={{ paddingBottom:"auto", paddingTop: 10 }}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
