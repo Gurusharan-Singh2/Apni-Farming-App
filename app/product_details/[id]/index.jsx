@@ -20,6 +20,7 @@ import useAuthStore from '../../../Store/AuthStore';
 import useWishlistStore from '../../../Store/WishlistStore';
 import ProfileIcon from '../../../components/ProfileIcon';
 import CartIconWithBadge from '../../../components/Carticon';
+import BuyitAgain from '../../../components/BuyitAgain';
 
 const BackendUrl2 = 'https://api.apnifarming.com';
 
@@ -33,7 +34,7 @@ const fetchProductById = async (productId) => {
 const ProductDetails = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
+ 
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['product', id],
@@ -225,7 +226,7 @@ const isWishlisted = useMemo(() => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY  }}>
       {/* Header */}
       <View className="mb-1">
         <View className="flex flex-row w-full justify-between px-6 my-3">
@@ -246,7 +247,7 @@ const isWishlisted = useMemo(() => {
       </View>
 
       {/* Product Content */}
-      <ScrollView className="px-4">
+      <ScrollView className="px-4 pb-10 ">
         {isAuthenticated() && (
           <View className="z-40 w-8 absolute top-0 right-0">
             <TouchableOpacity
@@ -295,13 +296,14 @@ const isWishlisted = useMemo(() => {
         {/* Size Picker */}
         {selectedSize && (
           <TouchableOpacity
-            className="border border-gray-300 rounded-md px-2 py-3 my-3 flex-row justify-between items-center"
+            className={`border border-gray-300 rounded-md px-2 py-3 my-3 flex-row justify-between items-center disabled:border-gray-100`}
+            disabled={quantity>0}
             onPress={() => setModalVisible(true)}
           >
-            <Text className="text-gray-700 text-[14px]">
+            <Text className={`text-gray-700 text-[14px] ${quantity>0 && "text-gray-200"} `}>
               {selectedSize.size + ' ' + selectedSize.option?.toLowerCase()}
             </Text>
-            <Ionicons name="chevron-down" size={16} color="#6B7280" />
+            <Ionicons name="chevron-down" size={16} color={quantity > 0 ? '#e5e7eb' : '#6B7280'} />
           </TouchableOpacity>
         )}
 
@@ -316,16 +318,17 @@ const isWishlisted = useMemo(() => {
             </Text>
           </TouchableOpacity>
         ) : (
-          <View className="flex-row items-center justify-between bg-green-600 rounded-full px-4 py-3 w-[150px] self-center">
-            <TouchableOpacity onPress={() => decrement(data?.id, selectedSize.id)}>
-              <Ionicons name="remove" size={26} color="#fff" />
+          <View className="flex-row items-center justify-between bg-green-600 rounded-full px-4 py-3 w-full self-center">
+            <TouchableOpacity onPress={() => decrement(data?.id, selectedSize.id)} className="w-[33%]">
+              <Text><Ionicons name="remove" size={26} color="#fff" /></Text>
             </TouchableOpacity>
-            <Text className="text-[14px] font-semibold text-white">{quantity}</Text>
-            <TouchableOpacity onPress={() => increment(data?.id, selectedSize.id)}>
+            <Text className="text-[14px] text-center w-[33%] font-semibold text-white">{quantity}</Text>
+            <TouchableOpacity className="w-[33%] flex-row justify-end" onPress={() => increment(data?.id, selectedSize.id)}>
               <Ionicons name="add" size={26} color="#fff" />
             </TouchableOpacity>
           </View>
         )}
+         <BuyitAgain url={'https://api.apnifarming.com/user/products/buyitagain.php'} title={'Buy it Again'} />
       </ScrollView>
 
       {/* Size Selection Modal */}
@@ -338,7 +341,7 @@ const isWishlisted = useMemo(() => {
           <View className="bg-white rounded-xl p-4 w-[85%] max-w-[320px]">
             <Text className="text-lg font-bold mb-3 text-gray-800">Select Size</Text>
             {data?.sizes?.map((sizeObj) => {
-              const isSelected = selectedSize?.size === sizeObj.size;
+              const isSelected = selectedSize?.id === sizeObj.id;
               return (
                 <TouchableOpacity
                   key={sizeObj.id}
@@ -369,6 +372,8 @@ const isWishlisted = useMemo(() => {
           </View>
         </TouchableOpacity>
       </Modal>
+
+     
     </SafeAreaView>
   );
 };

@@ -5,8 +5,6 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Image,
@@ -18,6 +16,12 @@ import { Colors } from '../assets/Colors';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import useAuthStore from '../Store/AuthStore';
+import EmptyCart from '../components/EmptyCart';
+import BuyitAgain from '../components/BuyitAgain';
+import { BackendUrl2 } from '../utils/Constants';
+import CartIconWithBadge from '../components/Carticon';
+import ProfileIcon from '../components/ProfileIcon';
+import EmptyOrder from '../components/EmptyOrder';
 
 const CartScreen = () => {
   const { cart, discount, finalAmount, decrement, increment } = useCartStore();
@@ -78,21 +82,31 @@ const CartScreen = () => {
             contentContainerStyle={{ padding: 16 }}
             ListHeaderComponent={() => (
               <>
-                 <TouchableOpacity onPress={() => router.back()}  className="flex-row items-center w-40 gap-3">
-                 <View className="flex-row gap-2">
-                  
-                    <Ionicons name="arrow-back" size={26} color="black" />
-                      <Text className="text-heading-big font-semibold ml-2">Cart</Text>
-               
-                 </View>
-                    </TouchableOpacity>
+               <View className="mb-1">
+        <View className="flex flex-row w-full justify-between px-6 my-3">
+          <View className="flex-row items-center py-3 bg-white">
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="flex-row items-center w-40 gap-3"
+            >
+              <Ionicons name="arrow-back" size={24} color="black" />
+              <Text className="text-heading-big">Back</Text>
+            </TouchableOpacity>
+          </View>
+          <View className="flex flex-row items-center gap-2">
+            <CartIconWithBadge />
+            {isAuthenticated() && <ProfileIcon />}
+          </View>
+        </View>
+      </View>
                 
                 
 
                 {cart.length === 0 && (
-                  <Text className="text-center text-gray-500 mt-20 text-xxs">
-                    Your cart is empty 🛒
-                  </Text>
+                <>
+                   <EmptyOrder/>
+                   <BuyitAgain url={`${BackendUrl2}/user/products/getAllProducts.php`} title={"Get Start Shopping"}/>
+                </>
                 )}
               </>
             )}

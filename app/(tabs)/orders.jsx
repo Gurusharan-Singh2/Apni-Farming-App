@@ -7,6 +7,9 @@ import { Colors } from '../../assets/Colors';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import useAuthStore from '../../Store/AuthStore';
+import BuyitAgain from '../../components/BuyitAgain';
+import EmptyOrder from '../../components/EmptyOrder';
+import EmptyCart from '../../components/EmptyCart';
 
 const Orders = () => {
   const {user}=useAuthStore();
@@ -58,6 +61,8 @@ const Orders = () => {
     </View>
   );
 
+
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY }}>
       {/* Header */}
@@ -85,7 +90,10 @@ const Orders = () => {
           {data?.orders?.length > 0 ? (
             data.orders.map(renderOrder)
           ) : (
-            <Text className="text-center text-gray-500 mt-5">No orders found.</Text>
+            <><EmptyCart/>
+              <BuyitAgain url={`https://api.apnifarming.com/user/products/youamyalsolike.php`}title={'No Order'}/>
+            </>
+          
           )}
         </ScrollView>
       )}

@@ -2,9 +2,12 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 import { useRouter } from 'expo-router';
 import useAuthStore from "../Store/AuthStore";
+import { Feather } from '@expo/vector-icons';
+import AccountAddress from '../components/Account_Address';
 
 const ProfileScreen = () => {
 
@@ -16,11 +19,13 @@ const ProfileScreen = () => {
       logout();              
       router.replace("/");   
     };
+   
+    
   
     
 
   return (
-    <SafeAreaView className="flex-1 bg-secondary">
+    <SafeAreaView className="flex-1 bg-white ">
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity onPress={() => router.back()}>
@@ -35,22 +40,57 @@ const ProfileScreen = () => {
 
 
       {/* Content */}
-       <View className="m-2 flex flex-col justify-center gap-6 pt-14 items-center px-4">
-          <Text className="text-3xl font-bold text-primary mb-6">👤 Profile</Text>
+       <View className=" flex flex-col justify-center gap-6 pt-14 items-center ">
+          
+          <View className="w-full px-6 flex-row  gap-4 items-center  ">
+            <View className="bg-green-200 h-[80px] w-[80px] rounded-full flex items-center justify-center">
+            <Text className="text-[38px]">
+                {user.name.slice(0,1)}
+            </Text>
 
-          <View className="bg-white p-6 rounded-xl w-full max-w-[90%] shadow-md">
-            <Text className="text-lg font-semibold text-gray-800 mb-2">
-              Name: <Text className="font-normal">{user?.name}</Text>
+           
+
+            </View>
+             <Text className="text-[25px] font-bold">
+              {user.name}
+            </Text>
+
+          </View>
+
+          <TouchableOpacity onPress={()=>router.push("/orders")} className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
+             <Feather name="bookmark" size={28} color="black" /> 
+            <Text className="text-[20px] font-semibold">
+            My Orders
+            </Text>
+          
+          </TouchableOpacity>
+         
+          <View className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
+            <Ionicons name="book-outline" size={28} color="black" />
+            <Text className="text-[20px] font-semibold">
+            Manage Subscription
             </Text>
             
           </View>
-
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="px-6 py-3 my-6 bg-red-500 rounded-lg"
-          >
-            <Text className="text-base text-white text-center font-semibold">Logout</Text>
+          <TouchableOpacity onPress={()=>router.p} className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
+            <Text>
+              <AccountAddress/>
+            
+            </Text>
+            
           </TouchableOpacity>
+
+          <TouchableOpacity className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md" onPress={handleLogout}>
+           
+            <AntDesign name="logout" size={30} color="black" />
+            <Text className="text-[20px] font-semibold">
+             Log Out
+            </Text>
+            
+          
+         </TouchableOpacity>
+
+          
         </View>
     </SafeAreaView>
   );

@@ -83,6 +83,7 @@ const {
 
 
 
+
   const addToWishlistMutation = useMutation({
     mutationFn: async () =>{
     const res =  await axios.post(`${BackendUrl2}/user/wishlists/wishlist.php?action=add`, {
@@ -238,11 +239,15 @@ const {
 
       {/* Size Picker */}
       <TouchableOpacity
-        className="border z-10 border-gray-300 rounded-md px-2 py-2 mb-4 mt-2 flex-row justify-between items-center"
+        className="border z-10 border-gray-300 rounded-md px-2 py-2 mb-4 mt-2 flex-row justify-between items-center text-gray-100 disabled:border-gray-100"
+        disabled={quantity>0}
         onPress={() => setModalVisible(true)}
       >
-        <Text className="text-gray-700 text-[14px]">{selectedSize?.size+" "+selectedSize.option.toLowerCase()}</Text>
-        <Ionicons name="chevron-down" size={16} color="#6B7280" />
+        <Text className={`text-gray-700 text-[14px] ${quantity>0 && 'text-gray-200'} `}>{selectedSize?.size+" "+selectedSize.option.toLowerCase()}</Text>
+     <Text>
+        <Text><Ionicons name="chevron-down" size={16} color={quantity > 0 ? '#e5e7eb' : '#6B7280'} /></Text>
+
+     </Text>
       </TouchableOpacity>
 
       {/* Cart Control */}
@@ -254,7 +259,7 @@ const {
           <Text className="text-green-500 text-center font-semibold text-[14px]">Add to Cart</Text>
         </TouchableOpacity>
       ) : (
-        <View className="flex-row items-center justify-between bg-green-600 rounded-full px-3 py-3 w-[150px] self-center">
+        <View className="flex-row items-center justify-between bg-green-600 rounded-full px-3 py-[8px] w-[160px] self-center">
           <TouchableOpacity onPress={() => decrement(item.id, selectedSize.id)}>
             <Ionicons name="remove" size={26} color="#fff" />
           </TouchableOpacity>
