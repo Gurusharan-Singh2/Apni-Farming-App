@@ -43,12 +43,12 @@ export default function Home() {
   } = useQuery({
     queryKey: ["products", categoryId],
     queryFn: async () => {
-      const url =
-        categoryId === "0"
-          ? `${BackendUrl2}/user/products/getAllProducts.php`
-          // : `${BackendUrl}/api/categories/${categoryId}/products`;l̥
-          : `${BackendUrl2}/user/categories/getProductsByCategory.php?id=${categoryId}`;
-      const res = await fetch(url);
+      // const url =
+        // categoryId === "0"
+        //   ? `${BackendUrl2}/user/products/getAllProducts.php`
+        //   // : `${BackendUrl}/api/categories/${categoryId}/products`;l̥
+        //   : `${BackendUrl2}/user/categories/getProductsByCategory.php?id=${categoryId}`;
+      const res = await fetch(`${BackendUrl2}/user/products/getAllProducts.php`);
       if (!res.ok) throw new Error("Network error");
      
       

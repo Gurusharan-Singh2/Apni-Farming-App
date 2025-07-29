@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { BackendUrl, BackendUrl2 } from '../utils/Constants';
+import {  BackendUrl2 } from '../utils/Constants';
+import { useRouter } from "expo-router";
+
 
 const fetchCategories = async () => {
   // const { data } = await axios.get(`${BackendUrl}/api/categories`);
@@ -10,8 +12,10 @@ const fetchCategories = async () => {
   return [{ id: '0', name: 'All', image: 'https://jobdsco.s3.ap-south-1.amazonaws.com/public/s550_4xb7_231012.jpg' }, ...data]; 
 };
 
-const CategoryItem = ({ setCategoryId }) => {
-  const [selectedCategory, setSelectedCategory] = useState('0');
+const CategoryItem = () => {
+  
+
+  const router=useRouter()
 
   const {
     data: categories,
@@ -23,8 +27,9 @@ const CategoryItem = ({ setCategoryId }) => {
   });
 
   const handleCategoryPress = (categoryId) => {
-    setSelectedCategory(categoryId);
-   setCategoryId(categoryId)
+  
+   router.push(`/product_screen/${categoryId}`);
+   
   };
 
   return (
@@ -45,18 +50,17 @@ const CategoryItem = ({ setCategoryId }) => {
           }}
           
           renderItem={({ item }) => {
-            const isSelected = item.id === selectedCategory;
             return (
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.id)}
-                className={`items-center mx-1 pb-0    w-[90px] min-h-[112px] ${isSelected ? 'border rounded-lg border-green-500 ' : ''}`}
+                className={`items-center mx-1 pb-0    w-[90px] min-h-[112px] `}
               >
                 <Image
                   source={{ uri: item.image }}
                   className={`w-full h-24  rounded-lg   `}
                   resizeMode="cover"
                 />
-                <Text className={`text-center font-bold text-[11px] mt-1 mb-0 ${isSelected ? 'text-green-600 ' : ''}`}>
+                <Text className={`text-center font-bold text-[11px] mt-1 mb-0`}>
                   { item.name}
                 </Text>
               </TouchableOpacity>

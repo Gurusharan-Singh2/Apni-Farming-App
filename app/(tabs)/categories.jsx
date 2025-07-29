@@ -1,12 +1,102 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
+import { BackendUrl2 } from '../../utils/Constants';
+import CartIconWithBadge from '../../components/Carticon';
+import ProfileIcon from '../../components/ProfileIcon';
+import useAuthStore from '../../Store/AuthStore';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from '../../assets/Colors';
+import { Ionicons } from '@expo/vector-icons';
 
-const categories = () => {
+
+const fetchCategories = async () => {
+
+
+
+
+  const { data } = await axios.get(`${BackendUrl2}/user/categories/getAllCategories.php`);
+  return data
+};
+
+const CategoriesScreen = ({ setCategoryId }) => {
+  const {isAuthenticated}=useAuthStore();
+const router=useRouter();
+  const [selectedCategory, setSelectedCategory] = useState();
+
+  const { data: categories, isLoading, error } = useQuery({
+    queryKey: ['categoriesPage'],
+    queryFn: fetchCategories,
+  });
+
+  const handleCategoryPress = (id) => {
+    setSelectedCategory(id);
+    setCategoryId?.(id);
+    router.push(`/product_screen/${id}`);
+  };
+
+  const renderItem = ({ item }) => {
+  const isSelected = selectedCategory === item.id;
   return (
-    <View>
-      <Text>categories</Text>
-    </View>
-  )
-}
+    <TouchableOpacity
+      onPress={() => handleCategoryPress(item.id)}
+      className={`w-[31%] m-1 p-3 rounded-2xl items-center ${
+        isSelected ? 'bg-yellow-100 border border-yellow-400' : 'bg-white'
+      }`}
+    >
+      <Image
+        source={{ uri: item.image }}
+        className="w-32 h-32 rounded-xl mb-2"
+        resizeMode="cover"
+      />
+      <Text className="text-sm font-semibold text-center" numberOfLines={2}>
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
-export default categories
+
+  if (isLoading) return <ActivityIndicator size="large" color="#000" />;
+  if (error) return <Text className="text-red-500 text-center mt-4">Failed to load categories.</Text>;
+
+  return (
+
+        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY }}>
+          
+      <View className="mb-1"> 
+      <View className="flex flex-row w-full justify-between px-6 my-3">
+       <View className="flex-row items-center  py-3 bg-white">
+                <TouchableOpacity 
+                  onPress={() => router.back()} 
+                   className="flex-row items-center w-40 gap-3"
+                >
+                  <Ionicons name="arrow-back" size={24} color="black" />
+                  <Text className="text-heading-big">Categories</Text>
+                </TouchableOpacity>
+              </View>
+        <View className="flex flex-row items-center gap-2">
+        <CartIconWithBadge/>
+{isAuthenticated() && <ProfileIcon />}
+        </View>
+        </View>
+        </View>
+
+    
+   <FlatList
+        data={categories}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={3}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        showsVerticalScrollIndicator={false}
+      />
+   
+    </SafeAreaView>
+  
+  );
+};
+
+export default CategoriesScreen;

@@ -22,6 +22,8 @@ import { BackendUrl2 } from '../utils/Constants';
 import CartIconWithBadge from '../components/Carticon';
 import ProfileIcon from '../components/ProfileIcon';
 import EmptyOrder from '../components/EmptyOrder';
+import YouMayAlsoLike from '../components/YouMayAlsoLike';
+import CartReccomendation from '../components/CartReccomendation';
 
 const CartScreen = () => {
   const { cart, discount, finalAmount, decrement, increment } = useCartStore();
@@ -105,7 +107,7 @@ const CartScreen = () => {
                 {cart.length === 0 && (
                 <>
                    <EmptyOrder/>
-                   <BuyitAgain url={`${BackendUrl2}/user/products/getAllProducts.php`} title={"Get Start Shopping"}/>
+                   <CartReccomendation url={`${BackendUrl2}/user/products/getAllProducts.php`} title={"Get Start Shopping"}/>
                 </>
                 )}
               </>
@@ -113,7 +115,10 @@ const CartScreen = () => {
           />
 
           {cart.length > 0 && (
-            <View className="bg-white px-4 py-2  shadow-lg border-t border-gray-200">
+
+          <>  
+                             <YouMayAlsoLike url={`${BackendUrl2}/user/products/youamyalsolike.php`} title={"Get Start Shopping"}/>
+<View className="bg-white px-4 py-2  shadow-lg border-t border-gray-200">
               <View className="flex flex-col gap-1 items-start">
                 <Text className="font-extrabold text-heading-small">Total: ₹ {finalAmount}</Text>
 
@@ -143,6 +148,8 @@ const CartScreen = () => {
                 )}
               </View>
             </View>
+          </>  
+          
           )}
         </View>
       </KeyboardAvoidingView>

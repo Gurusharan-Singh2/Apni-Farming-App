@@ -200,7 +200,8 @@ const isWishlisted = useMemo(() => {
       type: 'success',
       text1: 'Added to Cart!',
       text2: `${data.name} was added successfully.`,
-      visibilityTime: 1000,
+      visibilityTime: 500,
+      autoHide:true
     });
   };
 
@@ -328,7 +329,7 @@ const isWishlisted = useMemo(() => {
             </TouchableOpacity>
           </View>
         )}
-         <BuyitAgain url={'https://api.apnifarming.com/user/products/buyitagain.php'} title={'Buy it Again'} />
+         <BuyitAgain url={'https://api.apnifarming.com/user/products/buyitagain.php'} title={'Buy it Again'} method={"post"} objKey={"products"}  />
       </ScrollView>
 
       {/* Size Selection Modal */}
