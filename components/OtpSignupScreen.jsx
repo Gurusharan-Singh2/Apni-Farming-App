@@ -26,10 +26,13 @@ const OtpSignupScreen = ({ userData }) => {
 
   const VerifyMutation = useMutation({
     mutationFn: async ({ userData, otp }) => {
-      const response = await axios.post(`${BackendUrl}/api/verify`, {
+      const response = await axios.post(`https://api.apnifarming.com/user/authentication/auth/verify.php`, {
         ...userData,
         otp,
       });
+     
+      console.log(response.data);
+      
       return response.data;
     },
     onSuccess: (data) => {
@@ -65,20 +68,24 @@ const OtpSignupScreen = ({ userData }) => {
 
   const ResendMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post(`${BackendUrl}/api/resend`, data);
+      const response = await axios.post(`https://api.apnifarming.com/user/authentication/auth/resend.php`, data);
+      
+      
       return response.data;
     },
     onSuccess: () => {
       showToast("success", "OTP Resent", "OTP resent successfully.");
       setTimer(60);
-      setOtpValue(""); // Clear old OTP
+      setOtpValue(""); 
     },
     onError: (error) => {
-      console.error("Resend failed:", error);
-      showToast("error", "Resend Failed", "Please try again.");
+      console.error("Resend failed:", error?.response?.data?.message);
+      showToast("error", "Resend Failed",error?.response?.data?.message);
     },
   });
 
+ 
+  
   const handleResend = () => {
     ResendMutation.mutate(userData);
   };
@@ -86,8 +93,8 @@ const OtpSignupScreen = ({ userData }) => {
   return (
     <View className="flex gap-4 w-full max-w-md space-y-6 p-4">
       <View>
- <Text className="text-xl font-bold text-gray-900 text-center">Enter OTP</Text>
-      <Text className="text-sm text-gray-600 text-center">
+ <Text className="text-2xl font-bold text-gray-900 text-center">Enter OTP</Text>
+      <Text className="text-base text-gray-600 text-center">
         We've sent an OTP to your provided contact
       </Text>
       </View>
@@ -99,10 +106,10 @@ const OtpSignupScreen = ({ userData }) => {
       {/* Submit Button */}
       <TouchableOpacity
         onPress={onSubmit}
-        className="bg-primary rounded-lg py-3  mt-4"
+        className="bg-primary rounded-lg py-4  mt-4"
         disabled={VerifyMutation.isPending}
       >
-        <Text className="text-white text-center text-base font-semibold">
+        <Text className="text-white text-center text-[18px] font-semibold">
           {VerifyMutation.isPending ? "Verifying..." : "Verify OTP"}
         </Text>
       </TouchableOpacity>
@@ -115,7 +122,7 @@ const OtpSignupScreen = ({ userData }) => {
         </Text>
       ) : (
         <TouchableOpacity onPress={handleResend}>
-          <Text className="text-sm font-semibold text-primary text-center underline">
+          <Text className="text-[16px] mt-4 font-semibold text-primary text-center underline">
             {ResendMutation.isPending ? "Resending..." : "Resend OTP"}
           </Text>
         </TouchableOpacity>

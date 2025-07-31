@@ -36,7 +36,7 @@ const Signin = () => {
 
   const SignInMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post(`${BackendUrl}/api/login`, data);
+      const response = await axios.post(`https://api.apnifarming.com/user/authentication/auth/login.php`, data);
       return response.data;
     },
     onSuccess: (data) => {
@@ -63,8 +63,8 @@ const Signin = () => {
           {showOtp ? (
             <OtpSignupScreen userData={userData} />
           ) : (
-            <View className="w-full max-w-md space-y-4">
-              <Text className="text-base font-semibold text-black mb-2">
+            <View className="w-full my-5 max-w-md space-y-4">
+              <Text className="text-[18px] font-semibold text-black mb-2">
                 Phone Number
               </Text>
               <Controller
@@ -79,7 +79,7 @@ const Signin = () => {
                 }}
                 render={({ field: { onChange, value } }) => (
                   <TextInput
-                    className="h-14 px-4 rounded-lg shadow-lg bg-white text-gray-900"
+                    className="h-16 px-4 rounded-lg text-lg shadow-lg bg-white text-gray-900"
                     placeholder="1234567890"
                     placeholderTextColor="#9ca3af"
                     keyboardType="phone-pad"
@@ -96,9 +96,9 @@ const Signin = () => {
 
               <TouchableOpacity
                 onPress={handleSubmit(onSubmit)}
-                className="bg-primary rounded-lg py-3 mt-2"
+                className="mt-10 bg-primary rounded-lg py-3 "
               >
-                <Text className="text-base text-white text-center">
+                <Text className="text-[18px] font-semibold text-white text-center">
                   {SignInMutation.isPending ? "Logging in ..." : "Login"}
                 </Text>
               </TouchableOpacity>
@@ -112,9 +112,9 @@ const Signin = () => {
 
               <TouchableOpacity
                 onPress={() => router.push("/signup")}
-                className="mt-4 flex-row justify-center items-center"
+                className="mt-8 flex-row justify-center items-center"
               >
-                <Text className="text-gray-700 font-semibold">
+                <Text className="text-gray-700 text-lg font-semibold">
                   Don’t have an account?{" "}
                 </Text>
                 <Text className="text-base text-primary font-bold underline">
@@ -134,8 +134,8 @@ const Signin = () => {
                 onPress={() => router.push("/home")}
                 className="flex-row justify-center items-center"
               >
-                <Text className="text-gray-700 font-semibold">Be a </Text>
-                <Text className="text-base text-primary font-bold underline">
+                <Text className="text-gray-700 text-lg font-semibold">Be a </Text>
+                <Text className="text-lg text-primary font-bold underline">
                   Guest User
                 </Text>
               </TouchableOpacity>

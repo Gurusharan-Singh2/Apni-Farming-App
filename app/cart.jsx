@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import Entypo from '@expo/vector-icons/Entypo';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import useCartStore from '../Store/CartStore';
@@ -16,17 +17,16 @@ import { Colors } from '../assets/Colors';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import useAuthStore from '../Store/AuthStore';
-import EmptyCart from '../components/EmptyCart';
-import BuyitAgain from '../components/BuyitAgain';
 import { BackendUrl2 } from '../utils/Constants';
 import CartIconWithBadge from '../components/Carticon';
 import ProfileIcon from '../components/ProfileIcon';
 import EmptyOrder from '../components/EmptyOrder';
 import YouMayAlsoLike from '../components/YouMayAlsoLike';
 import CartReccomendation from '../components/CartReccomendation';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const CartScreen = () => {
-  const { cart, discount, finalAmount, decrement, increment } = useCartStore();
+  const { cart, discount, finalAmount, decrement, increment,removeFromCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
 
@@ -42,13 +42,13 @@ const CartScreen = () => {
           {item.selectedSize?.size} {item.selectedSize?.option}
         </Text>
 
-        <View className="flex-row gap-24 justify-between items-end mt-2">
-          <View className="w-14">
-            <Text className="text-heading-small text-black font-extrabold">
-              ₹ {item.selectedSize?.sellPrice}
-            </Text>
-            <Text className="text-basic line-through text-gray-500 font-semibold">
-              ₹{item.selectedSize?.costPrice}
+        <View className="flex-row w-[82%] items-center  justify-between  mt-2">
+            <View className="flex-row self-start rounded-lg px-1 py-1  bg-[#D02127]    justify-between items-center mb-2">
+            {item?.selectedSize?.discount && <Text className="text-[13px] font-semibold py-1 px-1 rounded-l-lg bg-[#D02127] text-white line-through">
+              ₹{item?.selectedSize?.costPrice}
+            </Text>}
+            <Text className="text-[14px] bg-white mx-1 px-2 py-1 rounded  text-green-600 font-bold ">
+              ₹{item?.selectedSize?.sellPrice}
             </Text>
           </View>
 
@@ -64,6 +64,8 @@ const CartScreen = () => {
   <Ionicons name="add" size={22} color="#fff" />
 </TouchableOpacity>
             </View>
+            <TouchableOpacity onPress={()=>removeFromCart(item?.id,item?.selectedSize?.id)}  className="self-end mt-3"><MaterialIcons name="delete" size={24} color="#D02127" /></TouchableOpacity>
+            
           </View>
         </View>
       </View>
@@ -76,7 +78,11 @@ const CartScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
+        
+
         <View style={{ flex: 1 }}>
+          
+              
           <FlatList
             data={cart}
             keyExtractor={(item, index) => `${item.id}-${item.selectedSize?.size}-${index}`}
@@ -101,43 +107,52 @@ const CartScreen = () => {
           </View>
         </View>
       </View>
-                
-                
-
-                {cart.length === 0 && (
+               {cart.length === 0 && (
                 <>
                    <EmptyOrder/>
                    <CartReccomendation url={`${BackendUrl2}/user/products/getAllProducts.php`} title={"Get Start Shopping"}/>
                 </>
-                )}
+                )}   
+                   
               </>
+            )}
+
+            ListFooterComponent={()=>(
+               <YouMayAlsoLike url={`${BackendUrl2}/user/products/youamyalsolike.php`} title={"Get Start Shopping"}/>
+
             )}
           />
 
           {cart.length > 0 && (
 
           <>  
-                             <YouMayAlsoLike url={`${BackendUrl2}/user/products/youamyalsolike.php`} title={"Get Start Shopping"}/>
+                         
 <View className="bg-white px-4 py-2  shadow-lg border-t border-gray-200">
               <View className="flex flex-col gap-1 items-start">
-                <Text className="font-extrabold text-heading-small">Total: ₹ {finalAmount}</Text>
+               
 
-                <View className="flex-row bg-green-100 p-1 items-center">
-                  <AntDesign name="tags" size={18} color="#22c55e" />
-                  <Text className="text-green-500 text-basic font-semibold ml-1">
-                    Saved ₹{discount}
-                  </Text>
-                </View>
+               
               </View>
 
               <View className="mt-2">
                 {isAuthenticated() ? (
-                  <TouchableOpacity
-                    className="bg-green-600 px-5 py-5 rounded-lg"
+                 <View className="flex-row">
+                   <View className="flex w-[30%]  p-1 items-center">
+                  <AntDesign name="tags" size={18} color="#22c55e" />
+                  <Text className="font-extrabold text-black text-heading-small">Total: ₹ {finalAmount}</Text>
+                  <Text className="text-green-500 text-basic font-semibold ml-1">
+                    Saved ₹{discount}
+                  </Text>
+                </View>
+                   <TouchableOpacity
+                    className="bg-green-600 flex-row justify-around w-[70%] px-5 py-5 rounded-lg"
                     onPress={() => router.push('/order')}
                   >
-                    <Text className="text-white font-semibold text-heading-big">Go to Checkout</Text>
+                     
+                    <Text className="text-white  text-center font-bold text-[17px]">Go to Checkout</Text>
+                    <Entypo name="chevron-with-circle-right" size={28} color="white" />
                   </TouchableOpacity>
+                  </View>
                 ) : (
                   <TouchableOpacity
                     className="bg-green-600 px-5 py-5 rounded-lg"

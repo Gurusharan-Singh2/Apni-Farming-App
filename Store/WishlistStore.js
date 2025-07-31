@@ -7,11 +7,9 @@ const useWishlistStore = create(
   persist(
     immer((set) => ({
       wishlist: [],
-
-      // Set full wishlist (array of product objects)
      setWishlist: (items) => {
   set((state) => {
-    state.wishlist = [...items]; // ✅ ensures a new array
+    state.wishlist = [...items]; 
   });
 },
 
@@ -29,7 +27,7 @@ const useWishlistStore = create(
       // Remove product object from wishlist by id
       removeFromWishlist: (id) => {
         set((state) => {
-          state.wishlist = state.wishlist.filter((item) => item.id !== id);
+          state.wishlist = state.wishlist.filter((item) => Number(item.id) !== Number(id));
         });
       },
 

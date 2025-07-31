@@ -84,10 +84,10 @@ const useCartStore = create(
 
 
       // ✅ Remove from cart
-      removeFromCart: (id, size) => {
+      removeFromCart: (id, sizeId) => {
         set((state) => {
           state.cart = state.cart.filter(
-            item => !(item.id === id && item.selectedSize?.id === size)
+            item => !(item.id === id && item.selectedSize?.id === sizeId)
 
           );
         });

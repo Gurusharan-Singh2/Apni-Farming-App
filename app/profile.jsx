@@ -45,14 +45,14 @@ const ProfileScreen = () => {
           <View className="w-full px-6 flex-row  gap-4 items-center  ">
             <View className="bg-green-200 h-[80px] w-[80px] rounded-full flex items-center justify-center">
             <Text className="text-[38px]">
-                {user.name.slice(0,1)}
+                {user?.name?.slice(0,1)}
             </Text>
 
            
 
             </View>
              <Text className="text-[25px] font-bold">
-              {user.name}
+              {user?.name}
             </Text>
 
           </View>

@@ -206,26 +206,22 @@ const {
 
       <Image
         source={{ uri: item?.image }}
-        className="w-full h-[90px] rounded-lg"
+        className="w-full h-[110px] rounded-lg"
         resizeMode="contain"
       />
     </TouchableOpacity>
 
-    <Text className="text-sm font-semibold mt-1" numberOfLines={1}>
+    <Text className="text-sm font-[700] mt-1" numberOfLines={1}>
       {item.name}
     </Text>
-    {item.tagline && (
-      <Text className="text-xs text-gray-500 mb-1" numberOfLines={1}>
-        {item.tagline}
-      </Text>
-    )}
+  
 
     <View className="flex-row justify-between items-center mb-1">
       <Text className="text-green-700 font-bold text-sm">
         ₹{selectedSize?.sellPrice}
       </Text>
       {selectedSize?.discount && (
-        <Text className="text-red-600 text-xs font-semibold">
+        <Text className="text-red-600 text-xs font-bold">
           {selectedSize?.discount}
         </Text>
       )}
@@ -238,8 +234,8 @@ const {
       onPress={() => setModalVisible(true)}
     >
       <Text
-        className={`text-gray-700 text-[14px] ${
-          quantity > 0 && 'text-gray-200'
+        className={` text-[14px] ${
+          quantity > 0 ? 'text-[#e5e7eb]':'text-gray-700'
         }`}
       >
         {selectedSize?.size} {selectedSize?.option?.toLowerCase()}

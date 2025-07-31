@@ -16,10 +16,10 @@ import axios from "axios";
 
 import CartIconWithBadge from "../../../components/Carticon";
 import ProfileIcon from "../../../components/ProfileIcon";
-import SuggestionCard from "../../../components/SuggestionCard";
 import useAuthStore from "../../../Store/AuthStore";
 import { BackendUrl2 } from "../../../utils/Constants";
 import CategoyComponentCard from "../../../components/categories/CatoryComponentCard";
+import EmptyCart from "../../../components/EmptyCart";
 
 const fetchProductsByCategory = async (categoryId) => {
    const url =
@@ -92,6 +92,8 @@ const index = () => {
         </View>
       </View>
 
+     
+
       {/* Main Content */}
       <View className=" flex-1 flex-row">
         {/* Sidebar Categories */}
@@ -121,7 +123,7 @@ const index = () => {
                   resizeMode="contain"
                 />
                 <Text
-                  className="text-xs text-center mt-1"
+                  className="text-[13px]  text-center mt-1"
                   numberOfLines={2}
                   ellipsizeMode="tail"
                 >
@@ -139,7 +141,7 @@ const index = () => {
           ) : errorProducts ? (
             <Text className="text-red-500">Failed to load products</Text>
           ) : products.length===0 ? (
-                        <Text className="text-red-500">No Product Found</Text>
+              <EmptyCart/>
 
           ): (
             <FlatList

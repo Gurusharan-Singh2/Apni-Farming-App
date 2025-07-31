@@ -21,7 +21,7 @@ import {checkFirstInstall} from '../utils/checkFirstInstall'
 
 export default function App() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const {user, isAuthenticated } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +44,10 @@ export default function App() {
 
     initializeApp();
   }, []);
+
+//  console.log(user);
+ 
+  
 
   if (loading) {
     return (
@@ -70,30 +74,30 @@ export default function App() {
             }}
           />
 
-          <Text className="mb-[60px] text-primary font-semibold text-sm">
+          <Text className="mb-[60px] text-primary font-bold text-[16px]">
             शुद्धता और ताज़गी – हर एक डिलीवरी में
           </Text>
 
           <View className="w-3/4">
             <TouchableOpacity
               onPress={() => router.push("./signup")}
-              className="px-2 py-3 my-2 bg-primary rounded-lg"
+              className="px-2 py-4 my-2 mb-5 bg-primary rounded-lg"
             >
-              <Text className="text-base text-white text-center">Sign Up</Text>
+              <Text className="text-[18px]  text-white text-center">Sign Up</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => router.push("/home")}
-              className="px-2 py-3 my-2 bg-black rounded-lg"
+              className="px-2 py-4 my-2 bg-black rounded-lg"
             >
-              <Text className="text-base text-white text-center">Guest User</Text>
+              <Text className="text-[18px] text-white text-center">Guest User</Text>
             </TouchableOpacity>
           </View>
 
           <View className="w-full">
             <View className="w-full flex-row items-center justify-center my-4 gap-2">
               <View className="border-b-2 border-primary w-20" />
-              <Text className="text-base font-semibold text-gray-700 mx-2">or</Text>
+              <Text className="text-[18px] font-semibold text-gray-700 mx-2">or</Text>
               <View className="border-b-2 border-primary w-20" />
             </View>
 
@@ -101,8 +105,8 @@ export default function App() {
               onPress={() => router.push("/signin")}
               className="flex flex-row gap-5 px-4 justify-center items-center"
             >
-              <Text className="text-gray-700 font-semibold">Already a User?</Text>
-              <Text className="text-base text-primary font-bold text-center underline">
+              <Text className="text-gray-700 text-[16px] font-semibold">Already a User?</Text>
+              <Text className="text-[16px] text-primary font-bold text-center underline">
                 Sign In
               </Text>
             </TouchableOpacity>

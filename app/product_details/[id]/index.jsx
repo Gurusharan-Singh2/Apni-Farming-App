@@ -301,7 +301,7 @@ const isWishlisted = useMemo(() => {
             disabled={quantity>0}
             onPress={() => setModalVisible(true)}
           >
-            <Text className={`text-gray-700 text-[14px] ${quantity>0 && "text-gray-200"} `}>
+            <Text className={`text-gray-700 text-[14px] ${quantity>0 ? "text-[#e5e7eb]":"ext-gray-700"} `}>
               {selectedSize.size + ' ' + selectedSize.option?.toLowerCase()}
             </Text>
             <Ionicons name="chevron-down" size={16} color={quantity > 0 ? '#e5e7eb' : '#6B7280'} />

@@ -78,7 +78,7 @@ const LocationIcon = () => {
   }));
 
   setAddresses(formatted);
-
+  
   
   if (formatted.length > 0) {
     const defaultAddr = formatted.find((addr) => addr.default_address === 1);
@@ -112,11 +112,12 @@ const LocationIcon = () => {
 
   addAddress(newAddress);
 
+  setSelectedAddress(newAddress)
   // ✅ If this is the first address, set it as the selected one
   if (addresses.length === 0) {
-    setSelectedAddress(newAddress);
+    setSelectedAddress(addresses);
   }
-
+ 
   closeDrawer();
 },
 
@@ -181,11 +182,14 @@ const LocationIcon = () => {
     };
     Getdata.mutate(payload);
   }
+  if(!selectedAddress){
+    setSelectedAddress(addresses[0])
+  }
 
   return () => {
     isMounted = false;
   };
-}, [customer_id]);
+}, [customer_id,selectedAddress]);
 
 
   const openDrawer = () => setDrawerVisible(true);
@@ -355,7 +359,8 @@ const LocationIcon = () => {
                           </View>
                           <Text className="text-gray-600 text-sm">{addr.street}, {addr.city}</Text>
                           <Text className="text-gray-600 text-sm">{addr.state} - {addr.zip}</Text>
-                          <View className="absolute right-0 bottom-1 m-1 flex-row space-x-4 mt-2">
+                          <View className="absolute right-0 bottom-1 m-1 flex-row
+                          gap-4 mr-2 space-x-4 mt-2">
                             <TouchableOpacity onPress={() => handleEdit(index)}>
                               <AntDesign name="edit" size={20} color="#4B5563" />
                             </TouchableOpacity>

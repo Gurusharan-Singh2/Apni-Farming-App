@@ -18,6 +18,7 @@ import axios from "axios";
 
 import { BackendUrl } from "../../utils/Constants";
 import OtpSignupScreen from "../../components/OtpSignupScreen";
+import Toast from "react-native-toast-message";
 
 const Signup = () => {
   const router = useRouter();
@@ -37,13 +38,20 @@ const Signup = () => {
 
   const SignupMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post(`${BackendUrl}/api/signup`, data);
+      const response = await axios.post(`https://api.apnifarming.com/user/authentication/auth/signup.php`, data);
       return response.data;
     },
     onSuccess: (data) => {
       console.log("Signup successful:", data);
       setshowOtp(true);
     },
+    onError:(error)=>{
+      console.log(error?.response?.data?.message);
+      Toast.show({
+        type:"error",
+        text1:error?.response?.data?.message
+      })
+    }
   });
 
   const onSubmit = (data) => {
@@ -68,17 +76,17 @@ const Signup = () => {
           {showOtp ? (
             <OtpSignupScreen userData={userData} />
           ) : (
-            <View className="w-full max-w-md space-y-4">
+            <View className="w-full  max-w-md space-y-4">
           
-              <View>
-                <Text className="text-base font-semibold text-black mb-2">Full Name</Text>
+              <View className="my-5">
+                <Text className="text-[18px]  font-semibold text-black mb-2">Full Name</Text>
                 <Controller
                   control={control}
                   name="name"
                   rules={{ required: "Name is required" }}
                   render={({ field: { onChange, value } }) => (
                     <TextInput
-                      className="h-14 px-4 rounded-lg shadow-2xl bg-white text-gray-900"
+                      className="h-16 px-4 rounded-lg text-xl shadow-2xl bg-white text-gray-900"
                       placeholder="John Doe"
                       placeholderTextColor="#9ca3af"
                       onChangeText={onChange}
@@ -92,8 +100,8 @@ const Signup = () => {
               </View>
 
        
-              <View>
-                <Text className="text-base font-semibold text-black mb-2">Phone Number</Text>
+              <View className="my-5">
+                <Text className="text-[16px] font-semibold text-black mb-2">Phone Number</Text>
                 <Controller
                   control={control}
                   name="phone"
@@ -106,7 +114,7 @@ const Signup = () => {
                   }}
                   render={({ field: { onChange, value } }) => (
                     <TextInput
-                      className="h-14 px-4 rounded-lg shadow-2xl bg-white text-gray-900"
+                      className="h-16 px-4 text-xl rounded-lg shadow-2xl bg-white text-gray-900"
                       placeholder="1234567890"
                       placeholderTextColor="#9ca3af"
                       keyboardType="phone-pad"
@@ -123,9 +131,9 @@ const Signup = () => {
         
               <TouchableOpacity
                 onPress={handleSubmit(onSubmit)}
-                className="bg-primary rounded-lg py-3 mt-2"
+                className="bg-primary rounded-lg py-4 mt-2"
               >
-                <Text className="text-base text-white text-center">
+                <Text className="text-[18px] text-white text-center">
                   {SignupMutation.isPending ? "Signing Up ..." : "Signup"}
                 </Text>
               </TouchableOpacity>
@@ -138,10 +146,10 @@ const Signup = () => {
 
               <TouchableOpacity
                 onPress={() => router.push("/signin")}
-                className="mt-4 flex-row justify-center items-center"
+                className="mt-8 flex-row justify-center items-center"
               >
-                <Text className="text-gray-700 font-semibold">Already a User? </Text>
-                <Text className="text-base text-primary font-bold underline">Sign In</Text>
+                <Text className="text-gray-700 text-lg font-semibold">Already a User? </Text>
+                <Text className="text-lg text-primary font-bold underline">Sign In</Text>
               </TouchableOpacity>
 
               {/* OR Divider */}
@@ -156,8 +164,8 @@ const Signup = () => {
                 onPress={() => router.push("/home")}
                 className="flex-row justify-center items-center"
               >
-                <Text className="text-gray-700 font-semibold ">Be a </Text>
-                <Text className="text-base text-primary font-bold underline">Guest User</Text>
+                <Text className="text-gray-700 font-semibold text-lg ">Be a </Text>
+                <Text className="text-lg text-primary font-bold underline">Guest User</Text>
               </TouchableOpacity>
             </View>
           )}

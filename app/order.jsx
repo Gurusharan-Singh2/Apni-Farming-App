@@ -70,7 +70,7 @@ const ApplyCouponMutation = useMutation({
   if (data.success && data.order_id) {
     setCreatedOrderId(data.order_id);
     setthank(true);
-    useCartStore.getState().clearCart(); // optional: clear cart after order
+    useCartStore.getState().clearCart(); 
   } else {
     Toast.show({
       type: 'error',
@@ -288,9 +288,7 @@ if (thank) {
                 <ChangedAddress />
               </>
             ) : (
-              <TouchableOpacity onPress={() => router.push('/address-selection')}>
-                <Text className="text-blue-500">Add Delivery Address</Text>
-              </TouchableOpacity>
+              <ChangedAddress/>
             )}
           </View>
         </View>

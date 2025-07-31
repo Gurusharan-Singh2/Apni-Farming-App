@@ -33,8 +33,8 @@ const CategoryItem = () => {
   };
 
   return (
-    <View className="mt-4">
-      <Text className="text-heading-big font-bold px-5 py-3">Shop By Category</Text>
+    <View >
+      <Text className="text-heading-big font-bold mb-1 px-5 py-3">Shop By Category</Text>
 
       {isLoading && <Text className="px-5">Loading categories...</Text>}
       {error && <Text className="px-5 text-red-500">Failed to load categories</Text>}
@@ -60,7 +60,7 @@ const CategoryItem = () => {
                   className={`w-full h-24  rounded-lg   `}
                   resizeMode="cover"
                 />
-                <Text className={`text-center font-bold text-[11px] mt-1 mb-0`}>
+                <Text className={`text-center font-semibold text-[11px] mt-1 mb-0`}>
                   { item.name}
                 </Text>
               </TouchableOpacity>

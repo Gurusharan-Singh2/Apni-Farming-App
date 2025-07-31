@@ -65,12 +65,8 @@ const BuyitAgain = ({url,title}) => {
     retry:2,
     retryDelay:5*1000
   });
-
- 
-
-
   return (
-    <View className="py-2 mt-4">
+    <View className="py-2 mt-4 z-40">
       <Text className="text-lg font-bold px-4 mb-4">{title}</Text>
 
       {isLoading ? (

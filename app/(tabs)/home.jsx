@@ -16,6 +16,7 @@ import { useRouter } from "expo-router";
 import { handleBackgroundNotificationNavigation } from "../../utils/notification";
 import CartIconWithBadge from "../../components/Carticon";
 import {  BackendUrl2 } from "../../utils/Constants";
+import BuyitAgain from "../../components/BuyitAgain";
 
 export default function Home() {
   const router = useRouter();
@@ -55,10 +56,7 @@ export default function Home() {
       return res.json();
     },
   });
-  // console.log(products);
-  
 
-  // Fetch banners
   const {
     data: banners,
     isLoading: bannersLoading,
@@ -121,6 +119,7 @@ export default function Home() {
               isLoading={bannersLoading}
               isError={bannersError}
             />
+            <BuyitAgain url={'https://api.apnifarming.com/user/products/buyitagain.php'} title={'Buy it Again'} method={"post"} objKey={"products"}  />
             <CategoryItem setCategoryId={setCategoryId} />
           </>
         }

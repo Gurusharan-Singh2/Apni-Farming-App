@@ -8,6 +8,7 @@ import ProfileIcon from "../../components/ProfileIcon";
 import useAuthStore from "../../Store/AuthStore";
 import { useRouter } from "expo-router";
 import WishListItem from "../../components/WishListItem";
+import EmptyCart from "../../components/EmptyCart";
 
 export default function Wishlist() {
   const { wishlist } = useWishlistStore();
@@ -48,9 +49,7 @@ const renderItem = ({ item }) => {
         </View>
         </View>
 {wishlist.length===0 && 
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-heading-big text-red-500">No Item in Wishlist .Please Add!!!</Text>
-        </View>
+       <EmptyCart/>
 }
     
     <FlatList

@@ -8,8 +8,8 @@ const OtpInput = ({ value, onChange }) => {
   };
 
   return (
-    <View className="w-full">
-      <Text className="text-sm mb-2 text-gray-700">Enter OTP</Text>
+    <View className="w-full my-5">
+      <Text className="text-[16px] mb-2 text-gray-700">Enter OTP</Text>
       <TextInput
         value={value}
         onChangeText={handleChange}
@@ -20,7 +20,7 @@ const OtpInput = ({ value, onChange }) => {
         textContentType="oneTimeCode" // iOS autofill
         autoComplete="sms-otp"        // Android autofill
         importantForAutofill="yes"
-        className="border border-gray-300 rounded-lg px-4 py-3 text-lg bg-white"
+        className="border border-gray-300 rounded-lg px-4 py-4 text-xl bg-white"
       />
     </View>
   );

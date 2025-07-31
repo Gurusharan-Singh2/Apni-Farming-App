@@ -34,6 +34,7 @@ const YouMayAlsoLike = ({ url, title }) => {
   const { data: ypumayalso, isLoading } = useQuery({
     queryKey: ["ypumayalso", customer_id],
     queryFn: YouMAyAlsoLikeFetch,
+    
     onError: (error) => {
       console.error("Error fetching Buy it again:", error.message);
       Toast.show({
@@ -45,7 +46,6 @@ const YouMayAlsoLike = ({ url, title }) => {
       });
     },
     enabled: !!customer_id,
-    staleTime: 1000 * 60 * 5,
     retry: 2,
     retryDelay: 5 * 1000,
   });

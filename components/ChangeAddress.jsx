@@ -112,7 +112,7 @@ const ChangedAddress = () => {
 
   addAddress(newAddress);
 
-  // ✅ If this is the first address, set it as the selected one
+ 
   if (addresses.length === 0) {
     setSelectedAddress(newAddress);
   }
@@ -181,11 +181,14 @@ const ChangedAddress = () => {
     };
     Getdata.mutate(payload);
   }
+  if(!selectedAddress){
+    setSelectedAddress(addresses[0])
+  }
 
   return () => {
     isMounted = false;
   };
-}, [customer_id]);
+}, [customer_id,selectedAddress]);
 
 
   const openDrawer = () => setDrawerVisible(true);
@@ -298,8 +301,9 @@ const ChangedAddress = () => {
     <View className="items-start">
      <TouchableOpacity onPress={openDrawer} className="flex-row items-center space-x-1 px-6 py-1 border border-green-500 rounded-full">
         
+      {selectedAddress ? <Text className="text-green-500 text-sm">Change Address</Text>: <Text className="text-green-500 text-sm">Add Address</Text> }
           
-       <Text className="text-green-500 text-sm">Change Address</Text>
+      
          
        
                
@@ -354,7 +358,7 @@ const ChangedAddress = () => {
                           </View>
                           <Text className="text-gray-600 text-sm">{addr.street}, {addr.city}</Text>
                           <Text className="text-gray-600 text-sm">{addr.state} - {addr.zip}</Text>
-                          <View className="absolute right-0 bottom-1 m-1 flex-row space-x-4 mt-2">
+                          <View className="absolute gap-4 mr-2 right-0 bottom-1 m-1 flex-row space-x-4 mt-2">
                             <TouchableOpacity onPress={() => handleEdit(index)}>
                               <AntDesign name="edit" size={20} color="#4B5563" />
                             </TouchableOpacity>

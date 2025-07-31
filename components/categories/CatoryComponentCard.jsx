@@ -182,7 +182,7 @@ const {
   };
 
  return (
-  <View className="w-[120px] ml-4 bg-white rounded-xl  shadow shadow-gray-300">
+  <View className="w-[130px] ml-4 bg-white rounded-xl  shadow shadow-gray-300">
     <TouchableOpacity
       onPress={() => router.push(`product_details/${item?.id}`)}
       className="relative"
@@ -207,7 +207,7 @@ const {
 
       <Image
         source={{ uri: item?.image }}
-        className="w-full h-[90px] rounded-lg"
+        className="w-full h-[110px] rounded-lg"
         resizeMode="contain"
       />
     </TouchableOpacity>
@@ -215,18 +215,13 @@ const {
     <Text className="text-sm font-semibold mt-1" numberOfLines={1}>
       {item.name}
     </Text>
-    {item.tagline && (
-      <Text className="text-xs text-gray-500 mb-1" numberOfLines={1}>
-        {item.tagline}
-      </Text>
-    )}
-
+   
     <View className="flex-row justify-between items-center mb-1">
       <Text className="text-green-700 font-bold text-sm">
         ₹{selectedSize?.sellPrice}
       </Text>
       {selectedSize?.discount && (
-        <Text className="text-red-600 text-xs font-semibold">
+        <Text className="text-red-600 text-xs font-bold">
           {selectedSize?.discount}
         </Text>
       )}
