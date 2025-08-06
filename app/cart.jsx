@@ -151,7 +151,7 @@ const CartScreen = () => {
               <View className="mt-2">
                 {isAuthenticated() ? (
                  <View className="flex-row">
-                   <View className="flex justify-center w-[30%]  p-1 items-center">
+                   <View className="flex justify-center w-[40%]  p-1 items-center">
                 
                   <Text className="font-extrabold text-black text-heading-small">Total: ₹ {finalAmount}</Text>
                   <Text className="text-green-500 text-basic font-semibold ml-1">
@@ -159,7 +159,7 @@ const CartScreen = () => {
                   </Text>
                 </View>
                    <TouchableOpacity
-                    className="bg-green-600 flex-row justify-around w-[70%] px-5 py-5 rounded-lg"
+                    className="bg-green-600 flex-row justify-between w-[60%] px-2 py-3 rounded-lg"
                     onPress={() => router.push('/order')}
                   >
                      

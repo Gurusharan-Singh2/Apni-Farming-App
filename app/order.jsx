@@ -17,6 +17,8 @@ import useAuthStore from '../Store/AuthStore';
 import { toastConfig } from '../hooks/toastConfig';
 import ThankYouCard from '../components/ThankYouCard';
 import DeliveryInstructions from '../components/DeliveryInstruction';
+import CancellationPolicy from '../components/cc';
+import Back from '../components/Back';
 
 
 
@@ -259,15 +261,7 @@ if (thank) {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-3 bg-white border-b border-gray-200">
-        <TouchableOpacity 
-          onPress={() => router.back()} 
-          className="flex-row items-center w-44 gap-3"
-        >
-          <Ionicons name="arrow-back" size={24} color="black" />
-          <Text className="text-heading-big font-semibold">Checkout</Text>
-        </TouchableOpacity>
-      </View>
+      <Back title='Back'/>
 
       <ScrollView className="flex-1 px-4"   contentContainerStyle={{ flexGrow: 1, paddingBottom: 90 }}>
           <Coupon />
@@ -333,6 +327,7 @@ if (thank) {
   delivey_instruction={delivey_instruction}
   setdelivery_instruction={setdelivery_instruction}
 />
+<CancellationPolicy/>
 
 {/* Pament Method */}
 {/* <View className="mb-4 px-6">
