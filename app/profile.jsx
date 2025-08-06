@@ -20,8 +20,7 @@ const ProfileScreen = () => {
       router.replace("/");   
     };
    
-    
-  
+     
     
 
   return (

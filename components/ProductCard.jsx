@@ -174,6 +174,8 @@ const {
       autoHide: true,
     });
   };
+  
+  
 
   const handleSelectSize = sizeObj => {
     setSelectedSize(sizeObj);
@@ -264,7 +266,20 @@ const {
             <Ionicons name="remove" size={26} color="#fff" />
           </TouchableOpacity>
           <Text className="text-[14px] font-semibold text-white">{quantity}</Text>
-          <TouchableOpacity onPress={() => increment(item.id, selectedSize.id)}>
+          <TouchableOpacity onPress={() =>{
+                              if(selectedSize?.maxOrder===null){
+increment(item.id, selectedSize.id)
+                              }else{
+                                if(quantity<selectedSize?.maxOrder){
+          increment(item.id, selectedSize.id)
+                              }else{
+                                Toast.show({
+                                  type:"error",
+                                  text1:"Max Quantity Reached"
+                                })
+                              }
+                              }
+                               }}>
             <Ionicons name="add" size={26} color="#fff" />
           </TouchableOpacity>
         </View>

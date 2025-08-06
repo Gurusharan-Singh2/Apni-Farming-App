@@ -21,6 +21,7 @@ import useWishlistStore from '../../../Store/WishlistStore';
 import ProfileIcon from '../../../components/ProfileIcon';
 import CartIconWithBadge from '../../../components/Carticon';
 import BuyitAgain from '../../../components/BuyitAgain';
+import Back from '../../../components/Back';
 
 const BackendUrl2 = 'https://api.apnifarming.com';
 
@@ -229,17 +230,9 @@ const isWishlisted = useMemo(() => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY  }}>
       {/* Header */}
-      <View className="mb-1">
-        <View className="flex flex-row w-full justify-between px-6 my-3">
-          <View className="flex-row items-center py-3 bg-white">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="flex-row items-center w-40 gap-3"
-            >
-              <Ionicons name="arrow-back" size={24} color="black" />
-              <Text className="text-heading-big">Back</Text>
-            </TouchableOpacity>
-          </View>
+      <View className="">
+        <View className="flex flex-row w-full justify-between px-6 my-1">
+           <Back title="Back" />
           <View className="flex flex-row items-center gap-2">
             <CartIconWithBadge />
             {isAuthenticated() && <ProfileIcon />}

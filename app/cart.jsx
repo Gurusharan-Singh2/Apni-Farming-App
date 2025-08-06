@@ -24,13 +24,18 @@ import EmptyOrder from '../components/EmptyOrder';
 import YouMayAlsoLike from '../components/YouMayAlsoLike';
 import CartReccomendation from '../components/CartReccomendation';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Toast from 'react-native-toast-message';
+import Back from '../components/Back';
 
 const CartScreen = () => {
   const { cart, discount, finalAmount, decrement, increment,removeFromCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
 
+  
+  
   const renderItem = ({ item }) => (
+    
     <View className="flex-row gap-3 mt-3 bg-white p-2 border-b border-b-gray-100 shadow">
       <View className="flex-row items-center border border-gray-200 p-1 rounded-lg">
         <Image className="w-28 h-28 rounded-lg" source={{ uri: item.image }} />
@@ -60,7 +65,20 @@ const CartScreen = () => {
 
               <Text className="text-basic font-semibold text-white">{item.quantity}</Text>
 
-              <TouchableOpacity onPress={() => increment(item.id, item.selectedSize?.id)}>
+              <TouchableOpacity onPress={() =>{
+                                            if(item?.selectedSize?.maxOrder===null){
+              increment(item?.id, item?.selectedSize?.id)
+                                            }else{
+                                              if(item?.quantity<item?.selectedSize?.maxOrder){
+                        increment(item.id, item?.selectedSize?.id)
+                                            }else{
+                                              Toast.show({
+                                                type:"error",
+                                                text1:"Max Quantity Reached"
+                                              })
+                                            }
+                                            }
+                                             }}>
   <Ionicons name="add" size={22} color="#fff" />
 </TouchableOpacity>
             </View>
@@ -91,16 +109,8 @@ const CartScreen = () => {
             ListHeaderComponent={() => (
               <>
                <View className="mb-1">
-        <View className="flex flex-row w-full justify-between px-6 my-3">
-          <View className="flex-row items-center py-3 bg-white">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="flex-row items-center w-40 gap-3"
-            >
-              <Ionicons name="arrow-back" size={24} color="black" />
-              <Text className="text-heading-big">Back</Text>
-            </TouchableOpacity>
-          </View>
+        <View className="flex flex-row w-full justify-between px-2 my-3">
+          <Back title="Cart" />
           <View className="flex flex-row items-center gap-2">
             <CartIconWithBadge />
             {isAuthenticated() && <ProfileIcon />}
@@ -117,10 +127,14 @@ const CartScreen = () => {
               </>
             )}
 
-            ListFooterComponent={()=>(
-               <YouMayAlsoLike url={`${BackendUrl2}/user/products/youamyalsolike.php`} title={"Get Start Shopping"}/>
-
-            )}
+            ListFooterComponent={ cart.length > 0
+      ? () => (
+          <YouMayAlsoLike
+            url={`${BackendUrl2}/user/products/youamyalsolike.php`}
+            title="You May Also Like"
+          />
+        )
+      : null}
           />
 
           {cart.length > 0 && (
@@ -137,11 +151,11 @@ const CartScreen = () => {
               <View className="mt-2">
                 {isAuthenticated() ? (
                  <View className="flex-row">
-                   <View className="flex w-[30%]  p-1 items-center">
-                  <AntDesign name="tags" size={18} color="#22c55e" />
+                   <View className="flex justify-center w-[30%]  p-1 items-center">
+                
                   <Text className="font-extrabold text-black text-heading-small">Total: ₹ {finalAmount}</Text>
                   <Text className="text-green-500 text-basic font-semibold ml-1">
-                    Saved ₹{discount}
+                      <AntDesign name="tags" size={18} color="#22c55e" />Saved ₹{discount}
                   </Text>
                 </View>
                    <TouchableOpacity

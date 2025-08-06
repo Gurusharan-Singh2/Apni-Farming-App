@@ -10,6 +10,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../assets/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import YouMayAlsoLike from '../../components/YouMayAlsoLike';
+import Back from '../../components/Back';
 
 
 const fetchCategories = async () => {
@@ -68,15 +70,7 @@ const router=useRouter();
           
       <View className="mb-1"> 
       <View className="flex flex-row w-full justify-between px-6 my-3">
-       <View className="flex-row items-center  py-3 bg-white">
-                <TouchableOpacity 
-                  onPress={() => router.back()} 
-                   className="flex-row items-center w-40 gap-3"
-                >
-                  <Ionicons name="arrow-back" size={24} color="black" />
-                  <Text className="text-heading-big">Categories</Text>
-                </TouchableOpacity>
-              </View>
+       <Back title="Categories" />
         <View className="flex flex-row items-center gap-2">
         <CartIconWithBadge/>
 {isAuthenticated() && <ProfileIcon />}
@@ -91,6 +85,12 @@ const router=useRouter();
         keyExtractor={(item) => item.id.toString()}
         numColumns={3}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
+        ListFooterComponent={()=>(
+           <YouMayAlsoLike
+            url={`${BackendUrl2}/user/products/youamyalsolike.php`}
+            title="You May Also Like"
+          />
+        )}
         showsVerticalScrollIndicator={false}
       />
    

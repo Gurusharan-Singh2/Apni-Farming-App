@@ -17,7 +17,6 @@ import useAuthStore from '../Store/AuthStore';
 import { toastConfig } from '../hooks/toastConfig';
 import ThankYouCard from '../components/ThankYouCard';
 import DeliveryInstructions from '../components/DeliveryInstruction';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 
@@ -34,7 +33,7 @@ const OrderScreen = () => {
   const [showInput, setShowInput] = useState(true);
   const [thank,setthank]=useState(false);
   const [createdOrderId, setCreatedOrderId] = useState(null);
-  const insets = useSafeAreaInsets();
+  
 
   const {
     cart,
@@ -241,11 +240,6 @@ const orderPayload = {
 };
 
    CheckoutMutation.mutate(orderPayload);
-  //  console.log(delivey_instruction);
-   
-    
-    
-
   };
 
 
@@ -352,10 +346,10 @@ if (thank) {
 </View> */}
 
         {/* Order Summary */}
-        <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
+        <View className="bg-white  rounded-lg shadow-sm p-4 mb-4">
           <Text className="text-heading font-bold text-black mb-4">Order Summary</Text>
           
-          <View className="flex gap-1">
+          <View className="flex gap-2">
             <View className="flex-row justify-between">
               <Text className="text-basic text-gray-600">Subtotal</Text>
               <Text className="text-basic font-medium">₹{totalAmount.toFixed(2)}</Text>
@@ -367,7 +361,7 @@ if (thank) {
             </View>
              <View className="flex-row justify-between">
               <Text className="text-basic text-gray-600">Coupon</Text>
-              <Text className="text-basic text-green-500">-₹{couponDiscount.toFixed(2)}</Text>
+              <Text className="text-basic text-green-600">-₹{couponDiscount.toFixed(2)}</Text>
             </View>
             
             <View className="flex-row justify-between">
@@ -411,7 +405,7 @@ if (thank) {
         <Text className="text-white font-bold text-lg">
           {CheckoutMutation.isPending ? 'Proceeding...' : 'Proceed to Payment'}
         </Text>
-        <Text className="text-white text-sm mt-1">₹{finalAmount.toFixed(2)}</Text>
+        <Text className="text-white text-xl font-bold mt-1">₹{finalAmount.toFixed(2)}</Text>
       </View>
     </TouchableOpacity>
   </View>

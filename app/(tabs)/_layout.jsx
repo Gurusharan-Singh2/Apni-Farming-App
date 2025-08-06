@@ -6,6 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Font from 'expo-font';
 import useWishlistStore from '../../Store/WishlistStore';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 
 const TabLayout = () => {
   const insets = useSafeAreaInsets();
@@ -61,7 +62,7 @@ const TabLayout = () => {
           options={{
             title: "Home",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="home" size={20} color={color} />
+              <Ionicons name="home-outline" size={20} color={color} />
             ),
           }}
         />
@@ -79,7 +80,7 @@ const TabLayout = () => {
           options={{
             title: "Wishlist",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="heart" size={20} color={color} />
+              <Feather name="heart" size={20} color={color} />
             ),
             tabBarBadge: wishlist.length > 0 ? wishlist.length : null,
             tabBarBadgeStyle: {
@@ -93,15 +94,7 @@ const TabLayout = () => {
             },
           }}
         />
-         <Tabs.Screen
-          name="subscription"
-          options={{
-            title: "Subscriptions",
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="repeat-outline" size={20} color={color} />
-            ),
-          }}
-        />
+        
         <Tabs.Screen
           name="orders"
           options={{

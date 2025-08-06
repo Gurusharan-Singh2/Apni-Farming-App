@@ -37,6 +37,8 @@ export const requestPermissionAndGetToken = async () => {
 
 // Display notification only in foreground
 export const displayNotification = async ({ title, body, image, screen, orderId, url }) => {
+  console.log("🖼️ Image URL for notification:", image);
+
   await notifee.createChannel({
     id: "default",
     name: "Default Channel",

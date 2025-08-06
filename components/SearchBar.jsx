@@ -31,7 +31,7 @@ export default function SearchBar({ query, onChange, onSubmit }) {
     return () => clearTimeout(timeout);
   }, [query]);
 
-  const { data } = useQuery({
+  const { data,isLoading } = useQuery({
     queryKey: ["search", debouncedQuery],
     queryFn: async () => {
       const res = await axios.get(
@@ -122,101 +122,117 @@ export default function SearchBar({ query, onChange, onSubmit }) {
         )}
       </View>
 
-      {showSuggestions && (
-        <FlatList
-          keyboardShouldPersistTaps="handled"
-          data={data}
-          keyExtractor={(item) => item.id}
-          className="bg-white mt-2 rounded-xl shadow-md min-h-[90%]"
-          renderItem={({ item }) => {
-            const selectedSize = selectedSizes[item.id] || item.sizes?.[0];
+      {showSuggestions ? (
+  isLoading ? (
+    <View className="p-4 items-center justify-center">
+      <Ionicons name="hourglass-outline" size={30} color="#aaa" />
+      <Text className="text-gray-500 mt-2">Searching...</Text>
+    </View>
+  ) : data?.length > 0 ? (
+    <FlatList
+      keyboardShouldPersistTaps="handled"
+      data={data}
+      keyExtractor={(item) => item.id.toString()}
+      className="bg-white mt-2 rounded-xl shadow-md min-h-[90%]"
+      renderItem={({ item }) => {
+        const selectedSize = selectedSizes[item.id] || item.sizes?.[0];
+        const quantity =
+          cart.find(
+            (i) =>
+              Number(i.id) === Number(item.id) &&
+              Number(i.selectedSize?.id) === Number(selectedSize?.id)
+          )?.quantity || 0;
 
-            const quantity =
-              cart.find(
-                (i) =>
-                  Number(i.id) === Number(item.id) &&
-                  Number(i.selectedSize?.id) === Number(selectedSize?.id)
-              )?.quantity || 0;
+        return (
+          <View className="flex-row items-center bg-white p-3 rounded-2xl shadow-sm mb-2 mx-2">
+            <Image
+              source={{ uri: item.image }}
+              className="w-24 h-24 rounded-xl mr-3"
+              resizeMode="cover"
+            />
 
-            return (
-              <View className="flex-row items-center bg-white p-3 rounded-2xl shadow-sm mb-2 mx-2">
-                <Image
-                  source={{ uri: item.image }}
-                  className="w-24 h-24 rounded-xl mr-3"
-                  resizeMode="cover"
-                />
+            <View className="flex-1 flex-row justify-between items-center">
+              <View className="flex-1 mr-2">
+                <Text
+                  className="text-gray-900 font-semibold text-[14px] mb-1"
+                  numberOfLines={2}
+                >
+                  {item?.name}
+                </Text>
 
-                <View className="flex-1 flex-row justify-between items-center">
-                  <View className="flex-1 mr-2">
-                    <Text className="text-gray-900 font-semibold text-[14px] mb-1" numberOfLines={2}>
-                      {item?.name}
+                <Text className="text-heading-small mb-1 text-green-600 font-bold">
+                  {selectedSize?.discount}
+                </Text>
+
+                <View className="flex-row self-start rounded-lg px-1 py-1 bg-[#D02127] justify-between items-center mb-2">
+                  {selectedSize?.discount && (
+                    <Text className="text-[13px] font-semibold py-1 px-1 rounded-l-lg bg-[#D02127] text-white line-through">
+                      ₹{selectedSize?.costPrice}
                     </Text>
-
-                    <Text className="text-heading-small mb-1 text-green-600 font-bold ">
-                      {selectedSize?.discount}
-                    </Text>
-
-                    <View className="flex-row self-start rounded-lg px-1 py-1 bg-[#D02127] justify-between items-center mb-2">
-                      {selectedSize?.discount && (
-                        <Text className="text-[13px] font-semibold py-1 px-1 rounded-l-lg bg-[#D02127] text-white line-through">
-                          ₹{selectedSize?.costPrice}
-                        </Text>
-                      )}
-                      <Text className="text-[14px] bg-white mx-1 px-2 py-1 rounded text-green-600 font-bold ">
-                        ₹{selectedSize?.sellPrice}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {quantity > 0 ? (
-                    <View className="flex-row items-center">
-                      <View className="flex-row items-center justify-between bg-green-600 rounded-full px-2 py-2 min-w-[100px]">
-                        <TouchableOpacity onPress={() => decrement(item.id, selectedSize.id)}>
-                          <Ionicons name="remove" size={24} color="#fff" />
-                        </TouchableOpacity>
-                        <Text className="text-white text-[14px] font-semibold px-2">{quantity}</Text>
-                        <TouchableOpacity onPress={() => increment(item.id, selectedSize.id)}>
-                          <Ionicons name="add" size={24} color="#fff" />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  ) : (
-                    <View className="items-end">
-                      {item.sizes && (
-                        <TouchableOpacity
-                          className="border mb-4 border-gray-300 rounded-md px-4 py-1 flex-row items-center"
-                          onPress={() => {
-                            setSelectedProduct(item);
-                            setModalVisible(true);
-                          }}
-                        >
-                          <Text className="text-gray-700 text-[14px] mr-1">
-                            {selectedSize?.size + " " + selectedSize?.option?.toLowerCase()}
-                          </Text>
-                          <Ionicons name="chevron-down" size={14} color="#6B7280" />
-                        </TouchableOpacity>
-                      )}
-
-                      <TouchableOpacity
-                        className="border border-green-500 px-7 py-2 rounded-full"
-                        onPress={() => handleAddToCart(item)}
-                      >
-                        <Text className="text-green-500 text-[14px] font-bold">Add</Text>
-                      </TouchableOpacity>
-                    </View>
                   )}
+                  <Text className="text-[14px] bg-white mx-1 px-2 py-1 rounded text-green-600 font-bold">
+                    ₹{selectedSize?.sellPrice}
+                  </Text>
                 </View>
               </View>
-            );
-          }}
-          ItemSeparatorComponent={() => <View className="h-px bg-gray-200 mx-3 my-2" />}
-          ListEmptyComponent={() => (
-            <View className="p-4 items-center justify-center">
-              <Text className="text-gray-600">Item not available, try another name</Text>
+
+              {quantity > 0 ? (
+                <View className="flex-row items-center">
+                  <View className="flex-row items-center justify-between bg-green-600 rounded-full px-2 py-2 min-w-[100px]">
+                    <TouchableOpacity onPress={() => decrement(item.id, selectedSize.id)}>
+                      <Ionicons name="remove" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text className="text-white text-[14px] font-semibold px-2">
+                      {quantity}
+                    </Text>
+                    <TouchableOpacity onPress={() => increment(item.id, selectedSize.id)}>
+                      <Ionicons name="add" size={24} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <View className="items-end">
+                  {item.sizes && (
+                    <TouchableOpacity
+                      className="border mb-4 border-gray-300 rounded-md px-4 py-1 flex-row items-center"
+                      onPress={() => {
+                        setSelectedProduct(item);
+                        setModalVisible(true);
+                      }}
+                    >
+                      <Text className="text-gray-700 text-[14px] mr-1">
+                        {selectedSize?.size + " " + selectedSize?.option?.toLowerCase()}
+                      </Text>
+                      <Ionicons name="chevron-down" size={14} color="#6B7280" />
+                    </TouchableOpacity>
+                  )}
+
+                  <TouchableOpacity
+                    className="border border-green-500 px-7 py-2 rounded-full"
+                    onPress={() => handleAddToCart(item)}
+                  >
+                    <Text className="text-green-500 text-[14px] font-bold">Add</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-          )}
-        />
-      )}
+          </View>
+        );
+      }}
+      ItemSeparatorComponent={() => <View className="h-px bg-gray-200 mx-3 my-2" />}
+    />
+  ) : (
+    <View className="p-4 items-center justify-center">
+      <Ionicons name="sad-outline" size={40} color="#ccc" />
+      <Text className="text-gray-600 mt-2 text-center">
+        No products found. Try something else.
+      </Text>
+    </View>
+  )
+) : null}
+
+
+
 
       {/* Size Selection Modal */}
       <Modal transparent visible={modalVisible} animationType="fade">
