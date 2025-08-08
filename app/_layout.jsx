@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { Text as DefaultText} from "react-native";
-import { Stack } from "expo-router";
-import * as Font from "expo-font";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as Font from "expo-font";
+import { Stack } from "expo-router";
+import { useEffect, useState } from "react";
+import { Text as DefaultText } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from 'react-native-toast-message';
-import {toastConfig} from '../hooks/toastConfig'
+import { toastConfig } from '../hooks/toastConfig';
 
 import "../global.css";
 

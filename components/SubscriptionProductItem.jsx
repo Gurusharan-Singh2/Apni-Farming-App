@@ -14,11 +14,10 @@ const SubcriptionItem = ({ item }) => {
 
   
 useEffect(() => {
- 
   if (item?.sizes?.length) {
     setSelectedSize(item.sizes[0]);
   }
-}, [item]);
+}, [item.id, item.sizes]);
 
   const quantity = useMemo(() => {
     return (
@@ -214,4 +213,4 @@ increment(item.id, selectedSize.id)
   );
 };
 
-export default SubcriptionItem;
+export default React.memo(SubcriptionItem);

@@ -47,7 +47,7 @@ const Signup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      console.log("Signup successful:", data);
+      
       setshowOtp(true);
     },
     onError: (error) => {

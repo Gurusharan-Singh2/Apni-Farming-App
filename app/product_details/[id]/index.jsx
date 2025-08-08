@@ -43,6 +43,9 @@ const ProductDetails = () => {
     enabled: !!id,
   });
 
+ 
+  
+
   const { user, isAuthenticated } = useAuthStore();
   const customer_id = user?.userId;
 
@@ -115,7 +118,8 @@ const isWishlisted = useMemo(() => {
       refetchWishlist();
       Toast.show({
         type: 'success',
-        text1: 'Added to wishlist',
+        text1: 'Success',
+        text2: 'Added to wishlist',
         visibilityTime: 1000,
         autoHide: true,
       });
@@ -143,7 +147,8 @@ const isWishlisted = useMemo(() => {
       refetchWishlist();
       Toast.show({
         type: 'success',
-        text1: 'Removed from wishlist',
+        text1: 'Success',
+        text2: 'Removed from wishlist',
         visibilityTime: 1000,
         autoHide: true,
       });
@@ -201,7 +206,7 @@ const isWishlisted = useMemo(() => {
       type: 'success',
       text1: 'Added to Cart!',
       text2: `${data.name} was added successfully.`,
-      visibilityTime: 500,
+      visibilityTime: 800,
       autoHide:true
     });
   };
@@ -241,7 +246,7 @@ const isWishlisted = useMemo(() => {
       </View>
 
       {/* Product Content */}
-      <ScrollView className="px-4 pb-10 ">
+      <ScrollView className="px-6 pb-10 ">
         {isAuthenticated() && (
           <View className="z-40 w-8 absolute top-0 right-0">
             <TouchableOpacity
@@ -294,7 +299,7 @@ const isWishlisted = useMemo(() => {
             disabled={quantity>0}
             onPress={() => setModalVisible(true)}
           >
-            <Text className={`text-gray-700 text-[14px] ${quantity>0 ? "text-[#e5e7eb]":"ext-gray-700"} `}>
+            <Text className={` text-[14px] ${quantity>0 ? "text-[#e5e7eb]":"text-gray-700"} `}>
               {selectedSize.size + ' ' + selectedSize.option?.toLowerCase()}
             </Text>
             <Ionicons name="chevron-down" size={16} color={quantity > 0 ? '#e5e7eb' : '#6B7280'} />
@@ -322,6 +327,18 @@ const isWishlisted = useMemo(() => {
             </TouchableOpacity>
           </View>
         )}
+        {data?.description && (
+          <>
+           <Text className="text-black text-[16px] mt-4 font-bold">
+          Description :
+        </Text>
+        <Text className="text-gray-600 text-[14px] mt-2">
+          {data?.description}
+        </Text>
+          </>
+
+        )}
+       
          <BuyitAgain url={'https://api.apnifarming.com/user/products/buyitagain.php'} title={'Buy it Again'} method={"post"} objKey={"products"}  />
       </ScrollView>
 

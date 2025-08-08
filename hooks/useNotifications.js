@@ -30,15 +30,15 @@ export default function useNotifications() {
 
   const { mutateAsync: registerFCMToken } = useMutation({
     mutationFn: registerToken,
-    onSuccess: () => console.log("✅ FCM token registered"),
     onError: (err) => console.error("❌ FCM registration failed:", err?.response?.data || err.message),
+    retry:3,
+    
   });
 
   // Step 1: Request token when component mounts
   useEffect(() => {
     const fetchToken = async () => {
       const fcmToken = await requestPermissionAndGetToken();
-      console.log("✅ Token in hook:", fcmToken);
       setToken(fcmToken);
     };
     fetchToken();
@@ -54,7 +54,7 @@ export default function useNotifications() {
     if (!hasSubscribed) {
       hasSubscribed = true;
       listenerRef.current = handleForegroundMessages();
-      console.log("📲 Foreground message listener attached.");
+    
     }
 
     handleBackgroundNotificationNavigation(router);
@@ -63,7 +63,7 @@ export default function useNotifications() {
       if (listenerRef.current) {
         listenerRef.current();
         listenerRef.current = null;
-        console.log("🧹 Foreground message listener removed.");
+    
         hasSubscribed = false;
       }
     };
@@ -73,7 +73,7 @@ export default function useNotifications() {
 
 export function handleNotificationTap(data) {
   const { screen, orderId, url } = data || {};
-  // console.log("📲 Handling tap to:", screen, orderId, url);
+  
 
   if (screen === 'offers') {
     router.push({

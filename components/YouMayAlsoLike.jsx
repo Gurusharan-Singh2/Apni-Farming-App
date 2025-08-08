@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  Modal,
-  ActivityIndicator,
-} from "react-native";
 import axios from "axios";
+import React, { useCallback } from "react";
+import {
+    ActivityIndicator,
+    FlatList,
+    Text,
+    View
+} from "react-native";
 import Toast from "react-native-toast-message";
 
 import { useQuery } from "@tanstack/react-query";
-import useCartStore from "../Store/CartStore";
 import useAuthStore from "../Store/AuthStore";
+import useCartStore from "../Store/CartStore";
 import SuggestionCard from "./SuggestionCard";
 
 const YouMayAlsoLike = ({ url, title }) => {
@@ -50,6 +47,8 @@ const YouMayAlsoLike = ({ url, title }) => {
     retryDelay: 5 * 1000,
   });
 
+  const renderItem = useCallback(({ item }) => <SuggestionCard item={item} />, []);
+
   return (
     <View className="py-2 mt-4">
       <Text className="text-lg font-bold px-4 mb-4">{title}</Text>
@@ -61,7 +60,7 @@ const YouMayAlsoLike = ({ url, title }) => {
       ) : (
         <FlatList
           data={ypumayalso}
-          renderItem={({ item }) => <SuggestionCard item={item} />}
+          renderItem={renderItem}
           keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -71,4 +70,4 @@ const YouMayAlsoLike = ({ url, title }) => {
   );
 };
 
-export default YouMayAlsoLike;
+export default React.memo(YouMayAlsoLike);

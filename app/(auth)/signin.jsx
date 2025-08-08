@@ -45,7 +45,7 @@ const Signin = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      console.log("Login successful:", data);
+    
       setshowOtp(true);
     },
   });

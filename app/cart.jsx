@@ -105,18 +105,17 @@ const CartScreen = () => {
             data={cart}
             keyExtractor={(item, index) => `${item.id}-${item.selectedSize?.size}-${index}`}
             renderItem={renderItem}
-            contentContainerStyle={{ padding: 16 }}
+            contentContainerStyle={{ padding: 10 }}
             ListHeaderComponent={() => (
               <>
-               <View className="mb-1">
-        <View className="flex flex-row w-full justify-between px-2 my-3">
+        <View className="flex mb-2 px-2 flex-row w-full justify-between ">
           <Back title="Cart" />
-          <View className="flex flex-row items-center gap-2">
-            <CartIconWithBadge />
+          <View className="flex flex-row items-center gap-4">
+            
             {isAuthenticated() && <ProfileIcon />}
           </View>
         </View>
-      </View>
+ 
                {cart.length === 0 && (
                 <>
                    <EmptyOrder/>
@@ -159,11 +158,11 @@ const CartScreen = () => {
                   </Text>
                 </View>
                    <TouchableOpacity
-                    className="bg-green-600 flex-row justify-between w-[60%] px-2 py-3 rounded-lg"
+                    className="bg-green-600 flex-row  justify-between w-[60%] px-4 py-3 rounded-lg"
                     onPress={() => router.push('/order')}
                   >
                      
-                    <Text className="text-white  text-center font-bold text-[17px]">Go to Checkout</Text>
+                    <Text className="text-white   text-center font-bold text-[17px]">Go to Checkout</Text>
                     <Entypo name="chevron-with-circle-right" size={28} color="white" />
                   </TouchableOpacity>
                   </View>

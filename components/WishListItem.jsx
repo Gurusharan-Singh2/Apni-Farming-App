@@ -1,13 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Image, TouchableOpacity, Modal } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import useCartStore from "../Store/CartStore";
-import Toast from "react-native-toast-message";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { BackendUrl2 } from "../utils/Constants";
+import React, { useEffect, useMemo, useState } from "react";
+import { Image, Modal, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 import useAuthStore from "../Store/AuthStore";
+import useCartStore from "../Store/CartStore";
 import useWishlistStore from "../Store/WishlistStore";
+import { BackendUrl2 } from "../utils/Constants";
 
 const WishListItem = ({ item }) => {
   const { user, isAuthenticated } = useAuthStore();
@@ -59,14 +59,14 @@ const WishListItem = ({ item }) => {
   };
 
   const removeFromWishlistMutation = useMutation({
-    mutationFn: async () =>
+   mutationFn: async () =>
       await axios.post(`${BackendUrl2}/user/wishlists/wishlist.php?action=remove`, {
         customer_id,
-        product_id: item.id,
+        product_id: item.product_id,
       }),
+     
    onSuccess: async () => {
   removeFromWishlist(item.id); // local update
-  refetchWishlist(); // optional sync
   Toast.show({ type: 'success', text1: 'Removed from wishlist' ,visibilityTime: 1000, autoHide: true});
 }
 ,

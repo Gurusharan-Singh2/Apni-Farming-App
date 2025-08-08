@@ -212,7 +212,7 @@ const {
         className="border border-gray-300 rounded-md px-2 py-1 mb-3 flex-row justify-between items-center"
         onPress={() => setModalVisible(true)}
       >
-        <Text className="text-gray-700 text-sm">{selectedSize.size}</Text>
+        <Text className="text-gray-700 text-sm">{selectedSize.size + selectedSize.option}</Text>
         <Ionicons name="chevron-down" size={16} color="#6B7280" />
       </TouchableOpacity>
 
@@ -253,7 +253,7 @@ const {
               >
                 <View className="flex-row px-2 justify-between items-center">
                   <Text className={`text-gray-700 text-sm ${selectedSize.size === sizeObj.size ? 'font-bold text-green-600' : ''}`}>
-                    {sizeObj.size}
+                    {sizeObj.size } {sizeObj.option} 
                   </Text>
                   <Text className={`text-sm ${selectedSize.size === sizeObj.size ? 'font-bold text-green-600' : 'text-gray-500'}`}>
                     ₹{sizeObj.sellPrice}
@@ -268,4 +268,4 @@ const {
   );
 };
 
-export default BannerProductCard;
+export default React.memo(BannerProductCard);

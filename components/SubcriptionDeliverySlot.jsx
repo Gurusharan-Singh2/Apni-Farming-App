@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 // Convert 24-hour format to 12-hour format with AM/PM
 const formatTo12Hour = (timeStr) => {
@@ -58,4 +58,4 @@ const  SubscriptinSlotSelector = ({ slots, selectedSlotId, onSelect }) => {
   );
 };
 
-export default SubscriptinSlotSelector;
+export default React.memo(SubscriptinSlotSelector);

@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
-import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-import { BackendUrl2 } from '../../utils/Constants';
-import CartIconWithBadge from '../../components/Carticon';
-import ProfileIcon from '../../components/ProfileIcon';
-import useAuthStore from '../../Store/AuthStore';
+import axios from 'axios';
 import { useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../assets/Colors';
-import { Ionicons } from '@expo/vector-icons';
-import YouMayAlsoLike from '../../components/YouMayAlsoLike';
 import Back from '../../components/Back';
+import CartIconWithBadge from '../../components/Carticon';
+import ProfileIcon from '../../components/ProfileIcon';
+import YouMayAlsoLike from '../../components/YouMayAlsoLike';
+import useAuthStore from '../../Store/AuthStore';
+import { BackendUrl2 } from '../../utils/Constants';
 
 
 const fetchCategories = async () => {
@@ -39,7 +38,7 @@ const router=useRouter();
     router.push(`/product_screen/${id}`);
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = useCallback(({ item }) => {
   const isSelected = selectedCategory === item.id;
   return (
     <TouchableOpacity
@@ -58,7 +57,7 @@ const router=useRouter();
       </Text>
     </TouchableOpacity>
   );
-};
+}, [selectedCategory]);
 
 
   if (isLoading) return <ActivityIndicator size="large" color="#000" />;
@@ -99,4 +98,4 @@ const router=useRouter();
   );
 };
 
-export default CategoriesScreen;
+export default React.memo(CategoriesScreen);

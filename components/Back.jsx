@@ -1,20 +1,32 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import React, { useCallback, memo } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
-export default function Back({ title = "Back", onPress }) {
+const Back = ({
+  title = 'Back',
+  onPress,
+  iconColor = 'black',
+  iconSize = 24,
+  textClassName = 'text-xl font-semibold',
+  containerClassName = 'flex-row items-center gap-4 my-2 mx-1',
+}) => {
   const router = useRouter();
 
+  const handlePress = useCallback(() => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.back();
+    }
+  }, [onPress, router]);
+
   return (
-    <View className="flex-row items-center py-3 bg-white">
-      <TouchableOpacity
-        onPress={onPress || (() => router.back())}
-        className="flex-row items-center w-40 gap-3"
-      >
-        <Ionicons name="arrow-back" size={24} color="black" />
-        <Text className="text-heading-big">{title}</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity onPress={handlePress} className={containerClassName}>
+      <Ionicons name="arrow-back" size={iconSize} color={iconColor} />
+      <Text className={textClassName}>{title}</Text>
+    </TouchableOpacity>
   );
-}
+};
+
+export default memo(Back);

@@ -1,21 +1,30 @@
 import React, { useMemo } from 'react';
-import { View, Text, ActivityIndicator, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Colors } from '../../../assets/Colors';
 import useAuthStore from '../../../Store/AuthStore';
+import TrackOrder from '../../../components/TrackOrder';
+
+
+
+
+
 
 const OrderDetail = () => {
-    const {user}=useAuthStore();
-
-  const { id } = useLocalSearchParams(); 
+  const { user } = useAuthStore();
+  const { id } = useLocalSearchParams();
   const router = useRouter();
   const uid = user.userId;
-
 
   const fetchOrderDetail = async () => {
     const response = await axios.post(
@@ -32,101 +41,148 @@ const OrderDetail = () => {
   });
 
 
- 
-  
-const order = data?.order;
-const items = data?.items;
+  const order = data?.order;
+  const items = data?.items;
 
-const billedAmount = useMemo(() => {
-  if (!items?.length) return 0;
+  const billedAmount = useMemo(() => {
+    if (!items?.length) return 0;
 
-  return items.reduce((sum, item) => {
-    const price = parseFloat(item.sale_price || '0');
-    const qty = parseInt(item.product_qty || '0');
-    return sum + price * qty;
-  }, 0);
-}, [items]);
-
+    return items.reduce((sum, item) => {
+      const price = parseFloat(item.sale_price || '0');
+      const qty = parseInt(item.product_qty || '0');
+      return sum + price * qty;
+    }, 0);
+  }, [items]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY }}>
       {/* Header */}
-      <View className="flex-row items-center px-4 py-3 bg-white shadow-sm">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <Ionicons name="arrow-back" size={24} color="black" />
+      <View
+        className="flex-row items-center px-4 py-3 bg-white shadow-md"
+        style={{ elevation: 3 }}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="mr-4 p-2 rounded-full"
+          style={{ backgroundColor: '#f0f0f0' }}
+        >
+          <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
         </TouchableOpacity>
-        <Text className="text-heading-big font-bold">Order Details</Text>
+        <Text className="text-xl font-bold text-gray-900">Order Details</Text>
       </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color={Colors.PRIMARY} className="mt-10" />
+        <ActivityIndicator
+          size="large"
+          color={Colors.PRIMARY}
+          className="mt-10"
+        />
       ) : isError ? (
-        <Text className="text-red-500 text-center mt-10">Failed to load order details.</Text>
+        <Text className="text-red-500 text-center mt-10 font-semibold">
+          Failed to load order details.
+        </Text>
       ) : (
         <ScrollView className="flex-1 p-4">
           {/* Order Summary */}
-          <View className="bg-white p-4 rounded-xl mb-4 shadow-sm" style={{ elevation: 1 }}>
-           <View className="border-b border-b-gray-200 pb-5 mb-6">
-             <Text className="text-heading-big font-bold mb-2">Order Details</Text>
-            
-            
-            <Text className="text-basic mb-1">Delivery: {order.delivery_date} ({order.delivery_from_time} - {order.delivery_to_time})</Text>
-           
-            <Text className="text-basic mb-1">Order Id : #{order.id}</Text>
-            <Text className="text-basic mb-1">Status : {order.order_status}</Text>
-            <Text className="text-basic mb-1">Address: {order.shipping_address}, {order.shipping_city}</Text>
+          <View
+            className="bg-white rounded-xl p-5 mb-6 shadow-md"
+            style={{ elevation: 2 }}
+          >
+            <Text className="text-2xl font-bold mb-4 text-gray-900">
+              Order Summary
+            </Text>
 
-           </View>
-            
-          {/* Products */}
-         <View className="flex-row justify-between">
-           <Text className="text-heading-big font-bold mb-2 px-1">Ordered Items</Text>
-           <Text className="text-heading-big font-bold mb-2 px-1"> ₹{billedAmount.toFixed(2)}</Text>
-         </View>
-          {items?.map((item) => (
-            <View
-              key={item.id}
-              className="bg-white p-3 rounded-lg  "
-              
-            >
-              <Text className="text-basic font-semibold">{item.product_name}</Text>
-              <Text className="text-basic">Size: {item.variant_name}</Text>
-              <Text className="text-basic">₹{item.sale_price} x {item.product_qty}</Text>
-            </View>
-          ))}
-           
-            <View className=" flex gap-1 border-t border-gray-200 mt-3 pt-3">
-              <Text className="text-heading-big font-bold mb-2 px-1">Order Summary</Text>
-             <View className="flex-row justify-between">
-               <Text className="text-heading-small">Billed Amount </Text>
-            <Text className="text-heading-small font-bold">₹{billedAmount.toFixed(2)}</Text>
-
-               
-             </View>
-             <View className="flex-row justify-between">
-               <Text className="text-heading-small">Taxes & Other Fees </Text>
-               <Text className="text-heading-small font-bold">₹{order.tax}</Text>
-
-             </View>
-             <View className="flex-row justify-between">
-               <Text className="text-heading-small">Delivery Charges </Text>
-               <Text className="text-heading-small font-bold">₹{order.shipping_price}</Text>
-
-             </View>
-             <View className="flex-row justify-between">
-               <Text className="text-heading-small">Discount </Text>
-               <Text className="text-heading-small font-bold">₹{order.discount}</Text>
-
-             </View>
-             <View className="flex-row justify-between">
-               <Text className="text-heading-small">Total </Text>
-               <Text className="text-heading-small font-bold">₹{order.total_price}</Text>
-
-             </View>
+            <View className="mb-5">
              
+              <Text className="text-base text-gray-700 mb-1">
+                <Text className="font-semibold">Order ID:</Text> #{order?.id}
+              </Text>
+              <Text className="text-base text-gray-700 mb-1">
+                <Text className="font-semibold">Status:</Text> {order?.order_status}
+              </Text>
+              <Text className="text-base text-gray-700">
+                <Text className="font-semibold">Address:</Text> {order?.shipping_address},{' '}
+                {order?.shipping_city}
+              </Text>
+            </View>
+
+            <View className="border-t border-gray-300 pt-4">
+              <Text className="text-xl font-semibold mb-3 text-gray-900">
+                Items Ordered
+              </Text>
+
+              {items?.map((item) => (
+                <View
+                  key={item.id}
+                  className="mb-3 p-3 rounded-lg bg-gray-50 shadow-sm"
+                  style={{ elevation: 1 }}
+                >
+                  <Text className="text-base font-semibold text-gray-800">
+                    {item.product_name}
+                  </Text>
+                  <Text className="text-sm text-gray-600 mb-1">
+                    Size: {item.variant_name}
+                  </Text>
+                  <Text className="text-sm text-gray-700 font-medium">
+                    ₹{item.sale_price} × {item.product_qty}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            <View className="border-t border-gray-300 pt-4 mt-5 space-y-2">
+              <Text className="text-xl font-semibold text-gray-900 mb-3">
+                Payment Summary
+              </Text>
+
+              <View className="flex-row justify-between">
+                <Text className="text-base text-gray-700">Billed Amount</Text>
+                <Text className="text-base font-semibold text-gray-900">
+                  ₹{billedAmount.toFixed(2)}
+                </Text>
+              </View>
+
+              <View className="flex-row justify-between">
+                <Text className="text-base text-gray-700">Taxes & Other Fees</Text>
+                <Text className="text-base font-semibold text-gray-900">
+                  ₹{order.tax}
+                </Text>
+              </View>
+
+              <View className="flex-row justify-between">
+                <Text className="text-base text-gray-700">Delivery Charges</Text>
+                <Text className="text-base font-semibold text-gray-900">
+                  ₹{order.shipping_price}
+                </Text>
+              </View>
+
+              <View className="flex-row justify-between">
+                <Text className="text-base text-gray-700">Discount</Text>
+                <Text className="text-base font-semibold text-green-600">
+                  -₹{order.discount}
+                </Text>
+              </View>
+
+              <View className="flex-row justify-between border-t border-gray-300 pt-3 mt-3">
+                <Text className="text-lg font-bold text-gray-900">Total</Text>
+                <Text className="text-lg font-bold text-gray-900">
+                  ₹{order.total_price}
+                </Text>
+              </View>
             </View>
           </View>
 
+          {/* Track Order Section */}
+          <View
+            className="bg-white rounded-xl p-5 shadow-md"
+            style={{ elevation: 2 }}
+          >
+            <Text className="text-xl font-bold mb-4 text-gray-900">Track Order</Text>
+            <TrackOrder
+              currentStep={data?.order?.current_step}
+              
+            />
+          </View>
         </ScrollView>
       )}
     </SafeAreaView>

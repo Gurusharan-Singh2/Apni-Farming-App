@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
-import useCartStore from '../Store/CartStore';
-import useAuthStore from '../Store/AuthStore';
-import useWishlistStore from '../Store/WishlistStore';
-import axios from 'axios';
-import Toast from 'react-native-toast-message';
-import { BackendUrl2 } from '../utils/Constants';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import {useRouter} from 'expo-router'
+import axios from 'axios';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useState } from 'react';
+import {
+  Image,
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Toast from 'react-native-toast-message';
+import useAuthStore from '../Store/AuthStore';
+import useCartStore from '../Store/CartStore';
+import useWishlistStore from '../Store/WishlistStore';
+import { BackendUrl2 } from '../utils/Constants';
 
 const ProductCard = ({ item }) => {
   const { user, isAuthenticated } = useAuthStore();
@@ -94,15 +94,15 @@ const {
    onSuccess: async (data) => {
   addToWishlist(item); 
   refetchWishlist(); 
-  Toast.show({ type: 'success', text1: 'Added to wishlist',
-    visibilityTime: 1000,
+  Toast.show({ type: 'success' ,text1: 'Success', text2: 'Added to wishlist',
+    visibilityTime: 800,
     autoHide: true,
    });
 },
 
 
     onError: (error) => {
-      Toast.show({ type: 'error', text1: 'Add failed', text2: error.message,
+      Toast.show({ type: 'error' ,text1: 'Add failed', text2: error.message,
         visibilityTime: 1000,
         autoHide: true,
        });
@@ -119,7 +119,7 @@ const {
    onSuccess: async () => {
   removeFromWishlist(item.id); // local update
   refetchWishlist(); // optional sync
-  Toast.show({ type: 'success', text1: 'Removed from wishlist' ,visibilityTime: 1000, autoHide: true});
+  Toast.show({ type: 'success', text1: 'Success',text2:'Removed from wishlist' ,visibilityTime: 800, autoHide: true});
 }
 ,
    
@@ -332,4 +332,5 @@ increment(item.id, selectedSize.id)
   );
 };
 
-export default ProductCard;
+// Wrap with React.memo for performance
+export default React.memo(ProductCard);

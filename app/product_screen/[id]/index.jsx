@@ -19,7 +19,7 @@ import ProfileIcon from "../../../components/ProfileIcon";
 import useAuthStore from "../../../Store/AuthStore";
 import { BackendUrl2 } from "../../../utils/Constants";
 import CategoyComponentCard from "../../../components/categories/CatoryComponentCard";
-import EmptyCart from "../../../components/EmptyCart";
+import EmptyCategory from "../../../components/EmptyCategory";
 
 const fetchProductsByCategory = async (categoryId) => {
    const url =
@@ -141,7 +141,7 @@ const index = () => {
           ) : errorProducts ? (
             <Text className="text-red-500">Failed to load products</Text>
           ) : products.length===0 ? (
-              <EmptyCart/>
+              <EmptyCategory/>
 
           ): (
             <FlatList

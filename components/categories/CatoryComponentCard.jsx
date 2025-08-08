@@ -325,4 +325,4 @@ const {
 
 };
 
-export default CategoyComponentCard;
+export default React.memo(CategoyComponentCard);

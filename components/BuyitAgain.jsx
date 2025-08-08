@@ -1,51 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  Modal,
-  ActivityIndicator,
-} from 'react-native';
-import axios from 'axios';
-import Toast from 'react-native-toast-message';
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import React, { useCallback } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native';
+import Toast from 'react-native-toast-message';
+import LottieView from 'lottie-react-native';
+import { useRouter } from 'expo-router';
 
 import useAuthStore from '../Store/AuthStore';
 import SuggestionCard from './SuggestionCard';
 
-
-const BuyitAgain = ({url,title}) => {
+const BuyitAgain = ({ url, title = '' }) => {
   const { user } = useAuthStore();
   const customer_id = user?.userId;
-
-
-
-
-
+  const router = useRouter();
 
   const fetchBuyItAgain = async () => {
-    const res = await axios.post(
-      url,
-      {
-        uid: customer_id,
-        
-      }
-    );
-  
-    
-
-    
-    
+    const res = await axios.post(url, { uid: customer_id });
     return res?.data?.data ?? [];
   };
 
- 
-  
-
   const {
-    data: products,
+    data: products = [],
     isLoading,
   } = useQuery({
     queryKey: ['products', customer_id],
@@ -56,35 +37,61 @@ const BuyitAgain = ({url,title}) => {
         type: 'error',
         text1: 'Failed to load Buy it again',
         text2: error.message,
-        visibilityTime: 1000,
+        visibilityTime: 2000,
         autoHide: true,
       });
     },
     enabled: !!customer_id,
     staleTime: 1000 * 60 * 5,
-    retry:2,
-    retryDelay:5*1000
+    retry: 2,
+    retryDelay: 5 * 1000,
   });
+
+  const renderItem = useCallback(
+    ({ item }) => <SuggestionCard item={item} />,
+    []
+  );
+
   return (
     <View className="py-2 mt-4 z-40">
-      <Text className="text-lg font-bold px-4 mb-4">{title}</Text>
+      <Text className="text-lg font-bold px-4 mb-4">{title || ''}</Text>
 
       {isLoading ? (
         <View className="flex-1 justify-center items-center h-32">
           <ActivityIndicator size="large" color="#10b981" />
         </View>
+      ) : products.length === 0 ? (
+        <View className="flex-1 items-center justify-center px-6">
+          <LottieView
+            source={require('../assets/animations/Empty_Cart.json')}
+            autoPlay
+            loop
+            style={{ width: 150, height: 150, marginBottom: 10 }}
+          />
+          <Text className="text-[16px] font-bold text-[#D02127] mt-4">
+            Nothing to buy again yet
+          </Text>
+          <Text className="text-sm text-black font-semibold text-center mt-2 mb-2">
+            Start ordering and see your favorites here!
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.push('/home')}
+            className="bg-green-500 py-2 px-8 rounded-full border-2 font-semibold border-green-500"
+          >
+            <Text className="text-white text-[16px] font-bold">Shop Now</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <FlatList
-          data={products}
-        renderItem={({ item }) => <SuggestionCard item={item} />}
-          keyExtractor={(item) => item.id}
+          data={Array.isArray(products) ? products : []}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => String(item?.id ?? index)}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
       )}
-
     </View>
   );
 };
 
-export default BuyitAgain;
+export default React.memo(BuyitAgain);

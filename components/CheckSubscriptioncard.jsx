@@ -1,17 +1,18 @@
 import { View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import LottieView from 'lottie-react-native';
+import { memo } from 'react';
 
-export default function SubscriptionCard() {
+function SubscriptionCard() {
   const router = useRouter();
 
   return (
     <Pressable
       onPress={() => router.push('/subscription')}
-      className="h-[100px] flex-row bg-orange-100 rounded-2xl mx-2 my-3 shadow-lg items-center justify-center"
+      className="h-[100px] flex-row bg-yellow-50 rounded-2xl mx-2 my-3 shadow-xl items-center justify-center"
     >
       <LottieView
-        source={require('../assets/animations/Buy Button.json')} // Replace with your file
+        source={require('../assets/animations/o.json')} 
         autoPlay
         loop
         style={{ width: 100, height: 100 }}
@@ -27,3 +28,7 @@ export default function SubscriptionCard() {
     </Pressable>
   );
 }
+
+
+
+export default memo(SubscriptionCard)

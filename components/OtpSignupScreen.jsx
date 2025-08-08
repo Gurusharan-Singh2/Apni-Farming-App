@@ -40,7 +40,7 @@ const OtpSignupScreen = ({ userData }) => {
           otp,
         }
       );
-      console.log(response.data);
+ 
       return response.data;
     },
     onSuccess: (data) => {
@@ -51,7 +51,7 @@ const OtpSignupScreen = ({ userData }) => {
         token: data.token,
         phone: data.phone,
       });
-      router.push("/home");
+      router.replace("/home");
     },
     onError: (error) => {
       console.error("Verification failed:", error);

@@ -64,14 +64,14 @@ const ProfileScreen = () => {
           
           </TouchableOpacity>
          
-          <View className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
+          <TouchableOpacity  onPress={()=>router.push('/subscription')} className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
             <Ionicons name="book-outline" size={28} color="black" />
             <Text className="text-[20px] font-semibold">
             Manage Subscription
             </Text>
             
-          </View>
-          <TouchableOpacity onPress={()=>router.p} className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
+          </TouchableOpacity>
+          <TouchableOpacity  className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
             <Text>
               <AccountAddress/>
             

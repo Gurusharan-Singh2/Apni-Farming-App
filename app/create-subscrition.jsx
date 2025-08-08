@@ -1,41 +1,56 @@
-import React, { useEffect, useRef, useState } from "react";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  Alert,
   ActivityIndicator,
   ScrollView,
-  Image,
-  FlatList,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Ionicons, Feather } from "@expo/vector-icons";
-import useAuthStore from "../Store/AuthStore";
-import ProfileIcon from "../components/ProfileIcon";
-import CartIconWithBadge from "../components/Carticon";
-import axios from "axios";
-import useSubscriptionStore from "../Store/SubscriptionStore";
-import ChangedAddress from "../components/ChangeAddress";
-import useAddressStore from "../Store/useAddressStore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import SubscriptinSlotSelector from "../components/SubcriptionDeliverySlot";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import useAuthStore from "../Store/AuthStore";
+import useSubscriptionStore from "../Store/SubscriptionStore";
+import useAddressStore from "../Store/useAddressStore";
+import CartIconWithBadge from "../components/Carticon";
+import ChangedAddress from "../components/ChangeAddress";
+import ProfileIcon from "../components/ProfileIcon";
+import SubscriptinSlotSelector from "../components/SubcriptionDeliverySlot";
+import Back from "../components/Back";
 
 export default function CreateSubcription() {
-  const [frequency, setFrequency] = useState("daily");
-  const [billingCycle, setBillingCycle] = useState(7);
+const frequencyOptions = useMemo(() => ["daily", "alternate"], []);
+const billingCycleOptions = useMemo(() => [7, 10, 15, 30], []);
+
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
-  const { selectedAddress } = useAddressStore();
-  const { cart,discount, finalAmount, applyChargesFromBackend , deliveryCharge,
-      gstAmount,totalAmount,clearCart } = useSubscriptionStore();
+  const isAuthenticated=useAuthStore((state)=>state.isAuthenticated)
+  const user=useAuthStore((state)=>state.user)
+  const selectedAddress=useAddressStore((state)=>state.selectedAddress)
+
+  const {
+  cart,
+  discount,
+  applyChargesFromBackend,
+  deliveryCharge,
+  gstAmount,
+  totalAmount,
+  clearCart,
+} = useSubscriptionStore();
+const [frequency, setFrequency] = useState("daily");
+const [billingCycle, setBillingCycle] = useState(7);
+const [hasAutoSelectedSlot, setHasAutoSelectedSlot] = useState(false);
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSlotId, setSelectedSlotId] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  
+  const [hasAppliedCharges, setHasAppliedCharges] = useState(false);
+
+  const minDate = useMemo(() => selectedDate, [selectedDate]);
+
 
   useEffect(() => {
     const nextDate = new Date();
@@ -59,13 +74,13 @@ const createSubscription = useMutation({
       frequency,
       start_date: formatDate(selectedDate),
       billing_days: billingCycle,
-      address_id: selectedAddress.id,
+      address_id: selectedAddress?.id,
       time_slot_id: selectedSlotId,
       products: cart.map((item) => ({
-        productid: item.id,
+        productid: item?.id,
         varient_id: item?.selectedSize?.id,
-        quantity: item.quantity,
-        cost: item.costPrice,
+        quantity: item?.quantity,
+        cost: item?.costPrice,
         tax: gstAmount,
         shipping: deliveryCharge,
       })),
@@ -79,7 +94,14 @@ const createSubscription = useMutation({
   },
   onSuccess: (data) => {
     
-     Toast.show({type:"success", text1:"Subscription created successfully!"});
+     Toast.show({
+  type: "success",
+  text1: "🎉 Subscription Created!",
+  text2: "Your subscription has been set up successfully. Enjoy your benefits!",
+  visibilityTime: 1000,
+  autoHide: true,
+});
+
     clearCart();
     router.push("/subscription"); // or wherever you want to go
   },
@@ -89,46 +111,62 @@ const createSubscription = useMutation({
   },
 });
 
-  const handleDateConfirm = (date) => {
-    console.log("Selected Date:", date);
-    setSelectedDate(date);
-    setDatePickerVisibility(false);
-  };
+// Memoize order summary calculations
+const subtotal = useMemo(() => Number(totalAmount), [totalAmount]);
+const total = useMemo(() => subtotal * Number(billingCycle) + Number(deliveryCharge) + Number(gstAmount) - Number(discount), [subtotal, billingCycle, deliveryCharge, gstAmount, discount]);
+const saved = useMemo(() => Number(discount), [discount]);
 
-  const { data: TimeSlots, isLoading } = useQuery({
-    queryKey: ["Time Slots"],
-    queryFn: async () => {
-      const res = await axios.get(
-        `https://api.apnifarming.com/user/checkout/slots.php?subtotal=${totalAmount}`
-      );
-       applyChargesFromBackend(res.data);
-      console.log(res.data);
-      
-      return res.data.data;
-    },
-  });
+// Memoize handlers
+const handleDateConfirm = useCallback((date) => {
+  setSelectedDate(date);
+  setDatePickerVisibility(false);
+}, []);
+
+const handleCreateSubscription = useCallback(() => {
+  if (!selectedSlotId) {
+    alert("Please select Delivery Slot");
+    return;
+  }
+  createSubscription.mutate();
+}, [selectedSlotId, createSubscription]);
+
+const handleSlotSelect = useCallback((id) => setSelectedSlotId(id), []);
+
+const { data: slotResponse, isLoading } = useQuery({
+  queryKey: ["Time Slots", totalAmount],
+  queryFn: async () => {
+    const res = await axios.get(
+      `https://api.apnifarming.com/user/checkout/slots.php?subtotal=${totalAmount}`
+    );
+    return res.data;
+  },
+});
+useEffect(() => {
+  if (slotResponse && !hasAppliedCharges) {
+    applyChargesFromBackend(slotResponse);
+    setHasAppliedCharges(true);
+  }
+}, [slotResponse, hasAppliedCharges]);
+
+
+
+const TimeSlots = useMemo(() => slotResponse?.data || [], [slotResponse]);
 
   
   
-  useEffect(() => {
-    if (TimeSlots?.length > 0 && !selectedSlotId) {
-      setSelectedSlotId(TimeSlots[0].id);
-    }
-  }, [TimeSlots]);
+useEffect(() => {
+  if (TimeSlots?.length > 0 && !selectedSlotId && !hasAutoSelectedSlot) {
+    setSelectedSlotId(TimeSlots[0]?.id);
+    setHasAutoSelectedSlot(true);
+  }
+}, [TimeSlots, selectedSlotId, hasAutoSelectedSlot]);
 
   return (
     <SafeAreaView className="flex-1 bg-white  ">
       
       <View className="mb-1">
         <View className="flex flex-row w-full justify-between px-6 my-3">
-          <View className="flex-row items-center py-3 bg-white">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="flex-row items-center w-40 gap-3"
-            >
-              <Ionicons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
+        <Back/>
           <View className="flex flex-row items-center gap-2">
             <CartIconWithBadge />
             {isAuthenticated() && <ProfileIcon />}
@@ -185,7 +223,7 @@ const createSubscription = useMutation({
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="date"
-          minimumDate={selectedDate}
+          minimumDate={minDate}
           onConfirm={handleDateConfirm}
           onCancel={() => setDatePickerVisibility(false)}
         />
@@ -201,57 +239,45 @@ const createSubscription = useMutation({
         <SubscriptinSlotSelector
           slots={TimeSlots || []}
           selectedSlotId={selectedSlotId}
-          onSelect={setSelectedSlotId}
+          onSelect={handleSlotSelect}
         />
       )}
 
-      <View className="  mx-4 mb-1">
-        <Text className="text-xl font-bold">Frequency :</Text>
-        <View className="flex-row justify-between mt-3">
-          <TouchableOpacity
-            onPress={() => setFrequency("daily")}
-            className={`${frequency === "daily" ? "bg-green-500" : "bg-white"}  border  border-green-500 w-[45%] px-7 py-2 rounded-full`}
-          >
-            <Text
-              className={` text-lg font-bold text-center ${frequency === "daily" ? "text-white" : "text-black"}`}
-            >
-              Daily
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setFrequency("alternate")}
-            className={`${frequency === "alternate" ? "bg-green-500" : "bg-white"}  border  border-green-500 w-[45%] px-7 py-2 rounded-full`}
-          >
-            <Text
-              className={` text-lg font-bold text-center ${frequency === "alternate" ? "text-white" : "text-black"}`}
-            >
-              Alternate
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View className="mx-4 my-1">
-        <Text className="text-xl font-bold">Billing Cycle :</Text>
-        <View className="flex-row flex-wrap justify-between mt-3 gap-y-3">
-          {[7, 10, 15, 30].map((days) => (
-            <TouchableOpacity
-              key={days}
-              onPress={() => setBillingCycle(days)}
-              className={`${
-                billingCycle === days ? "bg-green-500" : "bg-white"
-              } border border-green-500 w-[47%] px-3 py-2 rounded-full`}
-            >
-              <Text
-                className={`text-base font-bold text-center ${
-                  billingCycle === days ? "text-white" : "text-black"
-                }`}
-              >
-                {days} Days
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
+     
+      <View className="mx-4 mb-1">
+  <Text className="text-xl font-bold">Frequency :</Text>
+  <View className="flex-row justify-between mt-3">
+    {frequencyOptions.map((option) => (
+      <TouchableOpacity
+        key={option}
+        onPress={() => setFrequency(option)}
+        className={`${frequency === option ? "bg-green-500" : "bg-white"} border border-green-500 w-[45%] px-7 py-2 rounded-full`}
+      >
+        <Text className={`text-lg font-bold text-center ${frequency === option ? "text-white" : "text-black"}`}>
+          {option.charAt(0).toUpperCase() + option.slice(1)}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+</View>
+
+<View className="mx-4 my-1">
+  <Text className="text-xl font-bold">Billing Cycle :</Text>
+  <View className="flex-row flex-wrap justify-between mt-3 gap-y-3">
+    {billingCycleOptions.map((days) => (
+      <TouchableOpacity
+        key={days}
+        onPress={() => setBillingCycle(days)}
+        className={`${billingCycle === days ? "bg-green-500" : "bg-white"} border border-green-500 w-[47%] px-3 py-2 rounded-full`}
+      >
+        <Text className={`text-base font-bold text-center ${billingCycle === days ? "text-white" : "text-black"}`}>
+          {days} Days
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+</View>
+
 
       <View className="bg-white  rounded-lg shadow-sm p-4 ">
                <Text className="text-heading font-bold text-black mb-4">Order Summary</Text>
@@ -259,7 +285,7 @@ const createSubscription = useMutation({
                <View className="flex gap-1">
                  <View className="flex-row justify-between">
                    <Text className="text-basic text-gray-600">Subtotal</Text>
-                   <Text className="text-basic font-medium">₹{Number(totalAmount)} X {Number(billingCycle)}={Number(totalAmount*billingCycle)}</Text>
+                   <Text className="text-basic font-medium">₹{subtotal} X {Number(billingCycle)}={subtotal * Number(billingCycle)}</Text>
                  </View>
                 
                  
@@ -283,11 +309,10 @@ const createSubscription = useMutation({
                      <View className="flex items-end">
                       
 <Text className="text-heading-small font-bold">
-  ₹{Number(totalAmount) * Number(billingCycle) + Number(deliveryCharge) + Number(gstAmount) - Number
-  (discount) }
+  ₹{total}
 </Text>
                           <Text className="text-basic  text-green-600 mt-1">
-                     You saved ₹{(discount)}
+                     You saved ₹{saved}
                    </Text>
                      </View>
                     
@@ -298,15 +323,7 @@ const createSubscription = useMutation({
              </View>
 
      <TouchableOpacity
-  onPress={() => {
-    if(!selectedSlotId){
-      alert("Please select Delivery Slot")
-      
-    }else{
-createSubscription.mutate()
-    }
-    }
-  }
+    onPress={handleCreateSubscription}
   disabled={createSubscription.isPending}
   className="mx-10 bg-black rounded-lg px-5 mb-5 py-4  mt-3 opacity-100"
   style={{ opacity: createSubscription.isPending ? 0.5 : 1 }}

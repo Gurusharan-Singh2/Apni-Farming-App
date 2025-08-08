@@ -137,7 +137,7 @@ decrement: (id, sizeId) => {
       },
 
 
-       applyChargesFromBackend: (data) => {
+       applyChargesFromBackend: (data) => { 
         const { deliverycharge , tax  } = data;
         set((state) => {
           state.deliveryCharge = deliverycharge;

@@ -1,12 +1,8 @@
-import React from "react";
-import { View, FlatList, RefreshControl, Text } from "react-native";
+import React, { useCallback } from "react";
+import { FlatList, RefreshControl, Text } from "react-native";
 import ProductCard from "./ProductCard";
-import useAuthStore from "../Store/AuthStore";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
-import { BackendUrl } from "../utils/Constants";
 
-export default function Products({
+function Products({
   ListHeaderComponent,
   data = [],
   loading,
@@ -14,7 +10,7 @@ export default function Products({
   refreshing,
   onRefresh,
 }) {
-
+  const renderItem = useCallback(({ item }) => <ProductCard item={item} />, []);
 
   if (loading && !refreshing) {
     return <Text className="px-5 py-4">Loading products...</Text>;
@@ -23,14 +19,12 @@ export default function Products({
   if (error) {
     return <Text className="px-5 text-red-500 py-4">Failed to load products</Text>;
   }
-  
+
   return (
     <FlatList
       data={data}
       numColumns={2}
-      renderItem={({ item }) => (
-        <ProductCard item={item}  />
-      )}
+      renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}
       ListHeaderComponent={ListHeaderComponent}
       showsVerticalScrollIndicator={false}
@@ -43,6 +37,12 @@ export default function Products({
           colors={["#10b981"]}
         />
       }
+      initialNumToRender={8}
+      windowSize={7}
+      maxToRenderPerBatch={8}
+      removeClippedSubviews={true}
     />
   );
 }
+
+export default React.memo(Products);
