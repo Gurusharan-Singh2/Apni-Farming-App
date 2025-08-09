@@ -124,6 +124,8 @@ const OrderScreen = () => {
 
   useEffect(() => {
     isMounted.current = true;
+    console.log("finalAmount", finalAmount);
+console.log("totalAmount", totalAmount);
     const validate = async () => {
       try {
         await useCartStore.getState().revalidateCoupon(ApplyCouponMutation);
@@ -147,7 +149,7 @@ const OrderScreen = () => {
       clearTimeout(timeout);
       isMounted.current = false;
     };
-  }, [selectedDate, fetchTimeSlots]);
+  }, [selectedDate, finalAmount]);
 
   const handleDateConfirm = (date) => {
     setSelectedDate(date);
@@ -165,6 +167,7 @@ const OrderScreen = () => {
     }
 
     const selectedSlot = timeSlots.find(slot => slot.id === selectedSlotId);
+
 
     const orderPayload = {
       user_token: token,

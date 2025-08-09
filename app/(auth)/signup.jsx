@@ -8,6 +8,8 @@ import {
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
+  Modal,
+  Pressable,
 } from "react-native";
 import logo from "../../assets/images/logo-final.png";
 import { Colors } from "../../assets/Colors";
@@ -26,6 +28,8 @@ const Signup = () => {
   const router = useRouter();
   const [userData, setuserData] = useState("");
   const [showOtp, setshowOtp] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const {
     control,
@@ -47,7 +51,6 @@ const Signup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      
       setshowOtp(true);
     },
     onError: (error) => {
@@ -60,10 +63,18 @@ const Signup = () => {
   });
 
   const onSubmit = (data) => {
-    Keyboard.dismiss(); // ✅ Dismiss keyboard on submit
+    if (!termsAccepted) {
+      Toast.show({
+        type: "error",
+        text1: "Please accept the Terms & Conditions",
+      });
+      return;
+    }
+    Keyboard.dismiss(); // Dismiss keyboard on submit
     const payload = {
       name: data.name,
       phone: data.phone,
+      termsAccepted: termsAccepted,
     };
     setuserData(payload);
     SignupMutation.mutate(payload);
@@ -73,7 +84,7 @@ const Signup = () => {
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
 
-      {/* ✅ Dismiss keyboard on tap outside */}
+      {/* Dismiss keyboard on tap outside */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
@@ -89,6 +100,7 @@ const Signup = () => {
               <OtpSignupScreen userData={userData} />
             ) : (
               <View className="w-full max-w-md space-y-4">
+                {/* Name Input */}
                 <View className="my-5">
                   <Text className="text-[18px] font-semibold text-black mb-2">
                     Full Name
@@ -114,6 +126,7 @@ const Signup = () => {
                   )}
                 </View>
 
+                {/* Phone Input */}
                 <View className="my-5">
                   <Text className="text-[16px] font-semibold text-black mb-2">
                     Phone Number
@@ -146,13 +159,44 @@ const Signup = () => {
                   )}
                 </View>
 
-                {/* ✅ Updated Submit button to dismiss keyboard first */}
+                {/* Terms & Conditions Checkbox */}
+                <TouchableOpacity
+                  className="flex-row items-center space-x-3 mb-4"
+                  onPress={() => setTermsAccepted(!termsAccepted)}
+                  activeOpacity={0.8}
+                >
+                  <View
+                    className={`h-6 w-6 flex-row items-center justify-center rounded border-2 ${
+                      termsAccepted
+                        ? "border-primary bg-primary"
+                        : "border-gray-400 bg-white"
+                    } items-center justify-center`}
+                  >
+                    {termsAccepted && (
+                      <Text className="text-white text-[14px] font-bold">✓</Text>
+                    )}
+                  </View>
+                  <Text className="text-gray-700 text-base ml-2">
+                    I agree to the{" "}
+                    <Text
+                      className="text-primary underline"
+                      onPress={() => router.push("/terms")}
+                    >
+                      Terms & Conditions
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Submit Button */}
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss(); // Close keyboard
                     handleSubmit(onSubmit)(); // Submit form
                   }}
-                  className="bg-primary rounded-lg py-4 mt-2"
+                  className={`rounded-lg py-4 mt-2 ${
+                    termsAccepted ? "bg-primary" : "bg-gray-400"
+                  }`}
+                  disabled={!termsAccepted || SignupMutation.isPending}
                 >
                   <Text className="text-[18px] text-white text-center">
                     {SignupMutation.isPending ? "Signing Up ..." : "Signup"}
@@ -201,6 +245,8 @@ const Signup = () => {
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
+
+     
     </SafeAreaView>
   );
 };

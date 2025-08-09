@@ -103,7 +103,8 @@ const createSubscription = useMutation({
 });
 
     clearCart();
-    router.push("/subscription"); // or wherever you want to go
+    
+    router.replace("/subscription"); 
   },
   onError: (error) => {
     Toast.show({type:"error", text1:"Failed to create subscription."});

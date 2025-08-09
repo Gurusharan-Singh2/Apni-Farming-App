@@ -14,6 +14,7 @@ import { Colors } from "../assets/Colors";
 import logo from "../assets/images/logo-final.png";
 import useAuthStore from "../Store/AuthStore";
 import { checkFirstInstall } from '../utils/checkFirstInstall';
+import WelcomeAnimation from "../components/WelcomeAnimation";
 
 
 
@@ -62,23 +63,24 @@ export default function App() {
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
       <ScrollView contentContainerStyle={{ height: "100%" }}>
  
-        <View className="m-2 flex flex-col justify-between gap-5 pt-14 items-center px-4">
+        <View className="m-2 flex flex-col justify-between gap-2 pt-4 items-center px-4">
           <Image
             source={logo}
             style={{
               width: 250,
               height: 250,
-              paddingTop: 10,
-              marginBottom: 10,
+              paddingTop: 5,
+              marginBottom: 5,
               resizeMode: "contain",
             }}
           />
 
-          <Text className="mb-[60px] text-primary font-bold text-[16px]">
+          <Text className="mb-[120px] text-primary font-bold z-40 text-[16px]">
             शुद्धता और ताज़गी – हर एक डिलीवरी में
           </Text>
+          <WelcomeAnimation/>
 
-          <View className="w-3/4">
+          <View className="w-3/4 mt-20">
             <TouchableOpacity
               onPress={() => router.push("./signup")}
               className="px-2 py-4 my-2 mb-5 bg-primary rounded-lg"

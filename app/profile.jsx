@@ -6,8 +6,9 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 import { useRouter } from 'expo-router';
 import useAuthStore from "../Store/AuthStore";
-import { Feather } from '@expo/vector-icons';
+import { Feather, Octicons } from '@expo/vector-icons';
 import AccountAddress from '../components/Account_Address';
+import Back from '../components/Back';
 
 const ProfileScreen = () => {
 
@@ -27,12 +28,7 @@ const ProfileScreen = () => {
     <SafeAreaView className="flex-1 bg-white ">
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity onPress={() => router.back()}>
-          <View className="px-3">
-          <Ionicons name="arrow-back" size={26} color="black" />
-
-          </View>
-        </TouchableOpacity>
+       <Back/>
         
       </View>
     
@@ -68,6 +64,13 @@ const ProfileScreen = () => {
             <Ionicons name="book-outline" size={28} color="black" />
             <Text className="text-[20px] font-semibold">
             Manage Subscription
+            </Text>
+            
+          </TouchableOpacity>
+          <TouchableOpacity  onPress={()=>router.push('/terms')} className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">
+            <Octicons name="law"  size={28} color="black" className="font-[400]" />
+            <Text className="text-[20px] font-semibold">
+            Terms and Conditions
             </Text>
             
           </TouchableOpacity>

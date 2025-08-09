@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 const Back = ({
   title = 'Back',
   onPress,
+  url,
   iconColor = 'black',
   iconSize = 24,
   textClassName = 'text-xl font-semibold',
@@ -14,8 +15,8 @@ const Back = ({
   const router = useRouter();
 
   const handlePress = useCallback(() => {
-    if (onPress) {
-      onPress();
+    if (url) {
+      router.replace(url);
     } else {
       router.back();
     }

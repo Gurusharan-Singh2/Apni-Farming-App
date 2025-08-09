@@ -230,6 +230,7 @@ export default function SubscriptionScreen() {
       </SafeAreaView>
     );
   }
+  
 
   const notSubscribed = !subscriptions || subscriptions.length === 0;
 
@@ -237,7 +238,7 @@ export default function SubscriptionScreen() {
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row justify-between items-center px-5 pt-4 pb-2">
-        <Back title="Subscription" />
+        <Back title="Subscription" url="/home" />
         <View className="flex-row items-center gap-3">
           <CartIconWithBadge />
           {isAuthenticated() && <ProfileIcon />}
