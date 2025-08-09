@@ -38,7 +38,7 @@ export default React.memo(function Wishlist() {
           </View>
         </View>
       </View>
-      {wishlist.length === 0 &&(<View className="h-[80%]"><EmptyWishlist />  <View className="mt-4">
+      {wishlist.length === 0 &&(<View className="h-[80%]"><EmptyWishlist />  <View className="mt-14">
         <BuyitAgain 
                 url={"https://api.apnifarming.com/user/products/buyitagain.php"}
                 title={"Buy it Again"}

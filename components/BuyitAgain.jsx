@@ -52,46 +52,26 @@ const BuyitAgain = ({ url, title = '' }) => {
     []
   );
 
-  return (
-    <View className="py-2 mt-4 z-40">
-      <Text className="text-lg font-bold px-4 mb-4">{title || ''}</Text>
+ return products.length > 0 ? (
+  <View className="py-2 mt-4 z-40">
+    <Text className="text-lg font-bold px-4 mb-4">{title || ''}</Text>
 
-      {isLoading ? (
-        <View className="flex-1 justify-center items-center h-32">
-          <ActivityIndicator size="large" color="#10b981" />
-        </View>
-      ) : products.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-6">
-          <LottieView
-            source={require('../assets/animations/Empty_Cart.json')}
-            autoPlay
-            loop
-            style={{ width: 150, height: 150, marginBottom: 10 }}
-          />
-          <Text className="text-[16px] font-bold text-[#D02127] mt-4">
-            Nothing to buy again yet
-          </Text>
-          <Text className="text-sm text-black font-semibold text-center mt-2 mb-2">
-            Start ordering and see your favorites here!
-          </Text>
-          <TouchableOpacity
-            onPress={() => router.push('/home')}
-            className="bg-green-500 py-2 px-8 rounded-full border-2 font-semibold border-green-500"
-          >
-            <Text className="text-white text-[16px] font-bold">Shop Now</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <FlatList
-          data={Array.isArray(products) ? products : []}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => String(item?.id ?? index)}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-      )}
-    </View>
-  );
+    {isLoading ? (
+      <View className="flex-1 justify-center items-center h-32">
+        <ActivityIndicator size="large" color="#10b981" />
+      </View>
+    ) : (
+      <FlatList
+        data={Array.isArray(products) ? products : []}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => String(item?.id ?? index)}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      />
+    )}
+  </View>
+) : null;
+
 };
 
 export default React.memo(BuyitAgain);
