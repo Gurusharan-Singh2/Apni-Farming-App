@@ -181,7 +181,7 @@ export default function SubscriptionScreen() {
   const upcomingDates = useMemo(
     () =>
       Array.from({ length: 10 }, (_, i) => {
-        const date = dayjs().add(i, 'day');
+        const date = dayjs().add(i+1, 'day');
         return {
           raw: date.format('YYYY-MM-DD'),
           display: date.format('dddd, MMM D, YYYY'),

@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../assets/Colors";
 import logo from "../assets/images/logo-final.png";
 import useAuthStore from "../Store/AuthStore";
-import { checkFirstInstall } from '../utils/checkFirstInstall';
+
 import WelcomeAnimation from "../components/WelcomeAnimation";
 
 
@@ -28,7 +28,7 @@ export default function App() {
   useEffect(() => {
     const initializeApp = async () => {
       setLoading(true);
-       await checkFirstInstall();
+     
   
       const result = await isAuthenticated();
       if (result) {
@@ -59,9 +59,9 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="bg-white">
+    <SafeAreaView className="bg-white flex-1">
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
-      <ScrollView contentContainerStyle={{ height: "100%" }}>
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
  
         <View className="m-2 flex flex-col justify-between gap-2 pt-4 items-center px-4">
           <Image

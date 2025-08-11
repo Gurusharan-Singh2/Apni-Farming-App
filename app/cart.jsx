@@ -1,5 +1,5 @@
 // ⬅️ Your imports remain the same
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -37,6 +37,10 @@ const CartScreen = () => {
   const renderItem = ({ item }) => (
     
     <View className="flex-row gap-3 mt-3 bg-white p-2 border-b border-b-gray-100 shadow">
+    <View className="absolute right-2 top-2">
+    <Text className=" text-xs font-bold">{item?.quantity} X ₹ {item?.selectedSize?.sellPrice} = ₹{item?.quantity*item?.selectedSize?.sellPrice || 0} </Text>
+    </View>
+
       <View className="flex-row items-center border border-gray-200 p-1 rounded-lg">
         <Image className="w-28 h-28 rounded-lg" source={{ uri: item.image }} />
       </View>
@@ -48,7 +52,8 @@ const CartScreen = () => {
         </Text>
 
         <View className="flex-row w-[82%] items-center  justify-between  mt-2">
-            <View className="flex-row self-start rounded-lg px-1 py-1  bg-[#D02127]    justify-between items-center mb-2">
+           <View>
+             <View className="flex-row self-start rounded-lg px-1 py-1  bg-[#D02127]    justify-between items-center mb-2">
             {item?.selectedSize?.discount && <Text className="text-[13px] font-semibold py-1 px-1 rounded-l-lg bg-[#D02127] text-white line-through">
               ₹{item?.selectedSize?.costPrice}
             </Text>}
@@ -56,14 +61,16 @@ const CartScreen = () => {
               ₹{item?.selectedSize?.sellPrice}
             </Text>
           </View>
+           <TouchableOpacity onPress={()=>removeFromCart(item?.id,item?.selectedSize?.id)}  ><MaterialIcons name="delete" size={24} color="#D02127" /></TouchableOpacity>
+           </View>
 
           <View>
-            <View className="flex-row items-center justify-between bg-green-600 rounded-lg px-3 py-1 w-[100px]">
+            <View className="flex-row items-center justify-between bg-green-600 rounded-lg px-1 py-2 w-[120px]">
               <TouchableOpacity onPress={() => decrement(item.id, item.selectedSize?.id)}>
-                <Ionicons name="remove" size={22} color="#fff" />
+                <Ionicons name="remove" size={30} color="#fff" />
               </TouchableOpacity>
 
-              <Text className="text-basic font-semibold text-white">{item.quantity}</Text>
+              <Text className="text-lg font-semibold text-white">{item.quantity}</Text>
 
               <TouchableOpacity onPress={() =>{
                                             if(item?.selectedSize?.maxOrder===null){
@@ -79,10 +86,10 @@ const CartScreen = () => {
                                             }
                                             }
                                              }}>
-  <Ionicons name="add" size={22} color="#fff" />
+  <Ionicons name="add" size={30} color="#fff" />
 </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={()=>removeFromCart(item?.id,item?.selectedSize?.id)}  className="self-end mt-3"><MaterialIcons name="delete" size={24} color="#D02127" /></TouchableOpacity>
+           
             
           </View>
         </View>

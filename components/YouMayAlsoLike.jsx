@@ -49,7 +49,7 @@ const YouMayAlsoLike = ({ url, title }) => {
 
   const renderItem = useCallback(({ item }) => <SuggestionCard item={item} />, []);
 
-  return (
+  return ypumayalso?.length>0 ? (
     <View className="py-2 mt-4">
       <Text className="text-lg font-bold px-4 mb-4">{title}</Text>
 
@@ -67,7 +67,7 @@ const YouMayAlsoLike = ({ url, title }) => {
         />
       )}
     </View>
-  );
+  ):null;
 };
 
 export default React.memo(YouMayAlsoLike);

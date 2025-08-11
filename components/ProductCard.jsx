@@ -183,17 +183,17 @@ const {
   };
 
   return (
-    <TouchableOpacity onPress={()=>router.push(`product_details/${item?.id}`)} className="bg-white ml-2 my-2 p-2 rounded-2xl w-[47%] shadow-md">
+    <TouchableOpacity onPress={()=>router.push(`product_details/${item?.id}`)} className="relative bg-white ml-2 my-6    rounded-2xl w-[47%] shadow-md">
       {/* Image */}
-      <View className="relative mb-4">
+    
         <Image
           source={{ uri: item?.image }}
-          className="w-full h-[150px] mt-4 rounded-xl"
+          className="w-full -mt-10 h-[220px]  rounded-xl"
           resizeMode="contain"
         />
 
 {isAuthenticated() ?  addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
-          <View style={{ position: 'absolute', top: 10, right: 10 }}>
+          <View style={{ position: 'absolute', top: 15, right: 10 }}>
             <AntDesign name="loading1" size={20} color="#10b981" />
           </View>)
           :(
@@ -201,21 +201,21 @@ const {
          <View className="z-40 w-8  absolute top-0 right-0">
             <TouchableOpacity
             disabled={wishlistLoading}
-            className=" bg-white rounded-full"
+            className="  rounded-full"
             onPress={handleWishlistToggle}
           >
             <AntDesign
               name={isWishlisted ? 'heart' : 'hearto'}
               size={20}
-              color={isWishlisted ? '#10b981' : 'gray'}
+              color={isWishlisted ? '#10b981' : '#fff'}
             />
           </TouchableOpacity>
          </View>
         ):""}
 
       
-      </View>
-
+    
+    <View className=" p-2 -mt-4">
       {/* Title */}
       <Text className="font-[700] text-sm text-gray-800 mb-1" numberOfLines={2}>
         {item?.name}
@@ -284,6 +284,7 @@ increment(item.id, selectedSize.id)
           </TouchableOpacity>
         </View>
       )}
+      </View>
 
       {/* Size Modal */}
        <Modal transparent visible={modalVisible} animationType="fade">

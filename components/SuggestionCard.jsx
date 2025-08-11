@@ -190,7 +190,7 @@ const {
         <TouchableOpacity
           disabled={wishlistLoading}
           onPress={handleWishlistToggle}
-          className="absolute top-2 right-2 z-10 bg-white p-1 rounded-full"
+          className="absolute top-2 right-2 z-10   rounded-full"
         >
           {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
             <AntDesign name="loading1" size={18} color="#10b981" />
@@ -198,7 +198,7 @@ const {
             <AntDesign
               name={isWishlisted ? 'heart' : 'hearto'}
               size={20}
-              color={isWishlisted ? '#10b981' : 'gray'}
+              color={isWishlisted ? '#10b981' : '#fff'}
             />
           )}
         </TouchableOpacity>
@@ -206,7 +206,7 @@ const {
 
       <Image
         source={{ uri: item?.image }}
-        className="w-full h-[110px] rounded-lg"
+        className="w-full h-[150px] rounded-lg"
         resizeMode="contain"
       />
     </TouchableOpacity>
@@ -265,7 +265,20 @@ const {
         <Text className="text-[14px] font-semibold text-white">
           {quantity}
         </Text>
-        <TouchableOpacity onPress={() => increment(item.id, selectedSize.id)}>
+        <TouchableOpacity onPress={() =>{
+                                      if(selectedSize?.maxOrder===null){
+        increment(item.id, selectedSize.id)
+                                      }else{
+                                        if(quantity<selectedSize?.maxOrder){
+                  increment(item.id, selectedSize.id)
+                                      }else{
+                                        Toast.show({
+                                          type:"error",
+                                          text1:"Max Quantity Reached"
+                                        })
+                                      }
+                                      }
+                                       }}>
           <Ionicons name="add" size={22} color="#fff" />
         </TouchableOpacity>
       </View>

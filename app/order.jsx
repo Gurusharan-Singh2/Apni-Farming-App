@@ -124,8 +124,7 @@ const OrderScreen = () => {
 
   useEffect(() => {
     isMounted.current = true;
-    console.log("finalAmount", finalAmount);
-console.log("totalAmount", totalAmount);
+
     const validate = async () => {
       try {
         await useCartStore.getState().revalidateCoupon(ApplyCouponMutation);

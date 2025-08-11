@@ -34,12 +34,15 @@ const Coupon = () => {
     },
     enabled: modalVisible,
   });
+  
+  
 
   const ApplyCouponMutation = useMutation({
     mutationFn: async (payload) => {
       const res = await axios.post('https://api.apnifarming.com/user/coupon/apply.php', payload);
       
       
+      console.log(res.data);
       
       return res.data;
     },
