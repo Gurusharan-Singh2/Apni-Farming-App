@@ -8,12 +8,12 @@ const EmptyWishlist = () => {
   const router = useRouter();
 
   return (
-    <View className="flex-1 mt-6 items-center justify-center bg-white px-6">
+    <View className="flex-1  items-center justify-center bg-white px-6">
       <LottieView
         source={require('../assets/animations/Astronaut - Light Theme.json')} // You’ll need to add this animation
         autoPlay
         loop
-        style={{ width: 180, height: 180, marginBottom: 10 }}
+        style={{ width: 180, height: 180 }}
       />
 
       <Text className="text-[16px] font-bold text-[#D02127] mt-4">

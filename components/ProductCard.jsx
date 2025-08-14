@@ -17,6 +17,8 @@ import useWishlistStore from '../Store/WishlistStore';
 import { BackendUrl2 } from '../utils/Constants';
 
 const ProductCard = ({ item }) => {
+  
+  
   const { user, isAuthenticated } = useAuthStore();
   const customer_id = user?.userId;
   const router=useRouter()

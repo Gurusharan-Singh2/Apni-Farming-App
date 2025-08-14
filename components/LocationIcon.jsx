@@ -98,6 +98,7 @@ const LocationIcon = () => {
   const deleteAddress = useAddressStore((state) => state.deleteAddress);
 
   const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const customer_id = user?.userId;
   const queryClient = useQueryClient();
 
@@ -316,7 +317,7 @@ useEffect(() => {
        <TouchableOpacity onPress={() => setDrawerVisible(true)}>
         <View className="flex-row items-center space-x-1">
           <SimpleLineIcons name="location-pin" size={20} />
-          <Text className="font-bold text-base">
+          <Text className="font-bold text-black text-base">
             {selectedAddress ? `${selectedAddress.title}` : "Address"}
           </Text>
           <MaterialIcons name="arrow-drop-down" size={24} color="black" />
@@ -343,8 +344,16 @@ useEffect(() => {
                 <>
                   <Text className="font-bold text-xl mb-4">Select Delivery Location</Text>
 
-                  <TouchableOpacity
+                {isAuthenticated() ?  <TouchableOpacity
                     onPress={() => {
+                       if (!user) {
+      Toast.show({
+        type: "error",
+        text1: "Please log in to add an address",
+        visibilityTime: 1000,
+      });
+      return;
+    }
                       setAddShow(true);
                       setEditIndex(null);
                       reset();
@@ -356,7 +365,7 @@ useEffect(() => {
                       + Add new address
                     </Text>
                     <AntDesign name="right" size={16} color="#6b7280" />
-                  </TouchableOpacity>
+                  </TouchableOpacity>:<Text>User not login</Text> } 
                 </>
               }
               renderItem={({ item, index }) => (
@@ -385,7 +394,7 @@ useEffect(() => {
 
               {fieldConfigs.map((field) => (
                 <View key={field.name} className="mb-2">
-                  <Text className="text-gray-500">{field.label}</Text>
+                  <Text className="text-black">{field.label}</Text>
                   <Controller
                     control={control}
                     name={field.name}

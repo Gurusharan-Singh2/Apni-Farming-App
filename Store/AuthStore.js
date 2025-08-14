@@ -8,7 +8,7 @@ const useAuthStore = create(
     immer((set, get) => ({
       user: null,
       token: null,
-      phone:null,
+      phone: null,
 
       // Set user and token
       login: (data) => {
@@ -17,7 +17,7 @@ const useAuthStore = create(
             name: data.name,
             userId: data.userId,
             email: data.email,
-            phone:data.phone
+            phone: data.phone,
           };
           state.token = data.token;
         });
@@ -28,12 +28,26 @@ const useAuthStore = create(
         set((state) => {
           state.user = null;
           state.token = null;
-          state.phone=null;
+          state.phone = null;
         });
       },
-
-      // Helper to check if authenticated
-      isAuthenticated: () => !!get().token,
+isLoggedIn: () => {
+  const { token } = get();
+  return !!token;
+},
+      // Auth check that waits for hydration
+      isAuthenticated: async () => {
+        // Wait until storage is hydrated
+        if (!useAuthStore.persist.hasHydrated()) {
+          await new Promise((resolve) => {
+            const unsub = useAuthStore.persist.onFinishHydration(() => {
+              unsub();
+              resolve();
+            });
+          });
+        }
+        return !!get().token;
+      },
     })),
     {
       name: 'auth-storage',

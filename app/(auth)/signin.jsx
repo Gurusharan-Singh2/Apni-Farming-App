@@ -8,6 +8,7 @@ import {
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
+  Dimensions,
 } from "react-native";
 import logo from "../../assets/images/logo-final.png";
 import { Colors } from "../../assets/Colors";
@@ -16,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
+import LottieView from "lottie-react-native";
 import axios from "axios";
 
 import { BackendUrl } from "../../utils/Constants";
@@ -25,6 +27,9 @@ const Signin = () => {
   const router = useRouter();
   const [userData, setuserData] = useState("");
   const [showOtp, setshowOtp] = useState(false);
+  const { width ,height } = Dimensions.get("window");
+  const animationSize = width * 0.45; // 80% of screen width
+
 
   const {
     control,
@@ -70,11 +75,19 @@ const Signin = () => {
               source={logo}
               style={{ width: 180, height: 180, resizeMode: "contain" }}
             />
+           
 
             {showOtp ? (
               <OtpSignupScreen userData={userData} />
             ) : (
-              <View className="w-full my-5 max-w-md space-y-4">
+              
+              <View className="w-full my-5 mt-0 max-w-md space-y-4">
+                 <LottieView
+    source={require("../../assets/animations/search for employee.json")}
+    autoPlay
+    loop
+    style={{ width: animationSize,height: animationSize, marginTop:0, justifyContent: "center", alignSelf:'center'  }}
+  />
                 <Text className="text-[18px] font-semibold text-black mb-2">
                   Phone Number
                 </Text>

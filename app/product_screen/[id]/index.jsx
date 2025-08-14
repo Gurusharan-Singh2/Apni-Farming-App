@@ -43,7 +43,7 @@ const fetchCategories = async () => {
 const index = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isLoggedIn } = useAuthStore();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState('0');
   useEffect(()=>{
@@ -88,7 +88,7 @@ const index = () => {
         </TouchableOpacity>
         <View className="flex flex-row items-center gap-2">
           <CartIconWithBadge />
-          {isAuthenticated() && <ProfileIcon />}
+          {isLoggedIn() && <ProfileIcon />}
         </View>
       </View>
 

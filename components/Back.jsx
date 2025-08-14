@@ -25,7 +25,7 @@ const Back = ({
   return (
     <TouchableOpacity onPress={handlePress} className={containerClassName}>
       <Ionicons name="arrow-back" size={iconSize} color={iconColor} />
-      <Text className={textClassName}>{title}</Text>
+      <Text className='font-bold text-black text-lg' >{title}</Text>
     </TouchableOpacity>
   );
 };

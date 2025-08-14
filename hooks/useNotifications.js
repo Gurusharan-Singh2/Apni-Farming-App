@@ -13,10 +13,12 @@ import notifee, { EventType } from '@notifee/react-native';
 
 
 const registerToken = async ({ userId, token }) => {
-  const res = await axios.post(`${BackendUrl}/api/admin/register-token`, {
-    userId,
+  const res = await axios.post(`https://api.apnifarming.com/user/pushnotification/savetoken.php`, {
+    user_id:userId,
     token,
   });
+
+  
   return res.data;
 };
 
@@ -72,6 +74,7 @@ export default function useNotifications() {
 
 
 export function handleNotificationTap(data) {
+
   const { screen, orderId, url } = data || {};
   
 

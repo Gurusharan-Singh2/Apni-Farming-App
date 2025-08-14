@@ -61,7 +61,15 @@ const useAddressStore = create(
           state.selectedAddress = address;
         });
       },
+      clearAll: () => {
+  set((state) => {
+    state.addresses = [];
+    state.selectedAddress = null;
+  });
+},
+
     })),
+
     {
       name: 'address-storage',
       storage: createJSONStorage(() => AsyncStorage),

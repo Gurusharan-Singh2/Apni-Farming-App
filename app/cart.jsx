@@ -1,4 +1,3 @@
-// ⬅️ Your imports remain the same
 import React, { useMemo, useState } from 'react';
 import {
   View,
@@ -8,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Dimensions
 } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,7 +18,6 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import useAuthStore from '../Store/AuthStore';
 import { BackendUrl2 } from '../utils/Constants';
-import CartIconWithBadge from '../components/Carticon';
 import ProfileIcon from '../components/ProfileIcon';
 import EmptyOrder from '../components/EmptyOrder';
 import YouMayAlsoLike from '../components/YouMayAlsoLike';
@@ -27,70 +26,181 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 import Back from '../components/Back';
 
+const { width, height } = Dimensions.get('window');
+
 const CartScreen = () => {
-  const { cart, discount, finalAmount, decrement, increment,removeFromCart } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
+  const { cart, discount, finalAmount, decrement, increment, removeFromCart } = useCartStore();
+  const { isLoggedIn } = useAuthStore();
   const router = useRouter();
 
-  
-  
   const renderItem = ({ item }) => (
-    
-    <View className="flex-row gap-3 mt-3 bg-white p-2 border-b border-b-gray-100 shadow">
-    <View className="absolute right-2 top-2">
-    <Text className=" text-xs font-bold">{item?.quantity} X ₹ {item?.selectedSize?.sellPrice} = ₹{item?.quantity*item?.selectedSize?.sellPrice || 0} </Text>
-    </View>
-
-      <View className="flex-row items-center border border-gray-200 p-1 rounded-lg">
-        <Image className="w-28 h-28 rounded-lg" source={{ uri: item.image }} />
+    <View
+      style={{
+        flexDirection: 'row',
+        gap: width * 0.03,
+        marginTop: height * 0.015,
+        backgroundColor: '#fff',
+        padding: width * 0.02,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      }}
+    >
+      <View style={{ position: 'absolute', right: width * 0.02, top: height * 0.005 }}>
+        <Text style={{ fontSize: width * 0.03, fontWeight: 'bold' }}>
+          {item?.quantity} X ₹ {item?.selectedSize?.sellPrice} = ₹
+          {item?.quantity * item?.selectedSize?.sellPrice || 0}
+        </Text>
       </View>
 
-      <View>
-        <Text className="text-heading-small text-gray-600 font-semibold">{item.name}</Text>
-        <Text className="text-basic text-gray-400 font-semibold">
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderWidth: 1,
+          borderColor: '#e0e0e0',
+          padding: width * 0.005,
+          borderRadius: width * 0.02,
+        }}
+      >
+        <Image
+          style={{
+            width: width * 0.28,
+            height: width * 0.28,
+            borderRadius: width * 0.02,
+          }}
+          source={{ uri: item.image }}
+        />
+      </View>
+
+      <View style={{ flex: 1 }}>
+        <Text
+          style={{
+            fontSize: width * 0.033,
+            color: '#4b5563',
+            fontWeight: '600',
+          }}
+        >
+          {item.name}
+        </Text>
+        <Text
+          style={{
+            fontSize: width * 0.035,
+            color: '#9ca3af',
+            fontWeight: '600',
+          }}
+        >
           {item.selectedSize?.size} {item.selectedSize?.option}
         </Text>
 
-        <View className="flex-row w-[82%] items-center  justify-between  mt-2">
-           <View>
-             <View className="flex-row self-start rounded-lg px-1 py-1  bg-[#D02127]    justify-between items-center mb-2">
-            {item?.selectedSize?.discount && <Text className="text-[13px] font-semibold py-1 px-1 rounded-l-lg bg-[#D02127] text-white line-through">
-              ₹{item?.selectedSize?.costPrice}
-            </Text>}
-            <Text className="text-[14px] bg-white mx-1 px-2 py-1 rounded  text-green-600 font-bold ">
-              ₹{item?.selectedSize?.sellPrice}
-            </Text>
-          </View>
-           <TouchableOpacity onPress={()=>removeFromCart(item?.id,item?.selectedSize?.id)}  ><MaterialIcons name="delete" size={24} color="#D02127" /></TouchableOpacity>
-           </View>
-
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '82%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: height * 0.01,
+          }}
+        >
           <View>
-            <View className="flex-row items-center justify-between bg-green-600 rounded-lg px-1 py-2 w-[120px]">
+            <View
+              style={{
+                flexDirection: 'row',
+                alignSelf: 'flex-start',
+                borderRadius: width * 0.02,
+                paddingHorizontal: width * 0.015,
+                paddingVertical: height * 0.003,
+                backgroundColor: '#D02127',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: height * 0.005,
+              }}
+            >
+              {item?.selectedSize?.discount && (
+                <Text
+                  style={{
+                    fontSize: width * 0.033,
+                    fontWeight: '600',
+                    paddingHorizontal: width * 0.01,
+                    backgroundColor: '#D02127',
+                    color: '#fff',
+                    textDecorationLine: 'line-through',
+                  }}
+                >
+                  ₹{item?.selectedSize?.costPrice}
+                </Text>
+              )}
+              <Text
+                style={{
+                  fontSize: width * 0.035,
+                  backgroundColor: '#fff',
+                  marginHorizontal: width * 0.01,
+                  paddingHorizontal: width * 0.02,
+                  paddingVertical: height * 0.005,
+                  borderRadius: width * 0.02,
+                  color: '#16a34a',
+                  fontWeight: 'bold',
+                }}
+              >
+                ₹{item?.selectedSize?.sellPrice}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => removeFromCart(item?.id, item?.selectedSize?.id)}
+            >
+              <MaterialIcons name="delete" size={width * 0.06} color="#D02127" />
+            </TouchableOpacity>
+          </View>
+
+          <View >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: '#16a34a',
+                borderRadius: width * 0.02,
+                paddingHorizontal: width * 0.015,
+                paddingVertical: height * 0.005,
+                width: width * 0.32,
+                marginLeft: width * 0.06,
+              }}
+            >
               <TouchableOpacity onPress={() => decrement(item.id, item.selectedSize?.id)}>
-                <Ionicons name="remove" size={30} color="#fff" />
+                <Ionicons name="remove" size={width * 0.07} color="#fff" />
               </TouchableOpacity>
 
-              <Text className="text-lg font-semibold text-white">{item.quantity}</Text>
+              <Text
+                style={{
+                  fontSize: width * 0.05,
+                  fontWeight: '600',
+                  color: '#fff',
+                }}
+              >
+                {item.quantity}
+              </Text>
 
-              <TouchableOpacity onPress={() =>{
-                                            if(item?.selectedSize?.maxOrder===null){
-              increment(item?.id, item?.selectedSize?.id)
-                                            }else{
-                                              if(item?.quantity<item?.selectedSize?.maxOrder){
-                        increment(item.id, item?.selectedSize?.id)
-                                            }else{
-                                              Toast.show({
-                                                type:"error",
-                                                text1:"Max Quantity Reached"
-                                              })
-                                            }
-                                            }
-                                             }}>
-  <Ionicons name="add" size={30} color="#fff" />
-</TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  if (item?.selectedSize?.maxOrder === null) {
+                    increment(item?.id, item?.selectedSize?.id);
+                  } else {
+                    if (item?.quantity < item?.selectedSize?.maxOrder) {
+                      increment(item.id, item?.selectedSize?.id);
+                    } else {
+                      Toast.show({
+                        type: 'error',
+                        text1: 'Max Quantity Reached',
+                      });
+                    }
+                  }
+                }}
+              >
+                <Ionicons name="add" size={width * 0.07} color="#fff" />
+              </TouchableOpacity>
             </View>
-           
-            
           </View>
         </View>
       </View>
@@ -103,88 +213,151 @@ const CartScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
-        
-
         <View style={{ flex: 1 }}>
-          
-              
           <FlatList
             data={cart}
-            keyExtractor={(item, index) => `${item.id}-${item.selectedSize?.size}-${index}`}
+            keyExtractor={(item, index) =>
+              `${item.id}-${item.selectedSize?.size}-${index}`
+            }
             renderItem={renderItem}
-            contentContainerStyle={{ padding: 10 }}
+            contentContainerStyle={{ padding: width * 0.025 }}
             ListHeaderComponent={() => (
               <>
-        <View className="flex mb-2 px-2 flex-row w-full justify-between ">
-          <Back title="Cart" />
-          <View className="flex flex-row items-center gap-4">
-            
-            {isAuthenticated() && <ProfileIcon />}
-          </View>
-        </View>
- 
-               {cart.length === 0 && (
-                <>
-                   <EmptyOrder/>
-                   <CartReccomendation url={`${BackendUrl2}/user/products/getAllProducts.php`} title={"Get Start Shopping"}/>
-                </>
-                )}   
-                   
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginBottom: height * 0.01,
+                    paddingHorizontal: width * 0.02,
+                  }}
+                >
+                  <Back title="Cart" />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: width * 0.04 }}>
+                    {isLoggedIn() && <ProfileIcon />}
+                  </View>
+                </View>
+
+                {cart.length === 0 && (
+                  <>
+                    <EmptyOrder />
+                    <CartReccomendation
+                      url={`${BackendUrl2}/user/products/getAllProducts.php`}
+                      title={'Get Start Shopping'}
+                    />
+                  </>
+                )}
               </>
             )}
-
-            ListFooterComponent={ cart.length > 0
-      ? () => (
-          <YouMayAlsoLike
-            url={`${BackendUrl2}/user/products/youamyalsolike.php`}
-            title="You May Also Like"
-          />
-        )
-      : null}
+            ListFooterComponent={
+              cart.length > 0
+                ? () => (
+                    <YouMayAlsoLike
+                      url={`${BackendUrl2}/user/products/youamyalsolike.php`}
+                      title="You May Also Like"
+                    />
+                  )
+                : null
+            }
           />
 
           {cart.length > 0 && (
-
-          <>  
-                         
-<View className="bg-white px-4 py-2  shadow-lg border-t border-gray-200">
-              <View className="flex flex-col gap-1 items-start">
-               
-
-               
-              </View>
-
-              <View className="mt-2">
-                {isAuthenticated() ? (
-                 <View className="flex-row">
-                   <View className="flex justify-center w-[40%]  p-1 items-center">
-                
-                  <Text className="font-extrabold text-black text-heading-small">Total: ₹ {finalAmount}</Text>
-                  <Text className="text-green-500 text-basic font-semibold ml-1">
-                      <AntDesign name="tags" size={18} color="#22c55e" />Saved ₹{discount}
-                  </Text>
-                </View>
-                   <TouchableOpacity
-                    className="bg-green-600 flex-row  justify-between w-[60%] px-4 py-3 rounded-lg"
+            <View
+              style={{
+                backgroundColor: '#fff',
+                paddingHorizontal: width * 0.04,
+                paddingVertical: height * 0.015,
+                shadowColor: '#000',
+                shadowOpacity: 0.05,
+                borderTopWidth: 1,
+                borderTopColor: '#e5e7eb',
+              }}
+            >
+              {isLoggedIn() ? (
+                <View style={{ flexDirection: 'row' }}>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      width: width * 0.33,
+                      padding: width * 0.02,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: '800',
+                        color: '#000',
+                        fontSize: width * 0.045,
+                      }}
+                    >
+                      Total: ₹ {finalAmount}
+                    </Text>
+                    <Text
+                      style={{
+                        color: '#22c55e',
+                        fontSize: width * 0.035,
+                        fontWeight: '600',
+                        marginLeft: width * 0.01,
+                      }}
+                    >
+                      <AntDesign name="tags" size={width * 0.045} color="#22c55e" /> Saved ₹
+                      {discount}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#16a34a',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      width: width * 0.6,
+                      paddingHorizontal: width * 0.04,
+                      paddingVertical: height * 0.015,
+                      borderRadius: width * 0.02,
+                    }}
                     onPress={() => router.push('/order')}
                   >
-                     
-                    <Text className="text-white   text-center font-bold text-[17px]">Go to Checkout</Text>
-                    <Entypo name="chevron-with-circle-right" size={28} color="white" />
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontWeight: 'bold',
+                        fontSize: width * 0.050,
+                        textAlign: 'center',
+                      }}
+                    >
+                      Go to Checkout
+                    </Text>
+                    <Entypo
+                      name="chevron-with-circle-right"
+                      size={width * 0.07}
+                      color="white"
+                    />
                   </TouchableOpacity>
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    className="bg-green-600 px-5 py-5 rounded-lg"
-                    onPress={() => router.push('/signin')}
+                </View>
+              ) : (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={{
+                    backgroundColor: '#16a34a',
+                    borderRadius: width * 0.02,
+                    paddingHorizontal: width * 0.08,
+                    paddingVertical: height * 0.02,
+                    shadowColor: '#000',
+                    shadowOpacity: 0.1,
+                  }}
+                  onPress={() => router.replace('/signin')}
+                >
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontWeight: 'bold',
+                      fontSize: width * 0.045,
+                      textAlign: 'center',
+                    }}
                   >
-                    <Text className="text-white font-semibold text-heading-big">Login</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+                    Login
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
-          </>  
-          
           )}
         </View>
       </KeyboardAvoidingView>

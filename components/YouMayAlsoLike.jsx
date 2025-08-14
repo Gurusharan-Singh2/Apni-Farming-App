@@ -50,7 +50,7 @@ const YouMayAlsoLike = ({ url, title }) => {
   const renderItem = useCallback(({ item }) => <SuggestionCard item={item} />, []);
 
   return ypumayalso?.length>0 ? (
-    <View className="py-2 mt-4">
+    <View className="py-2 mt-1">
       <Text className="text-lg font-bold px-4 mb-4">{title}</Text>
 
       {isLoading ? (

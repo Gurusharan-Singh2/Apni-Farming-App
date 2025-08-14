@@ -1,10 +1,18 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import LottieView from 'lottie-react-native';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+
+const { width: screenWidth } = Dimensions.get('window');
+
+// Simple scale function (you can also use react-native-size-matters if you prefer)
+const scaleFont = (size) => Math.round((size * screenWidth) / 375); // 375 is iPhone X base width
 
 function SubscriptionCard() {
   const router = useRouter();
+
+  const titleFont = useMemo(() => scaleFont(18), []);
+  const subtitleFont = useMemo(() => scaleFont(14), []);
 
   return (
     <Pressable
@@ -17,18 +25,30 @@ function SubscriptionCard() {
         loop
         style={{ width: 100, height: 100 }}
       />
-      <View className="w-[60%]">
-        <Text className="text-xl font-bold text-gray-800 ">
-        Manage Your Subscriptions
-      </Text>
-      <Text className="text-sm text-gray-500 px-4 text-center">
-        Tap to explore your daily milk, eggs, fruits, and more!
-      </Text>
+      <View style={{ width: '60%' }}>
+        <Text
+          style={{
+            textAlign: 'center',
+            fontSize: titleFont,
+            fontWeight: 'bold',
+            color: '#1f2937', // gray-800
+          }}
+        >
+          Manage Your Subscriptions
+        </Text>
+        <Text
+          style={{
+            fontSize: subtitleFont,
+            color: '#6b7280', // gray-500
+            paddingHorizontal: 16,
+            textAlign: 'center',
+          }}
+        >
+          Tap to explore your daily milk, eggs, fruits, and more!
+        </Text>
       </View>
     </Pressable>
   );
 }
 
-
-
-export default memo(SubscriptionCard)
+export default memo(SubscriptionCard);

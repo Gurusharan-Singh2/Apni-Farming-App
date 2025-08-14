@@ -113,17 +113,20 @@ const AccountAddress = () => {
 
   addAddress(newAddress);
 
-  // ✅ If this is the first address, set it as the selected one
-  if (addresses.length === 0) {
+ 
     setSelectedAddress(newAddress);
-  }
+
 
   closeDrawer();
 },
 
-    onError: (error) => {
-      Toast.show({ type: "error", text1: "Add failed", text2: error.message });
-    },
+   onError: (error) => {
+        console.log(error?.response?.data?.message);
+        Toast.show({
+          type: "error",
+          text1: error?.response?.data?.message,
+        });
+      },
   });
 
   const updateMutation = useMutation({
@@ -167,9 +170,13 @@ const AccountAddress = () => {
       deleteAddress(index);
       setSelectedAddress(null)
     },
-    onError: (error) => {
-      Toast.show({ type: "error", text1: "Delete failed", text2: error.message });
-    },
+     onError: (error) => {
+          console.log(error?.response?.data?.message);
+          Toast.show({
+            type: "error",
+            text1: error?.response?.data?.message,
+          });
+        },
   });
 
  useEffect(() => {

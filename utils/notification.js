@@ -1,13 +1,11 @@
-import notifee, { AndroidImportance, AndroidStyle } from "@notifee/react-native";
+import { Platform, PermissionsAndroid } from "react-native";
+import notifee, { AndroidImportance, AndroidStyle, EventType } from "@notifee/react-native";
 import messaging from "@react-native-firebase/messaging";
 
-
-import { Platform, PermissionsAndroid } from "react-native";
-
-
-// Request permission + token
+// ----------------------
+// REQUEST PERMISSION + GET TOKEN
+// ----------------------
 export const requestPermissionAndGetToken = async () => {
-  
   try {
     if (Platform.OS === "android") {
       const granted = await PermissionsAndroid.request(
@@ -35,95 +33,95 @@ export const requestPermissionAndGetToken = async () => {
   }
 };
 
-// Display notification only in foreground
-export const displayNotification = async ({ title, body, image, screen, orderId, url }) => {
-  console.log("🖼️ Image URL for notification:", image);
 
+export const displayNotification = async ({ title, body, image, screen, id, url }) => {
   await notifee.createChannel({
     id: "default",
     name: "Default Channel",
     importance: AndroidImportance.HIGH,
   });
 
-await notifee.displayNotification({
-  title,
-  body,
-  android: {
-    channelId: "default",
-    smallIcon: "ic_launcher",
-    largeIcon: image,
-    style: image ? { type: AndroidStyle.BIGPICTURE, picture: image } : undefined,
-    pressAction: {
-      id: 'default',
-      launchActivity: 'default',
+  await notifee.displayNotification({
+    title,
+    body,
+    android: {
+      channelId: "default",
+      smallIcon: "ic_launcher",
+      largeIcon: image,
+      style: image ? { type: AndroidStyle.BIGPICTURE, picture: image } : undefined,
+      pressAction: {
+        id: "default",
+        launchActivity: "default",
+      },
     },
-  },
-  data: {
-    title: title || '',
-    body: body || '',
-    image: image || '',
-    screen: screen || '',
-    orderId: orderId || '',
-    url: url || '',
-  }, // ✅ explicitly add data here
-});
-
-};
-
-
-// Foreground handler
-export const handleForegroundMessages = () => {
-  return messaging().onMessage(async (remoteMessage) => {
-    console.log("📩 Foreground message:", remoteMessage.data);
-    if (remoteMessage?.data) {
-      const { title, body, image, screen, orderId, url } = remoteMessage.data;
-      await displayNotification({ title, body, image, screen, orderId, url });
-    }
+    data: { title, body, image, screen, id, url },
   });
 };
 
 
+export const handleForegroundMessages = () => {
+  return messaging().onMessage(async (remoteMessage) => {
+
+    const data = extractNotificationData(remoteMessage);
+    
+    await displayNotification(data);
+  });
+};
 
 
 export const handleBackgroundNotificationNavigation = (router) => {
+  
   messaging().onNotificationOpenedApp((remoteMessage) => {
-    const data = remoteMessage?.data || remoteMessage?.notification?.data;
-    if (data) {
-      const { screen, orderId, url } = data;
-      console.log("🔄 App opened from background", screen, orderId);
-      navigateToScreen(router, screen, { orderId, url });
-    } else {
-      console.warn("⚠️ No data found in background tap");
-    }
+
+    const data = extractNotificationData(remoteMessage);
+    
+    navigateToScreen(router, data);
   });
+
 
   messaging()
     .getInitialNotification()
     .then((remoteMessage) => {
-      const data = remoteMessage?.data || remoteMessage?.notification?.data;
-      if (data) {
-        const { screen, orderId, url } = data;
-        console.log("🚀 App launched from quit state", screen, orderId);
-        navigateToScreen(router, screen, { orderId, url });
-      } else {
-        console.warn("⚠️ No data found in quit state tap");
-      }
+      
+      const data = extractNotificationData(remoteMessage);
+     
+      navigateToScreen(router, data);
     });
+
+  // Foreground notification tap
+  notifee.onForegroundEvent(({ type, detail }) => {
+    if (type === EventType.PRESS) {
+     
+      navigateToScreen(router, detail.notification?.data || {});
+    }
+  });
 };
 
 
-// Helper function for navigation
-function navigateToScreen(router, screen, { orderId, url }) {
-  if (screen === 'offers') {
-    router.push('/offers');
-  } else if (screen === 'orderDetails' && orderId) {
-    router.push(`/orders/${orderId}`);
-  } else if (screen === 'web' && url) {
-    router.push(`/webview?url=${encodeURIComponent(url)}`);
-  } else {
-    router.push(`/${screen}`); // fallback
-  }
+function extractNotificationData(remoteMessage) {
+  if (!remoteMessage) return {};
+
+  const rawData = remoteMessage.data || {};
+  return {
+    title: rawData.title || remoteMessage.notification?.title || "",
+    body: rawData.body || remoteMessage.notification?.body || "",
+    image: rawData.image || remoteMessage.notification?.android?.imageUrl || "",
+    screen: rawData.screen || "",
+    id: rawData.id || "",
+    url: rawData.url || "",
+  };
 }
 
 
-
+function navigateToScreen(router, { screen, id, url }) {
+ 
+  if (screen === "order-details" && id) {
+    router.push(`/order-details/${id}`);
+  } else if (screen === "offers") {
+    router.push("/offers");
+  } else if (screen === "web" && url) {
+    router.push(`/webview?url=${encodeURIComponent(url)}`);
+  } else if (screen) {
+    router.push(`/${screen}`);
+  }
+}

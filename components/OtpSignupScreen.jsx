@@ -11,8 +11,6 @@ import Toast from "react-native-toast-message";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-
-import { BackendUrl } from "../utils/Constants";
 import useAuthStore from "../Store/AuthStore";
 import OtpInput from "../components/OtpInput"; // Adjust path if needed
 

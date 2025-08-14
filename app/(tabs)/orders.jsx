@@ -23,7 +23,7 @@ const statusConfig = {
 const Orders = () => {
   const { user } = useAuthStore();
   const router = useRouter();
-  const uid = user.userId;
+  const uid = user?.userId;
 
   const fetchOrders = async () => {
     const response = await axios.post(

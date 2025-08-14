@@ -20,6 +20,7 @@ import DeliveryInstructions from '../components/DeliveryInstruction'
 import CancellationPolicy from '../components/cc'
 import DeliverySlotSelector from '../components/DeliverySlotSelector';
 import Back from '../components/Back';
+import ZipCodeNotServiceableModal from '../components/orderError';
 
 
 const OrderScreen = () => {
@@ -32,6 +33,9 @@ const OrderScreen = () => {
   const [paymentMethod] = useState('COD');
   const [thank, setThank] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState(null);
+  const [zipModalVisible, setZipModalVisible] = useState(false);
+const [zipMessage, setZipMessage] = useState('');
+
 
   const {
     cart,
@@ -55,18 +59,37 @@ const OrderScreen = () => {
       const res = await axios.post('https://api.apnifarming.com/user/coupon/apply.php', payload);
       return res.data;
     },
+    onError: (error) => {
+         console.log(error?.response?.data?.message);
+         Toast.show({
+           type: "error",
+           text1: error?.response?.data?.message,
+         });
+       },
   });
 
-  const CheckoutMutation = useMutation({
-    mutationFn: async (payload) => {
-      const res = await axios.post('https://api.apnifarming.com/user/checkout/submit.php', payload);
-      return res.data;
-    },
-    onSuccess: (data) => {
-      if (data.success && data.order_id) {
-        setCreatedOrderId(data.order_id);
-        setThank(true);
-        useCartStore.getState().clearCart();
+ const CheckoutMutation = useMutation({
+  mutationFn: async (payload) => {
+    const res = await axios.post('https://api.apnifarming.com/user/checkout/submit.php', payload);
+    
+    
+    return res.data;
+  },
+  onSuccess: (data) => {
+    
+    
+    
+    if (data.success && data.order_id) {
+      setCreatedOrderId(data.order_id);
+      setThank(true);
+      useCartStore.getState().clearCart();
+    } else {
+      // If API returns ZIP not serviceable
+      if (data?.success === false ) {
+        
+        
+        setZipMessage(data?.zip);
+        setZipModalVisible(true);
       } else {
         Toast.show({
           type: 'error',
@@ -74,53 +97,75 @@ const OrderScreen = () => {
           text2: data?.message || 'Please try again.',
         });
       }
-    },
-    onError: (error) => {
-      Toast.show({
-        type: 'error',
-        text1: error?.message || 'Something went wrong',
-        visibilityTime: 900,
-      });
-    },
-  });
-
-  const fetchTimeSlots = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(
-        `https://api.apnifarming.com/user/checkout/slots.php?subtotal=${finalAmount}`
-      );
-
-      if (res.data.success) {
-        const allSlots = res.data.data;
-        const now = new Date();
-
-        const availableFutureSlots = allSlots.filter((slot) => {
-          const [h, m] = slot.start_time.split(':').map(Number);
-          const slotDateTime = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth(),
-            selectedDate.getDate(),
-            h,
-            m
-          );
-          return slotDateTime > now;
-        });
-
-        setTimeSlots(allSlots);
-        setSelectedSlotId(availableFutureSlots.length > 0 ? availableFutureSlots[0].id : null);
-
-        useCartStore.getState().applyChargesFromBackend({
-          delivery_charge: parseFloat(res.data.deliverycharge || 0),
-          gst: parseFloat(res.data.tax || 0),
-        });
-      }
-    } catch {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to load slots' });
-    } finally {
-      setIsLoading(false);
     }
-  }, [finalAmount, selectedDate]);
+  },
+  onError: (error) => {
+    console.log(error);
+    
+    const success = error?.response?.data?.success;
+    if (success === false ) {
+      setZipMessage(error?.response?.data?.zip );
+      setZipModalVisible(true);
+    } else {
+      Toast.show({
+        type: "error",
+        text1: message || 'Something went wrong',
+      });
+    }
+  },
+});
+
+
+ const fetchTimeSlots = useCallback(async () => {
+  setIsLoading(true);
+  try {
+    const res = await axios.get(
+      `https://api.apnifarming.com/user/checkout/slots.php?subtotal=${finalAmount}`
+    );
+
+    const rawSlotsData = res?.data?.data;
+    const parsedSlots =
+      typeof rawSlotsData === 'string'
+        ? JSON.parse(rawSlotsData)
+        : rawSlotsData;
+
+    const allSlots = Array.isArray(parsedSlots) ? parsedSlots : [];
+    const now = new Date();
+
+    const availableFutureSlots = allSlots.filter((slot) => {
+      const [h, m] = slot.start_time.split(':').map(Number);
+      const slotDateTime = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        h,
+        m
+      );
+      return slotDateTime > now;
+    });
+
+    
+    setTimeSlots(allSlots);
+    
+
+    useCartStore.getState().applyChargesFromBackend({
+      delivery_charge: parseFloat(res.data.deliverycharge || 0),
+      gst: parseFloat(res.data.tax || 0),
+    });
+
+  } catch (error) {
+    console.log(error);
+    Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to load slots' });
+  } finally {
+    setIsLoading(false);
+  }
+}, [finalAmount]);
+
+useEffect(()=>{
+ if (timeSlots.length > 0 && !selectedSlotId){
+ setSelectedSlotId(timeSlots[0].id); 
+ }
+},[timeSlots])
 
   useEffect(() => {
     isMounted.current = true;
@@ -148,7 +193,7 @@ const OrderScreen = () => {
       clearTimeout(timeout);
       isMounted.current = false;
     };
-  }, [selectedDate, finalAmount]);
+  }, [ finalAmount]);
 
   const handleDateConfirm = (date) => {
     setSelectedDate(date);
@@ -199,9 +244,14 @@ const OrderScreen = () => {
         sale_price: item.price,
       })),
     };
+    
+    
 
     CheckoutMutation.mutate(orderPayload);
   };
+
+  
+  
 
   const orderSummary = useMemo(() => ({
     subtotal: totalAmount.toFixed(2),
@@ -341,6 +391,12 @@ const OrderScreen = () => {
           </TouchableOpacity>
         </View>
       )}
+      <ZipCodeNotServiceableModal
+  visible={zipModalVisible}
+  onClose={() => setZipModalVisible(false)}
+  message={zipMessage}
+/>
+
 
       <Toast config={toastConfig} />
     </SafeAreaView>

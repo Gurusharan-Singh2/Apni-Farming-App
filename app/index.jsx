@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -8,47 +9,38 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../assets/Colors";
 import logo from "../assets/images/logo-final.png";
 import useAuthStore from "../Store/AuthStore";
-
+import useCartStore from "../Store/CartStore";
+import useSubscriptionStore from "../Store/SubscriptionStore";
+import useAddressStore from "../Store/useAddressStore"
+import useWishlistStore from "../Store/WishlistStore"
 import WelcomeAnimation from "../components/WelcomeAnimation";
-
-
-
-
 
 export default function App() {
   const router = useRouter();
-  const {user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
+  const { width, height } = Dimensions.get("window");
+  const logoSize = width * 0.5; // 45% of screen width
+  const buttonWidth = width * 0.70; // 75% of screen width
+  const baseFont = width * 0.04; // scale font size with screen width
+
   useEffect(() => {
-    const initializeApp = async () => {
-      setLoading(true);
-     
-  
+    const checkAuth = async () => {
       const result = await isAuthenticated();
       if (result) {
         router.replace("/home");
-        return;
       }
-
-
       setLoading(false);
-
-  
-      return () => unsubscribe();
     };
-
-    initializeApp();
+    checkAuth();
   }, []);
-
-
- 
-  
 
   if (loading) {
     return (
@@ -61,61 +53,127 @@ export default function App() {
   return (
     <SafeAreaView className="bg-white flex-1">
       <StatusBar barStyle="light-content" backgroundColor={Colors.SECONDARY} />
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
- 
-        <View className="m-2 flex flex-col justify-between gap-2 pt-4 items-center px-4">
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View className="flex flex-col  items-center px-4 pt-2">
+          {/* Logo */}
           <Image
             source={logo}
             style={{
-              width: 250,
-              height: 250,
-              paddingTop: 5,
-              marginBottom: 5,
+              width: logoSize,
+              height: logoSize,
               resizeMode: "contain",
             }}
           />
 
-          <Text className="mb-[120px] text-primary font-bold z-40 text-[16px]">
+          {/* Tagline */}
+          <Text
+            style={{
+              fontSize: baseFont,
+              marginTop: height * 0.01,
+              marginBottom: height * -0.05
+            }}
+            className="text-primary font-bold text-center"
+          >
             शुद्धता और ताज़गी – हर एक डिलीवरी में
           </Text>
-          <WelcomeAnimation/>
 
-          <View className="w-3/4 mt-20">
+          {/* Animation */}
+          <WelcomeAnimation />
+
+          {/* Buttons */}
+          <View style={{ width: buttonWidth }}>
             <TouchableOpacity
               onPress={() => router.push("./signup")}
-              className="px-2 py-4 my-2 mb-5 bg-primary rounded-lg"
+              style={{
+                paddingVertical: height * 0.02,
+                backgroundColor: Colors.PRIMARY,
+                borderRadius: 10,
+                marginBottom: height * 0.02,
+              }}
             >
-              <Text className="text-[18px]  text-white text-center">Sign Up</Text>
+              <Text
+                style={{ fontSize: baseFont * 1.1 }}
+                className="text-white text-center"
+              >
+                Sign Up
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => router.push("/home")}
-              className="px-2 py-4 my-2 bg-black rounded-lg"
-            >
-              <Text className="text-[18px] text-white text-center">Guest User</Text>
-            </TouchableOpacity>
+           <TouchableOpacity
+  onPress={async () => {
+    try {
+       useAuthStore.getState().logout();
+       useCartStore.getState().clearCart();
+       useSubscriptionStore.getState().clearCart();
+       useAddressStore.getState().clearAll();
+       useWishlistStore.getState().clearWishlist();
+      await AsyncStorage.clear(); // Clears all stored data
+      router.push("/home");       // Then navigate
+    } catch (error) {
+      console.error("Error clearing AsyncStorage:", error);
+    }
+  }}
+  style={{
+    paddingVertical: height * 0.02,
+    backgroundColor: "black",
+    borderRadius: 10,
+  }}
+>
+  <Text
+    style={{ fontSize: baseFont * 1.1 }}
+    className="text-white text-center"
+  >
+    Guest User
+  </Text>
+</TouchableOpacity>
           </View>
 
-          <View className="w-full">
-            <View className="w-full flex-row items-center justify-center my-4 gap-2">
-              <View className="border-b-2 border-primary w-20" />
-              <Text className="text-[18px] font-semibold text-gray-700 mx-2">or</Text>
-              <View className="border-b-2 border-primary w-20" />
+          {/* Divider */}
+          <View className="w-full mt-6">
+            <View className="flex-row items-center justify-center my-4">
+              <View
+                style={{
+                  borderBottomWidth: 2,
+                  borderColor: Colors.PRIMARY,
+                  width: width * 0.2,
+                }}
+              />
+              <Text
+                style={{ fontSize: baseFont * 1.1 }}
+                className="font-semibold text-gray-700 mx-2"
+              >
+                or
+              </Text>
+              <View
+                style={{
+                  borderBottomWidth: 2,
+                  borderColor: Colors.PRIMARY,
+                  width: width * 0.2,
+                }}
+              />
             </View>
 
+            {/* Sign In link */}
             <TouchableOpacity
               onPress={() => router.push("/signin")}
-              className="flex flex-row gap-5 px-4 justify-center items-center"
+              className="flex flex-row gap-3 px-4 justify-center items-center"
             >
-              <Text className="text-gray-700 text-[16px] font-semibold">Already a User?</Text>
-              <Text className="text-[16px] text-primary font-bold text-center underline">
+              <Text
+                style={{ fontSize: baseFont }}
+                className="text-gray-700 font-semibold"
+              >
+                Already a User?
+              </Text>
+              <Text
+                style={{ fontSize: baseFont }}
+                className="text-primary font-bold text-center underline"
+              >
                 Sign In
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-      
     </SafeAreaView>
   );
 }

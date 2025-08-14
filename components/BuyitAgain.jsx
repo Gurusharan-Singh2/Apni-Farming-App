@@ -55,7 +55,7 @@ const BuyitAgain = ({ url, title = '' }) => {
   );
 
  return products.length > 0 ? (
-  <View className="py-2 mt-4 z-40">
+  <View className="py-2 mt-2 z-40 mb-4">
     <Text className="text-lg font-bold px-4 mb-4">{title || ''}</Text>
 
     {isLoading ? (

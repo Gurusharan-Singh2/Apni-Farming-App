@@ -17,6 +17,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {useRouter} from 'expo-router'
 
 const SuggestionCard = ({ item }) => {
+ 
+
   const { user, isAuthenticated } = useAuthStore();
   const customer_id = user?.userId;
   const router=useRouter()
@@ -211,7 +213,7 @@ const {
       />
     </TouchableOpacity>
 
-    <Text className="text-sm font-[700] mt-1" numberOfLines={1}>
+    <Text className="text-sm text-black font-[700] mt-1" numberOfLines={1}>
       {item.name}
     </Text>
   

@@ -211,6 +211,7 @@ decrement: (id, sizeId) => {
     {
       name: 'cart-storage',
       storage: createJSONStorage(() => AsyncStorage),
+     
     }
   )
 );
