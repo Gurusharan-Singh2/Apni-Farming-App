@@ -3,34 +3,36 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
-    FlatList,
-    Image,
-    Keyboard,
-    Modal,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  Keyboard,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import useCartStore from "../Store/CartStore";
 
 function SearchBar({ query, onChange, onSubmit }) {
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const { cart, addToCart, increment, decrement } = useCartStore();
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedSizes, setSelectedSizes] = useState({});
+  const [selectedSizes, setSelectedSizes] = useState({}); // Track selected size per product
 
+  // Debounce query input
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedQuery(query);
     }, 300);
-
     return () => clearTimeout(timeout);
   }, [query]);
 
+  // Fetch products
   const { data, isLoading } = useQuery({
     queryKey: ["search", debouncedQuery],
     queryFn: async () => {
@@ -57,40 +59,42 @@ function SearchBar({ query, onChange, onSubmit }) {
     setShowSuggestions(false);
   };
 
-  const handleSelectSize = (item, sizeObj) => {
-    setSelectedSizes((prev) => ({
+  const handleOpenSizeModal = (product) => {
+  setSelectedProduct(product);
+  setSelectedSizes((prev) => {
+    // If a size is already selected for this product, keep it
+    if (prev[product.id]) return prev;
+
+    // Otherwise default to the first size
+    return {
       ...prev,
-      [item.id]: {
-        id: sizeObj?.id,
-        size: sizeObj?.size,
-        option: sizeObj?.option,
-        costPrice: parseFloat(sizeObj?.costPrice || 0),
-        sellPrice: parseFloat(sizeObj?.sellPrice || 0),
-        discount: sizeObj?.discount,
-      },
-    }));
-    setModalVisible(false);
-  };
+      [product.id]: product.sizes?.[0] || null,
+    };
+  });
+  setModalVisible(true);
+};
+
+
+const handleSelectSize = (product, sizeObj) => {
+  setSelectedSizes((prev) => ({
+    ...prev,
+    [product.id]: sizeObj,
+  }));
+  setSelectedProduct((prev) =>
+    prev?.id === product.id ? { ...prev, selectedSize: sizeObj } : prev
+  );
+  setModalVisible(false);
+};
+
 
   const handleAddToCart = (item) => {
-    const selectedSize = selectedSizes[item.id] || item.sizes?.[0];
-
-    if (!selectedSize?.id) {
-      Toast.show({
-        type: "error",
-        text1: "Please select a size first",
-      });
-      return;
-    }
+    const size = selectedSizes[item.id] || item.sizes?.[0];
+    if (!size) return;
 
     addToCart({
-      id: item.id,
-      title: item.name,
-      image: item.image,
-      selectedSize: {
-        ...selectedSize,
-        id: Number(selectedSize.id),
-      },
+      ...item,
+      selectedSize: { ...size, id: Number(size.id) },
+      price: size.sellPrice,
     });
 
     Toast.show({
@@ -98,11 +102,13 @@ function SearchBar({ query, onChange, onSubmit }) {
       text1: "Added to Cart!",
       text2: `${item.name} was added successfully.`,
       visibilityTime: 1000,
+      autoHide: true,
     });
   };
 
   return (
     <View className="mx-2">
+      {/* Search Input */}
       <View className="flex-row items-center bg-white border border-gray-300 rounded-full px-4 py-1 shadow-sm">
         <View className="w-8 h-8 rounded-full bg-gray-200 items-center justify-center mr-2">
           <Ionicons name="search" size={18} color="#555" />
@@ -122,8 +128,9 @@ function SearchBar({ query, onChange, onSubmit }) {
         )}
       </View>
 
-      {showSuggestions ? (
-        isLoading ? (
+      {/* Suggestions */}
+      {showSuggestions &&
+        (isLoading ? (
           <View className="p-4 items-center justify-center">
             <Ionicons name="hourglass-outline" size={30} color="#aaa" />
             <Text className="text-gray-500 mt-2">Searching...</Text>
@@ -179,13 +186,17 @@ function SearchBar({ query, onChange, onSubmit }) {
                     {quantity > 0 ? (
                       <View className="flex-row items-center">
                         <View className="flex-row items-center justify-between bg-green-600 rounded-full px-2 py-2 min-w-[100px]">
-                          <TouchableOpacity onPress={() => decrement(item.id, selectedSize.id)}>
+                          <TouchableOpacity
+                            onPress={() => decrement(item.id, selectedSize.id)}
+                          >
                             <Ionicons name="remove" size={24} color="#fff" />
                           </TouchableOpacity>
                           <Text className="text-white text-[14px] font-semibold px-2">
                             {quantity}
                           </Text>
-                          <TouchableOpacity onPress={() => increment(item.id, selectedSize.id)}>
+                          <TouchableOpacity
+                            onPress={() => increment(item.id, selectedSize.id)}
+                          >
                             <Ionicons name="add" size={24} color="#fff" />
                           </TouchableOpacity>
                         </View>
@@ -195,15 +206,18 @@ function SearchBar({ query, onChange, onSubmit }) {
                         {item.sizes && (
                           <TouchableOpacity
                             className="border mb-4 border-gray-300 rounded-md px-4 py-1 flex-row items-center"
-                            onPress={() => {
-                              setSelectedProduct(item);
-                              setModalVisible(true);
-                            }}
+                            onPress={() => handleOpenSizeModal(item)}
                           >
                             <Text className="text-gray-700 text-[14px] mr-1">
-                              {selectedSize?.size + " " + selectedSize?.option?.toLowerCase()}
+                              {selectedSize?.size +
+                                " " +
+                                selectedSize?.option?.toLowerCase()}
                             </Text>
-                            <Ionicons name="chevron-down" size={14} color="#6B7280" />
+                            <Ionicons
+                              name="chevron-down"
+                              size={14}
+                              color="#6B7280"
+                            />
                           </TouchableOpacity>
                         )}
 
@@ -211,7 +225,9 @@ function SearchBar({ query, onChange, onSubmit }) {
                           className="border border-green-500 px-7 py-2 rounded-full"
                           onPress={() => handleAddToCart(item)}
                         >
-                          <Text className="text-green-500 text-[14px] font-bold">Add</Text>
+                          <Text className="text-green-500 text-[14px] font-bold">
+                            Add
+                          </Text>
                         </TouchableOpacity>
                       </View>
                     )}
@@ -228,58 +244,57 @@ function SearchBar({ query, onChange, onSubmit }) {
               No products found. Try something else.
             </Text>
           </View>
-        )
-      ) : null}
+        ))}
 
       {/* Size Selection Modal */}
       <Modal transparent visible={modalVisible} animationType="fade">
-        <TouchableOpacity
-          className="flex-1 bg-black/50 justify-center items-center"
-          activeOpacity={1}
-          onPressOut={() => setModalVisible(false)}
-        >
-          <View className="bg-white rounded-xl p-4 w-[85%] max-w-[320px]">
-            <Text className="text-lg font-bold mb-3 text-gray-800">
-              Select Size for {selectedProduct?.name}
-            </Text>
-            {selectedProduct?.sizes?.map((sizeObj) => {
-              const isSelected =
-                selectedSizes[selectedProduct.id]?.option === sizeObj.option;
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View className="flex-1 bg-black/50 justify-center items-center">
+            <View className="bg-white rounded-xl p-4 w-[85%] max-w-[320px]">
+              <Text className="text-lg font-bold mb-3 text-gray-800">
+                Select Size for {selectedProduct?.name}
+              </Text>
+              {selectedProduct?.sizes?.map((sizeObj) => {
+                const isSelected =
+                  selectedSizes[selectedProduct.id]?.id === sizeObj.id;
 
-              return (
-                <TouchableOpacity
-                  key={sizeObj.id}
-                  className={`py-3 px-3 rounded-lg mb-2 ${
-                    isSelected ? "bg-green-100 border border-green-400" : "bg-gray-50"
-                  }`}
-                  onPress={() => handleSelectSize(selectedProduct, sizeObj)}
-                >
-                  <View className="flex-row justify-between items-center">
-                    <Text
-                      className={`text-sm ${
-                        isSelected ? "text-green-800 font-bold" : "text-gray-700"
-                      }`}
-                    >
-                      {sizeObj.size + " " + sizeObj.option?.toLowerCase()}
-                    </Text>
-                    <Text
-                      className={`text-sm ${
-                        isSelected ? "text-green-800 font-bold" : "text-gray-600"
-                      }`}
-                    >
-                      ₹{sizeObj.sellPrice}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+                return (
+                  <TouchableOpacity
+                    key={sizeObj.id}
+                    className={`py-3 px-3 rounded-lg mb-2 ${
+                      isSelected
+                        ? "bg-green-100 border border-green-400"
+                        : "bg-gray-50"
+                    }`}
+                    onPress={() => handleSelectSize(selectedProduct, sizeObj)}
+                  >
+                    <View className="flex-row justify-between items-center">
+                      <Text
+                        className={`text-sm ${
+                          isSelected ? "text-green-800 font-bold" : "text-gray-700"
+                        }`}
+                      >
+                        {sizeObj.size + " " + sizeObj.option?.toLowerCase()}
+                      </Text>
+                      <Text
+                        className={`text-sm ${
+                          isSelected ? "text-green-800 font-bold" : "text-gray-600"
+                        }`}
+                      >
+                        ₹{sizeObj.sellPrice}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
 }
 
-SearchBar.whyDidYouRender = true;
+
 
 export default React.memo(SearchBar);

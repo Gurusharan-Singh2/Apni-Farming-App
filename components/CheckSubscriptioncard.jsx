@@ -11,8 +11,8 @@ const scaleFont = (size) => Math.round((size * screenWidth) / 375); // 375 is iP
 function SubscriptionCard() {
   const router = useRouter();
 
-  const titleFont = useMemo(() => scaleFont(18), []);
-  const subtitleFont = useMemo(() => scaleFont(14), []);
+  const titleFont = useMemo(() => scaleFont(15), []);
+  const subtitleFont = useMemo(() => scaleFont(12), []);
 
   return (
     <Pressable
@@ -40,7 +40,7 @@ function SubscriptionCard() {
           style={{
             fontSize: subtitleFont,
             color: '#6b7280', // gray-500
-            paddingHorizontal: 16,
+            paddingHorizontal: 2,
             textAlign: 'center',
           }}
         >

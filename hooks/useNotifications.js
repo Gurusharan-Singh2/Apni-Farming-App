@@ -79,12 +79,9 @@ export function handleNotificationTap(data) {
   
 
   if (screen === 'offers') {
-    router.push({
-      pathname: '/offers',
-      params: { orderId }, // ✅ pass as query param
-    });
+    router.push('/offers');
   } else if (screen === 'orderDetails' && orderId) {
-    router.push(`/orders/${orderId}`);
+    router.replace(`/orders/${orderId}`);
   } else if (screen === 'web' && url) {
     router.push({
       pathname: '/webview',

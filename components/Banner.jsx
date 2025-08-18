@@ -31,6 +31,8 @@ const BannerCarousel = ({ banners, isLoading, isError }) => {
   const router = useRouter();
 
 
+
+  
   // Auto-scroll every 5 seconds
   useEffect(() => {
     if (!banners || banners.length === 0) return;
@@ -56,10 +58,7 @@ const BannerCarousel = ({ banners, isLoading, isError }) => {
         router.push({
           pathname: '/bannerView',
           params: {
-            linkType: item.link_type,
-            link: item.link,
-            categoryId: item.category_id,
-            productId: item.pid,
+           id: item.id,
           },
         });
 

@@ -29,7 +29,7 @@ import Back from '../components/Back';
 const { width, height } = Dimensions.get('window');
 
 const CartScreen = () => {
-  const { cart, discount, finalAmount, decrement, increment, removeFromCart } = useCartStore();
+  const { cart, discount, subtotal, decrement, increment, removeFromCart } = useCartStore();
   const { isLoggedIn } = useAuthStore();
   const router = useRouter();
 
@@ -49,7 +49,7 @@ const CartScreen = () => {
       }}
     >
       <View style={{ position: 'absolute', right: width * 0.02, top: height * 0.005 }}>
-        <Text style={{ fontSize: width * 0.03, fontWeight: 'bold' }}>
+        <Text style={{ fontSize: width * 0.025, fontWeight: 'bold' }}>
           {item?.quantity} X ₹ {item?.selectedSize?.sellPrice} = ₹
           {item?.quantity * item?.selectedSize?.sellPrice || 0}
         </Text>
@@ -95,22 +95,19 @@ const CartScreen = () => {
           {item.selectedSize?.size} {item.selectedSize?.option}
         </Text>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            width: '82%',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: height * 0.01,
-          }}
-        >
-          <View>
-            <View
+         <View className="flex flex-row items-center justify-between w-full">
+               <TouchableOpacity className="self-end"
+              onPress={() => removeFromCart(item?.id, item?.selectedSize?.id)}
+            >
+              <MaterialIcons name="delete" size={width * 0.06} color="#D02127" />
+            </TouchableOpacity>
+            <View className="flex flex-col gap-2 " >
+              <View
               style={{
                 flexDirection: 'row',
-                alignSelf: 'flex-start',
+                alignSelf: 'flex-end',
                 borderRadius: width * 0.02,
-                paddingHorizontal: width * 0.015,
+                paddingHorizontal: width * 0.018,
                 paddingVertical: height * 0.003,
                 backgroundColor: '#D02127',
                 justifyContent: 'space-between',
@@ -121,9 +118,9 @@ const CartScreen = () => {
               {item?.selectedSize?.discount && (
                 <Text
                   style={{
-                    fontSize: width * 0.033,
+                    fontSize: width * 0.028,
                     fontWeight: '600',
-                    paddingHorizontal: width * 0.01,
+                    paddingHorizontal: width * 0.001,
                     backgroundColor: '#D02127',
                     color: '#fff',
                     textDecorationLine: 'line-through',
@@ -134,7 +131,7 @@ const CartScreen = () => {
               )}
               <Text
                 style={{
-                  fontSize: width * 0.035,
+                  fontSize: width * 0.032,
                   backgroundColor: '#fff',
                   marginHorizontal: width * 0.01,
                   paddingHorizontal: width * 0.02,
@@ -147,15 +144,7 @@ const CartScreen = () => {
                 ₹{item?.selectedSize?.sellPrice}
               </Text>
             </View>
-            <TouchableOpacity
-              onPress={() => removeFromCart(item?.id, item?.selectedSize?.id)}
-            >
-              <MaterialIcons name="delete" size={width * 0.06} color="#D02127" />
-            </TouchableOpacity>
-          </View>
-
-          <View >
-            <View
+              <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -165,7 +154,7 @@ const CartScreen = () => {
                 paddingHorizontal: width * 0.015,
                 paddingVertical: height * 0.005,
                 width: width * 0.32,
-                marginLeft: width * 0.06,
+                
               }}
             >
               <TouchableOpacity onPress={() => decrement(item.id, item.selectedSize?.id)}>
@@ -201,8 +190,9 @@ const CartScreen = () => {
                 <Ionicons name="add" size={width * 0.07} color="#fff" />
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
+            </View>
+              
+            </View>
       </View>
     </View>
   );
@@ -277,7 +267,7 @@ const CartScreen = () => {
                   <View
                     style={{
                       justifyContent: 'center',
-                      width: width * 0.33,
+                      width: width * 0.40,
                       padding: width * 0.02,
                       alignItems: 'center',
                     }}
@@ -286,15 +276,15 @@ const CartScreen = () => {
                       style={{
                         fontWeight: '800',
                         color: '#000',
-                        fontSize: width * 0.045,
+                        fontSize: width * 0.038,
                       }}
                     >
-                      Total: ₹ {finalAmount}
+                      Total: ₹ {subtotal}
                     </Text>
                     <Text
                       style={{
                         color: '#22c55e',
-                        fontSize: width * 0.035,
+                        fontSize: width * 0.028,
                         fontWeight: '600',
                         marginLeft: width * 0.01,
                       }}
@@ -308,7 +298,7 @@ const CartScreen = () => {
                       backgroundColor: '#16a34a',
                       flexDirection: 'row',
                       justifyContent: 'space-between',
-                      width: width * 0.6,
+                      width: width * 0.55,
                       paddingHorizontal: width * 0.04,
                       paddingVertical: height * 0.015,
                       borderRadius: width * 0.02,
@@ -319,7 +309,7 @@ const CartScreen = () => {
                       style={{
                         color: '#fff',
                         fontWeight: 'bold',
-                        fontSize: width * 0.050,
+                        fontSize: width * 0.045,
                         textAlign: 'center',
                       }}
                     >
@@ -327,7 +317,7 @@ const CartScreen = () => {
                     </Text>
                     <Entypo
                       name="chevron-with-circle-right"
-                      size={width * 0.07}
+                      size={width * 0.062}
                       color="white"
                     />
                   </TouchableOpacity>

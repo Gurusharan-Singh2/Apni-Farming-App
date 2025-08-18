@@ -21,7 +21,7 @@ import ProfileIcon from '../components/ProfileIcon';
 import useAuthStore from '../Store/AuthStore';
 
 const BannerView = () => {
-  const { linkType, link, categoryId, productId } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
 const {isAuthenticated}=useAuthStore();
   // Fetch products by category
   const {
@@ -29,41 +29,20 @@ const {isAuthenticated}=useAuthStore();
     isLoading: productsLoading,
     isError: productsError,
   } = useQuery({
-    queryKey: ['products', categoryId],
-    enabled: linkType === 'category' && !!categoryId,
+    queryKey: ['products', id],
+   
     queryFn: async () => {
       const res = await axios.get(
-        `${BackendUrl2}/user/categories/getProductsByCategory.php?id=${categoryId}`
+        `${BackendUrl2}/user/products/getofferproduct.php?banner_id=${id}`
       );
-      return res.data;
+      
+      
+      return res.data.data;
     },
   });
-const fetchProductById = async (id) => {
-  const res = await axios.post(`${BackendUrl2}/user/products/getProductbyid.php`, {
-    productId: Number(id),
-  });
+
 
   
-
-  // Extract the actual product object
-  return res.data?.data ?? null;
-};
-
-// Fetch single product
-const {
-  data: product,
-  isLoading: productLoading,
-  isError: productError,
-} = useQuery({
-  queryKey: ['product', productId],
-  enabled: linkType === 'product' && !!productId,
-  queryFn: () => fetchProductById(productId), 
-});
-
-
-  const handleOpenLink = useCallback(() => {
-    if (link) Linking.openURL(link);
-  }, [link]);
 
   const renderCategoryItem = useCallback(
     ({ item }) => <BannerProductCard item={item} />,
@@ -97,28 +76,7 @@ const {
     );
   }, [productsLoading, productsError, products, renderCategoryItem]);
 
-  const singleProduct = useMemo(() => {
-    if (productLoading)
-      return <ActivityIndicator size="large" color={Colors.PRIMARY} />;
-    if (productError || !product)
-      return <Text className="text-red-500">Product not found</Text>;
 
-    return (
-      <View style={{ paddingHorizontal: 12 }}>
-        <Pp product={product}/>
-      </View>
-    );
-  }, [productLoading, productError, product]);
-
-  const externalLink = useMemo(() => {
-    return (
-      <TouchableOpacity onPress={handleOpenLink}>
-        <Text className="text-blue-500 underline">
-          Open external link: {link}
-        </Text>
-      </TouchableOpacity>
-    );
-  }, [handleOpenLink, link]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.SECONDARY , paddingHorizontal:6, paddingTop:4}}>
@@ -130,9 +88,8 @@ const {
         </View>
         </View>
       <View style={{ flex: 1, paddingTop: 8 }}>
-        {linkType === 'category' && categoryProducts}
-        {linkType === 'product' && singleProduct}
-        {linkType === 'general' && link && externalLink}
+        { categoryProducts}
+        
       </View>
     </SafeAreaView>
   );

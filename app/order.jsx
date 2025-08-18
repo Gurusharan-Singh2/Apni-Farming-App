@@ -1,26 +1,28 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback, Suspense } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import useCartStore from '../Store/CartStore';
 import useAddressStore from '../Store/useAddressStore';
 import useAuthStore from '../Store/AuthStore';
 import { useMutation } from '@tanstack/react-query';
 import { toastConfig } from '../hooks/toastConfig';
-import Coupon from '../components/Coupon'
-import ChangedAddress from '../components/ChangeAddress'
-import ThankYouCard from '../components/ThankYouCard'
-import DeliveryInstructions from '../components/DeliveryInstruction'
-import CancellationPolicy from '../components/cc'
+import Coupon from '../components/Coupon';
+import ChangedAddress from '../components/ChangeAddress';
+import ThankYouCard from '../components/ThankYouCard';
+import DeliveryInstructions from '../components/DeliveryInstruction';
+import CancellationPolicy from '../components/cc';
 import DeliverySlotSelector from '../components/DeliverySlotSelector';
 import Back from '../components/Back';
 import ZipCodeNotServiceableModal from '../components/orderError';
+import LoadingScreen from '../components/LoadingScreen';
+import InfoModal from '../components/InfoModal';
+import deliveryAnime from '../assets/animations/Search for value.json';
+import timeAnime from '../assets/animations/Delivery.json';
 
 
 const OrderScreen = () => {
@@ -28,13 +30,21 @@ const OrderScreen = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSlotId, setSelectedSlotId] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
   const [deliveryInstruction, setDeliveryInstruction] = useState('');
   const [paymentMethod] = useState('COD');
   const [thank, setThank] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState(null);
   const [zipModalVisible, setZipModalVisible] = useState(false);
-const [zipMessage, setZipMessage] = useState('');
+  const [zipMessage, setZipMessage] = useState('');
+ const [modalVisible, setModalVisible] = useState(false);
+const [modalData, setModalData] = useState({
+  title: '',
+  messageEn: '',       
+  messageHi: '',       
+  animationSource: null,
+  zipCodes: [],
+});
 
 
   const {
@@ -60,112 +70,77 @@ const [zipMessage, setZipMessage] = useState('');
       return res.data;
     },
     onError: (error) => {
-         console.log(error?.response?.data?.message);
-         Toast.show({
-           type: "error",
-           text1: error?.response?.data?.message,
-         });
-       },
+      Toast.show({
+        type: "error",
+        text1: error?.response?.data?.message,
+      });
+    },
   });
 
- const CheckoutMutation = useMutation({
-  mutationFn: async (payload) => {
-    const res = await axios.post('https://api.apnifarming.com/user/checkout/submit.php', payload);
-    
-    
-    return res.data;
-  },
-  onSuccess: (data) => {
-    
-    
-    
-    if (data.success && data.order_id) {
-      setCreatedOrderId(data.order_id);
-      setThank(true);
-      useCartStore.getState().clearCart();
-    } else {
-      // If API returns ZIP not serviceable
-      if (data?.success === false ) {
-        
-        
-        setZipMessage(data?.zip);
+  const CheckoutMutation = useMutation({
+    mutationFn: async (payload) => {
+      const res = await axios.post('https://api.apnifarming.com/user/checkout/submit.php', payload);
+      
+      
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data.success && data.order_id) {
+        setCreatedOrderId(data.order_id);
+        setThank(true);
+        useCartStore.getState().clearCart();
+      } else {
+        if (data?.success === false) {
+          setZipMessage(data?.zip);
+          setZipModalVisible(true);
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Order Failed',
+            text2: data?.error || 'Please try again.',
+          });
+        }
+      }
+    },
+    onError: (error) => {
+      if (error?.response?.data?.success === false) {
+        setZipMessage(error?.response?.data?.zip);
         setZipModalVisible(true);
       } else {
         Toast.show({
-          type: 'error',
-          text1: 'Order Failed',
-          text2: data?.message || 'Please try again.',
+          type: "error",
+          text1: 'Something went wrong',
         });
       }
-    }
-  },
-  onError: (error) => {
-    console.log(error);
-    
-    const success = error?.response?.data?.success;
-    if (success === false ) {
-      setZipMessage(error?.response?.data?.zip );
-      setZipModalVisible(true);
-    } else {
-      Toast.show({
-        type: "error",
-        text1: message || 'Something went wrong',
-      });
-    }
-  },
-});
+    },
+  });
 
-
- const fetchTimeSlots = useCallback(async () => {
-  setIsLoading(true);
-  try {
-    const res = await axios.get(
-      `https://api.apnifarming.com/user/checkout/slots.php?subtotal=${finalAmount}`
-    );
-
-    const rawSlotsData = res?.data?.data;
-    const parsedSlots =
-      typeof rawSlotsData === 'string'
-        ? JSON.parse(rawSlotsData)
-        : rawSlotsData;
-
-    const allSlots = Array.isArray(parsedSlots) ? parsedSlots : [];
-    const now = new Date();
-
-    const availableFutureSlots = allSlots.filter((slot) => {
-      const [h, m] = slot.start_time.split(':').map(Number);
-      const slotDateTime = new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate(),
-        h,
-        m
+  const fetchTimeSlots = useCallback(async (showLoader = false) => {
+    if (showLoader) setIsInitialLoading(true);
+    try {
+      const res = await axios.get(
+        `https://api.apnifarming.com/user/checkout/slots.php?subtotal=${finalAmount}`
       );
-      return slotDateTime > now;
-    });
 
-    
-    setTimeSlots(allSlots);
-    
+      const rawSlotsData = res?.data?.data;
+      const parsedSlots =
+        typeof rawSlotsData === 'string'
+          ? JSON.parse(rawSlotsData)
+          : rawSlotsData;
 
-    useCartStore.getState().applyChargesFromBackend({
-      delivery_charge: parseFloat(res.data.deliverycharge || 0),
-      gst: parseFloat(res.data.tax || 0),
-    });
+      const allSlots = Array.isArray(parsedSlots) ? parsedSlots : [];
+      setTimeSlots(allSlots);
 
-  } catch (error) {
-    console.log(error);
-    Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to load slots' });
-  } finally {
-    setIsLoading(false);
-  }
-}, [finalAmount]);
-
-useEffect(()=>{
- if (timeSlots.length > 0 && !selectedSlotId){
- setSelectedSlotId(timeSlots[0].id); 
- }
-},[timeSlots])
+      useCartStore.getState().applyChargesFromBackend({
+        delivery_charge: parseFloat(res.data.deliverycharge || 0),
+        gst: parseFloat(res.data.tax || 0),
+      });
+    } catch (error) {
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to load slots' });
+    } finally {
+      if (showLoader) setIsInitialLoading(false);
+    }
+  }, [finalAmount]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -184,34 +159,67 @@ useEffect(()=>{
       }
     };
 
-    const timeout = setTimeout(() => {
-      validate();
-      fetchTimeSlots();
-    }, 400);
+    validate();
+    fetchTimeSlots(true); // First load with loader
 
     return () => {
-      clearTimeout(timeout);
       isMounted.current = false;
     };
-  }, [ finalAmount]);
+  }, []);
+
+
+
+  useEffect(() => {
+    if (timeSlots.length > 0) {
+      const now = new Date();
+      const validSlot = timeSlots.find(slot => {
+        const [h, m] = slot.start_time.split(':').map(Number);
+        const slotDateTime = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate(),
+          h,
+          m
+        );
+        return slotDateTime > now;
+      });
+      if (validSlot) {
+        setSelectedSlotId(validSlot.id);
+      }
+    }
+  }, [timeSlots, selectedDate]);
 
   const handleDateConfirm = (date) => {
+    setSelectedSlotId(null); // Reset slot 
     setSelectedDate(date);
     setDatePickerVisibility(false);
   };
 
   const handleCheckout = () => {
-    if (!selectedSlotId || !selectedAddress || !user?.userId) {
-      Toast.show({
-        type: 'error',
-        text1: 'Missing Information',
-        text2: 'Please complete address and slot selection.',
-      });
-      return;
-    }
+    if (!selectedAddress) {
+    setModalData({
+      title: 'Missing Information',
+      messageEn: 'Please select Address before proceeding.',
+      messageHi: 'कृपया आगे बढ़ने से पहले पता चुनें।',
+      animationSource: deliveryAnime,
+    });
+    setModalVisible(true);
+    return;
+  }
+
+  if (!selectedSlotId) {
+    setModalData({
+      title: 'Missing Information',
+      messageEn: 'Please choose a delivery slot before proceeding.',
+      messageHi: 'कृपया आगे बढ़ने से पहले डिलीवरी स्लॉट चुनें।',
+      animationSource: timeAnime,
+    });
+    setModalVisible(true);
+    return;
+  }
+
 
     const selectedSlot = timeSlots.find(slot => slot.id === selectedSlotId);
-
 
     const orderPayload = {
       user_token: token,
@@ -244,14 +252,9 @@ useEffect(()=>{
         sale_price: item.price,
       })),
     };
-    
-    
 
     CheckoutMutation.mutate(orderPayload);
   };
-
-  
-  
 
   const orderSummary = useMemo(() => ({
     subtotal: totalAmount.toFixed(2),
@@ -279,15 +282,16 @@ useEffect(()=>{
     );
   }
 
+
   return (
     <SafeAreaView className="flex-1 bg-white">
-     <View className="mx-4 mt-1">
-       <Back title="Back" />
-     </View>
+      <View className="mx-4 mt-1">
+        <Back title="Back" />
+      </View>
 
       <ScrollView className="flex-1 px-4" contentContainerStyle={{ flexGrow: 1, paddingBottom: 90 }}>
         <Suspense fallback={<ActivityIndicator />}>
-          <Coupon />
+          <Coupon  />
         </Suspense>
 
         <View className="mb-1 px-6">
@@ -333,18 +337,23 @@ useEffect(()=>{
           />
         </View>
 
-        {timeSlots ? (
-           <DeliverySlotSelector
+        {/* Delivery Slots */}
+        {isInitialLoading ? (
+          <View className="p-4 items-center">
+            <ActivityIndicator size="large" color="#16A34A" />
+            <Text className="text-basic text-gray-500 mt-2">Loading available slots...</Text>
+          </View>
+        ) : timeSlots && timeSlots.length > 0 ? (
+          <DeliverySlotSelector
             slots={timeSlots}
             selectedDate={selectedDate}
             selectedSlotId={selectedSlotId}
             onSelect={setSelectedSlotId}
           />
-         
         ) : (
-         <View className="p-4 items-center">
-            <Text className="text-basic text-gray-500">Loading available slots...</Text>
-          </View> 
+          <View className="p-4 items-center">
+            <Text className="text-basic text-gray-500">No slots available</Text>
+          </View>
         )}
 
         <Suspense fallback={<ActivityIndicator />}>
@@ -380,7 +389,8 @@ useEffect(()=>{
         <View className="bg-white px-4 py-3 shadow-lg border-t border-gray-200">
           <TouchableOpacity
             onPress={handleCheckout}
-            className="bg-green-600 rounded-lg py-4 px-6 items-center"
+            disabled={CheckoutMutation.isPending}
+            className="bg-green-600 rounded-lg py-4 px-6 items-center disabled:bg-gray-300 disabled:opacity-50"
           >
             <View className="flex-row w-full justify-between">
               <Text className="text-white font-bold text-lg">
@@ -391,13 +401,21 @@ useEffect(()=>{
           </TouchableOpacity>
         </View>
       )}
+
       <ZipCodeNotServiceableModal
-  visible={zipModalVisible}
-  onClose={() => setZipModalVisible(false)}
-  message={zipMessage}
-/>
-
-
+        visible={zipModalVisible}
+        onClose={() => setZipModalVisible(false)}
+        message={zipMessage}
+      />
+      <InfoModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title={modalData.title}
+        messageEn={modalData.messageEn}
+        messageHi={modalData.messageHi}
+        animationSource={modalData.animationSource}
+        zipCodes={modalData.zipCodes}
+      />
       <Toast config={toastConfig} />
     </SafeAreaView>
   );

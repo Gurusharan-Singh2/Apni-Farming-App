@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import { Feather, Octicons } from '@expo/vector-icons';
-
-import { useRouter } from 'expo-router';
-import useAuthStore from '../Store/AuthStore';
-import AccountAddress from '../components/Account_Address';
-import Back from '../components/Back';
-import GuestProfile from '../components/isAuth';
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { Feather, Octicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import useAuthStore from "../Store/AuthStore";
+import AccountAddress from "../components/Account_Address";
+import Back from "../components/Back";
+import GuestProfile from "../components/isAuth";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -22,15 +21,13 @@ const ProfileScreen = () => {
       const result = await isAuthenticated();
       setAuthenticated(result);
       setLoading(false);
-
-     
     };
     checkAuth();
   }, []);
 
   const handleLogout = () => {
     logout();
-    router.replace('/');
+    router.replace("/");
   };
 
   if (loading) {
@@ -42,8 +39,7 @@ const ProfileScreen = () => {
   }
 
   if (!authenticated) {
-    
-    return <GuestProfile/>;
+    return <GuestProfile />;
   }
 
   return (
@@ -63,7 +59,7 @@ const ProfileScreen = () => {
         </View>
 
         <TouchableOpacity
-          onPress={() => router.push('/orders')}
+          onPress={() => router.push("/orders")}
           className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md"
         >
           <Feather name="bookmark" size={28} color="black" />
@@ -71,7 +67,7 @@ const ProfileScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => router.push('/subscription')}
+          onPress={() => router.push("/subscription")}
           className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md"
         >
           <Ionicons name="book-outline" size={28} color="black" />
@@ -79,11 +75,22 @@ const ProfileScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => router.push('/terms')}
+          onPress={() => router.push("/terms")}
           className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md"
         >
           <Octicons name="law" size={28} color="black" />
-          <Text className="text-[20px] font-semibold">Terms and Conditions</Text>
+          <Text className="text-[20px] font-semibold">
+            Terms and Conditions
+          </Text>
+        </TouchableOpacity>
+
+        {/* Contact Us */}
+        <TouchableOpacity
+          onPress={() => router.push("/contactUs")}
+          className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md"
+        >
+          <MaterialIcons name="support-agent" size={28} color="black" />
+          <Text className="text-[20px] font-semibold">Contact Us</Text>
         </TouchableOpacity>
 
         <TouchableOpacity className="bg-white flex-row gap-6 px-6 py-5 rounded-xl w-full max-w-[90%] shadow-md">

@@ -4,13 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../assets/Colors';
 
 const stepsDefault = [
-  { key: 'orderConfirmed', label: 'Order Confirmed', icon: 'checkmark-done-outline' },
-  { key: 'orderPacked', label: 'Order Packed and Ready for Dispatch', icon: 'cube-outline' },
+  { key: 'orderProcessed', label: 'Order Processed', icon: 'document-text-outline' },
+  { key: 'orderConfirmed', label: 'Order Confirmed', icon: 'checkmark-circle-outline' },
   { key: 'outForDelivery', label: 'Out for Delivery', icon: 'bicycle-outline' },
   { key: 'delivered', label: 'Delivered', icon: 'home-outline' },
   { key: 'refunded', label: 'Refunded', icon: 'cash-outline' },
   { key: 'cancelled', label: 'Cancelled', icon: 'close-circle-outline' },
 ];
+
 
 const TrackOrder = ({
   currentStep = 0,
@@ -19,12 +20,13 @@ const TrackOrder = ({
   // Get the current step key
   const currentStepKey = steps[currentStep]?.key;
 
-  // If order is delivered or beyond (delivered, refunded, cancelled),
-  // filter out refunded and cancelled steps
   let filteredSteps = steps;
   if (currentStepKey === 'delivered' || currentStepKey === 'refunded' || currentStepKey === 'cancelled') {
     filteredSteps = steps.filter(step => step.key !== 'refunded' && step.key !== 'cancelled');
   }
+ 
+  
+  
 
   // If order is cancelled, show only cancelled step
   if (currentStepKey === 'cancelled') {
@@ -56,6 +58,29 @@ const TrackOrder = ({
       </View>
     );
   }
+
+  if (currentStepKey === 'refunded') {
+  return (
+    <View className="bg-white rounded-xl p-4 flex-row items-start mb-4">
+      <View className="items-center mr-4">
+        <View
+          className="w-8 h-8 rounded-full border-2 items-center justify-center"
+          style={{ backgroundColor: '#f3e6ff', borderColor: 'purple' }}
+        >
+          <Ionicons name="cash-outline" size={16} color="purple" />
+        </View>
+      </View>
+      <View className="flex-1">
+        <Text className="text-sm font-semibold" style={{ color: 'purple' }}>
+          Order Refunded
+        </Text>
+        <Text className="text-xs mt-1" style={{ color: 'purple', fontWeight: '600' }}>
+          Your order has been refunded.
+        </Text>
+      </View>
+    </View>
+  );
+}
 
   // Normal steps flow if not cancelled
   return (

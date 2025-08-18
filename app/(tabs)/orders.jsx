@@ -12,13 +12,14 @@ import BuyitAgain from '../../components/BuyitAgain';
 import EmptyCart from '../../components/EmptyCart';
 
 const statusConfig = {
-  'Order Confirmed': { icon: 'checkmark-done-outline', color: Colors.PRIMARY },
-  'Order Packed and Ready for Dispatch': { icon: 'cube-outline', color: '#FFA500' },
+  'Order Processed': { icon: 'document-text-outline', color: Colors.PRIMARY },
+  'Order Confirmed': { icon: 'checkmark-circle-outline', color: '#FFA500' },
   'Out for Delivery': { icon: 'bicycle-outline', color: '#1E90FF' },
   'Delivered': { icon: 'home-outline', color: 'green' },
   'Refunded': { icon: 'cash-outline', color: 'purple' },
   'Cancelled': { icon: 'close-circle-outline', color: 'red' },
 };
+
 
 const Orders = () => {
   const { user } = useAuthStore();
@@ -43,6 +44,9 @@ const Orders = () => {
     queryFn: fetchOrders,
     enabled: !!uid,
   });
+
+  
+  
 
   // Refetch orders every time screen gains focus
   useFocusEffect(

@@ -1,6 +1,18 @@
 import { Platform, PermissionsAndroid } from "react-native";
 import notifee, { AndroidImportance, AndroidStyle, EventType } from "@notifee/react-native";
-import messaging from "@react-native-firebase/messaging";
+import { getApp } from "@react-native-firebase/app";
+import {
+  getMessaging,
+  requestPermission,
+  getToken,
+  onMessage,
+  onNotificationOpenedApp,
+  getInitialNotification,
+  AuthorizationStatus,
+} from "@react-native-firebase/messaging";
+
+// Track last notification to avoid duplicate navigation
+let lastNotificationId = null;
 
 // ----------------------
 // REQUEST PERMISSION + GET TOKEN
@@ -17,15 +29,14 @@ export const requestPermissionAndGetToken = async () => {
       }
     }
 
-    const authStatus = await messaging().requestPermission();
+    const authStatus = await requestPermission(getMessaging(getApp()));
     const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL;
 
     if (!enabled) return null;
 
-    const token = await messaging().getToken();
-    console.log("🔥 FCM Token:", token);
+    const token = await getToken(getMessaging(getApp()));
     return token;
   } catch (e) {
     console.error("❌ Token error:", e.message);
@@ -33,7 +44,9 @@ export const requestPermissionAndGetToken = async () => {
   }
 };
 
-
+// ----------------------
+// DISPLAY NOTIFICATION
+// ----------------------
 export const displayNotification = async ({ title, body, image, screen, id, url }) => {
   await notifee.createChannel({
     id: "default",
@@ -58,45 +71,53 @@ export const displayNotification = async ({ title, body, image, screen, id, url 
   });
 };
 
-
+// ----------------------
+// FOREGROUND MESSAGES
+// ----------------------
 export const handleForegroundMessages = () => {
-  return messaging().onMessage(async (remoteMessage) => {
-
+  return onMessage(getMessaging(getApp()), async (remoteMessage) => {
     const data = extractNotificationData(remoteMessage);
-    
     await displayNotification(data);
   });
 };
 
-
+// ----------------------
+// BACKGROUND + INITIAL NAVIGATION
+// ----------------------
 export const handleBackgroundNotificationNavigation = (router) => {
-  
-  messaging().onNotificationOpenedApp((remoteMessage) => {
-
+  // Background → tap
+  onNotificationOpenedApp(getMessaging(getApp()), (remoteMessage) => {
     const data = extractNotificationData(remoteMessage);
-    
-    navigateToScreen(router, data);
+    navigateIfNotDuplicate(router, data);
   });
 
-
-  messaging()
-    .getInitialNotification()
-    .then((remoteMessage) => {
-      
+  // Cold start → tap
+  getInitialNotification(getMessaging(getApp())).then((remoteMessage) => {
+    if (remoteMessage) {
       const data = extractNotificationData(remoteMessage);
-     
-      navigateToScreen(router, data);
-    });
+      navigateIfNotDuplicate(router, data);
+    }
+  });
 
-  // Foreground notification tap
+  // Foreground tap
   notifee.onForegroundEvent(({ type, detail }) => {
     if (type === EventType.PRESS) {
-     
-      navigateToScreen(router, detail.notification?.data || {});
+      navigateIfNotDuplicate(router, detail.notification?.data || {});
     }
   });
 };
 
+// ----------------------
+// HELPERS
+// ----------------------
+function navigateIfNotDuplicate(router, data) {
+  const uniqueId = data.id || data.url || `${data.screen}-${Date.now()}`;
+
+  if (lastNotificationId === uniqueId) return;
+  lastNotificationId = uniqueId;
+
+  navigateToScreen(router, data);
+}
 
 function extractNotificationData(remoteMessage) {
   if (!remoteMessage) return {};
@@ -112,16 +133,15 @@ function extractNotificationData(remoteMessage) {
   };
 }
 
-
 function navigateToScreen(router, { screen, id, url }) {
- 
+  // Use replace to avoid "back to same page" issues
   if (screen === "order-details" && id) {
-    router.push(`/order-details/${id}`);
+    router.replace(`/order-details/${id}`);
   } else if (screen === "offers") {
-    router.push("/offers");
+    router.replace("/offers");
   } else if (screen === "web" && url) {
-    router.push(`/webview?url=${encodeURIComponent(url)}`);
+    router.replace(`/webview?url=${encodeURIComponent(url)}`);
   } else if (screen) {
-    router.push(`/${screen}`);
+    router.replace(`/${screen}`);
   }
 }

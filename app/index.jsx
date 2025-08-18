@@ -20,6 +20,7 @@ import useSubscriptionStore from "../Store/SubscriptionStore";
 import useAddressStore from "../Store/useAddressStore"
 import useWishlistStore from "../Store/WishlistStore"
 import WelcomeAnimation from "../components/WelcomeAnimation";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function App() {
   const router = useRouter();
@@ -44,9 +45,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-[#f0d699a3]">
-        <ActivityIndicator size="large" color={Colors.PRIMARY} />
-      </SafeAreaView>
+      <LoadingScreen/>
     );
   }
 
@@ -83,7 +82,7 @@ export default function App() {
           {/* Buttons */}
           <View style={{ width: buttonWidth }}>
             <TouchableOpacity
-              onPress={() => router.push("./signup")}
+              onPress={() => router.replace("./signup")}
               style={{
                 paddingVertical: height * 0.02,
                 backgroundColor: Colors.PRIMARY,
@@ -155,7 +154,7 @@ export default function App() {
 
             {/* Sign In link */}
             <TouchableOpacity
-              onPress={() => router.push("/signin")}
+              onPress={() => router.replace("/signin")}
               className="flex flex-row gap-3 px-4 justify-center items-center"
             >
               <Text

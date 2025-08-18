@@ -1,4 +1,6 @@
 
+
+
 import {
   AntDesign,
   Entypo,
@@ -33,6 +35,7 @@ import Toast from "react-native-toast-message";
 import useAuthStore from "../Store/AuthStore";
 import useAddressStore from "../Store/useAddressStore";
 import { BackendUrl2 } from "../utils/Constants";
+import { toastConfig } from '../hooks/toastConfig'
 
 // Default values
 const defaultValues = {
@@ -46,41 +49,62 @@ const defaultValues = {
 
 // Field configurations
 const fieldConfigs = [
-  { name: "street", label: "Street", keyboardType: "default" },
-  { name: "landmark", label: "Landmark", keyboardType: "default" },
+  { name: "street", label: "Street", keyboardType: "default", required: true },
+  { name: "landmark", label: "Landmark", keyboardType: "default", required: true },
   { name: "city", label: "City", keyboardType: "default" },
   { name: "state", label: "State", keyboardType: "default" },
   { name: "zip", label: "Zip", keyboardType: "numeric" },
 ];
 
-// Address item (memoized)
+import { Pressable} from "react-native";
+
 const AddressItem = memo(({ item, isSelected, onSelect, onEdit, onDelete }) => (
-  <TouchableOpacity onPress={onSelect}>
-    <View
-      className={`p-4 mb-4 rounded-xl border ${
-        isSelected ? "bg-green-100 border-green-500" : "bg-white border-gray-200"
-      }`}
-    >
-      <Text className="font-semibold text-base">{item.title}</Text>
-      <Text className="text-gray-600 text-sm">
+  <Pressable
+    onPress={onSelect}
+    android_ripple={{ color: "#d1fae5" }}
+    className={`mb-4 flex-row justify-between items-start rounded-2xl p-4 shadow-sm 
+      ${isSelected ? "bg-green-50 border border-green-500" : "bg-white border border-gray-200"}`}
+    style={{ elevation: 2 }} // subtle Android shadow
+  >
+    {/* Address Details */}
+    <View className="flex-1 pr-3">
+      <Text className="font-bold text-base text-gray-800">{item.title}</Text>
+      <Text className="text-gray-600 mt-1" numberOfLines={1}>
         {item.street}, {item.city}
       </Text>
-      <Text className="text-gray-600 text-sm">
+      <Text className="text-gray-600" numberOfLines={1}>
         {item.state} - {item.zip}
       </Text>
-      <View className="absolute gap-4 mr-2 right-0 bottom-1 m-1 flex-row">
-        <TouchableOpacity onPress={onEdit}>
-          <AntDesign name="edit" size={20} color="#4B5563" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDelete}>
-          <AntDesign name="delete" size={20} color="#EF4444" />
-        </TouchableOpacity>
-      </View>
     </View>
-  </TouchableOpacity>
+
+    {/* Actions */}
+    <View className="flex-row items-center self-end gap-3 space-x-3">
+
+      <Pressable
+        onPress={onEdit}
+        android_ripple={{ color: "#e5e7eb", borderless: true }}
+        className="p-2 rounded-full bg-gray-100"
+        style={({ pressed }) => [
+          { transform: [{ scale: pressed ? 0.9 : 1 }] },
+        ]}
+      >
+        <AntDesign name="edit" size={18} color="#374151" />
+      </Pressable>
+
+      <Pressable
+        onPress={onDelete}
+        android_ripple={{ color: "#fecaca", borderless: true }}
+        className="p-2 rounded-full bg-red-100"
+        style={({ pressed }) => [
+          { transform: [{ scale: pressed ? 0.9 : 1 }] },
+        ]}
+      >
+        <AntDesign name="delete" size={18} color="#dc2626" />
+      </Pressable>
+    </View>
+  </Pressable>
 ));
 
-// Main Component
 const LocationIcon = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -112,14 +136,12 @@ const LocationIcon = () => {
   });
 
   const handleSelect = (item) => {
-
     setSelectedAddress({ ...item });
-    setDrawerVisible(false); // Close modal after selection
+    setDrawerVisible(false);
   };
 
   // Fetch address list
-// Fetch address list
-const { data: addressList, isLoading } = useQuery({
+ const { data: addressList, isLoading } = useQuery({
   queryKey: ["addresses", customer_id],
   queryFn: async () => {
     const res = await axios.post(`${BackendUrl2}/user/address/address.php`, {
@@ -171,40 +193,33 @@ useEffect(() => {
   setAddresses(formatted )}
 },[addressList])
 
- 
-
   // Add address
   const addMutation = useMutation({
-  mutationFn: async (data) =>
-    await axios.post(`${BackendUrl2}/user/address/address.php`, data),
-  onSuccess: (response, variables) => {
-    queryClient.invalidateQueries(["addresses", customer_id]);
+    mutationFn: async (data) =>
+      await axios.post(`${BackendUrl2}/user/address/address.php`, data),
+    onSuccess: (response, variables) => {
+      const newAddress = {
+        id: response.data?.id,
+        uid: customer_id,
+        street: variables.street,
+        landmark: variables.landmark,
+        city: variables.city,
+        state: variables.state,
+        zip: variables.zip,
+        title: variables.title,
+        default_address: variables.default_address,
+      };
+      setAddresses([...addresses, newAddress]);
+      setSelectedAddress(newAddress);
+      Toast.show({ type: "success", text1: "Address added", visibilityTime: 1000 });
+      closeDrawer();
+      queryClient.invalidateQueries(["addresses", customer_id]);
+    },
+    onError: (err) =>
+      Toast.show({ type: "error", text1: "Add failed", text2: err.message }),
+  });
 
-    const newAddress = {
-      id: response.data?.id,
-      uid: customer_id,
-      street: variables.street,
-      landmark: variables.landmark,
-      city: variables.city,
-      state: variables.state,
-      zip: variables.zip,
-      title: variables.title,
-      default_address: variables.default_address,
-    };
-
-    // Update Zustand immediately for UI
-    setAddresses([...addresses, newAddress]);
-    setSelectedAddress(newAddress);
-
-    Toast.show({ type: "success", text1: "Address added",visibilityTime:1000 });
-    closeDrawer();
-  },
-  onError: (err) =>
-    Toast.show({ type: "error", text1: "Add failed", text2: err.message }),
-});
-
-
-  // Update address
+  // Update address (instant UI update)
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }) =>
       axios.post(`${BackendUrl2}/user/address/address.php`, {
@@ -213,13 +228,20 @@ useEffect(() => {
         ...data,
       }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries(["addresses", customer_id]);
-      updateAddress(editIndex, variables.data);
-      Toast.show({ type: "success", text1: "Address updated",visibilityTime:1000 });
+      const updatedAddress = {
+        ...addresses[editIndex],
+        ...variables.data,
+      };
+      const newList = [...addresses];
+      newList[editIndex] = updatedAddress;
+      setAddresses(newList);
+      setSelectedAddress(updatedAddress);
+      Toast.show({ type: "success", text1: "Address updated", visibilityTime: 1000 });
       closeDrawer();
+      queryClient.invalidateQueries(["addresses", customer_id]);
     },
     onError: (err) =>
-      Toast.show({ type: "error", text1: "Update failed", text2: err.message,visibilityTime:1000 }),
+      Toast.show({ type: "error", text1: "Update failed", text2: err.message }),
   });
 
   // Delete address
@@ -231,16 +253,16 @@ useEffect(() => {
         uid,
       }),
     onSuccess: (_, { index }) => {
-      queryClient.invalidateQueries(["addresses", customer_id]);
-      deleteAddress(index);
+      const updated = addresses.filter((_, i) => i !== index);
+      setAddresses(updated);
       setSelectedAddress(null);
-      Toast.show({ type: "success", text1: "Address deleted",visibilityTime:1000 });
+      Toast.show({ type: "success", text1: "Address deleted", visibilityTime: 1000 });
+      queryClient.invalidateQueries(["addresses", customer_id]);
     },
     onError: (err) =>
       Toast.show({ type: "error", text1: "Delete failed", text2: err.message }),
   });
 
-  // Close modal
   const closeDrawer = useCallback(() => {
     setDrawerVisible(false);
     setAddShow(false);
@@ -249,7 +271,6 @@ useEffect(() => {
     setSelectedTag("Home");
   }, []);
 
-  // Use location
   const useCurrentLocation = async () => {
     setLoading(true);
     try {
@@ -279,6 +300,8 @@ useEffect(() => {
 
   const handleEdit = (index) => {
     const addr = addresses[index];
+   
+    
     setEditIndex(index);
     setAddShow(true);
     setSelectedTag(addr.title);
@@ -287,12 +310,31 @@ useEffect(() => {
       landmark: addr.landmark,
       city: addr.city,
       state: addr.state,
-      zip: addr.zip,
+      zip: String(addr.zip || ""),
       default_address: addr.default_address,
     });
   };
 
   const onSubmit = (data) => {
+     if (!data.street?.trim()) {
+    Toast.show({
+      type: "error",
+      text1: "Missing Street",
+      text2: "Please enter your street address.",
+      visibilityTime: 1500,
+    });
+    return;
+  }
+
+  if (!data.landmark?.trim()) {
+    Toast.show({
+      type: "error",
+      text1: "Missing Address Title",
+      text2: "Please add landmark.",
+      visibilityTime: 1500,
+    });
+    return;
+  }
     const payload = {
       ...data,
       title: selectedTag,
@@ -308,13 +350,9 @@ useEffect(() => {
     }
   };
 
-  
-
-
-
   return (
     <View className="items-start">
-       <TouchableOpacity onPress={() => setDrawerVisible(true)}>
+        <TouchableOpacity onPress={() => setDrawerVisible(true)}>
         <View className="flex-row items-center space-x-1">
           <SimpleLineIcons name="location-pin" size={20} />
           <Text className="font-bold text-black text-base">
@@ -343,29 +381,32 @@ useEffect(() => {
               ListHeaderComponent={
                 <>
                   <Text className="font-bold text-xl mb-4">Select Delivery Location</Text>
-
-                {isAuthenticated() ?  <TouchableOpacity
-                    onPress={() => {
-                       if (!user) {
-      Toast.show({
-        type: "error",
-        text1: "Please log in to add an address",
-        visibilityTime: 1000,
-      });
-      return;
-    }
-                      setAddShow(true);
-                      setEditIndex(null);
-                      reset();
-                      setSelectedTag("Home");
-                    }}
-                    className="bg-white p-4 rounded-lg mb-4 flex-row justify-between"
-                  >
-                    <Text className="text-green-600 font-medium text-lg">
-                      + Add new address
-                    </Text>
-                    <AntDesign name="right" size={16} color="#6b7280" />
-                  </TouchableOpacity>:<Text>User not login</Text> } 
+                  {isAuthenticated() ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (!user) {
+                          Toast.show({
+                            type: "error",
+                            text1: "Please log in to add an address",
+                            visibilityTime: 1000,
+                          });
+                          return;
+                        }
+                        setAddShow(true);
+                        setEditIndex(null);
+                        reset(defaultValues);
+                        setSelectedTag("Home");
+                      }}
+                      className="bg-white p-4 rounded-lg mb-4 flex-row justify-between"
+                    >
+                      <Text className="text-green-600 font-medium text-lg">
+                        + Add new address
+                      </Text>
+                      <AntDesign name="right" size={16} color="#6b7280" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Text>User not login</Text>
+                  )}
                 </>
               }
               renderItem={({ item, index }) => (
@@ -476,9 +517,12 @@ useEffect(() => {
             </ScrollView>
           )}
         </View>
+        <Toast config={toastConfig}/>
       </Modal>
+      
     </View>
   );
 };
 
 export default memo(LocationIcon);
+

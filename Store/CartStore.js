@@ -12,6 +12,7 @@ const useCartStore = create(
       discount: 0,
       finalAmount: 0,
       totalItems: 0,
+      subtotal:0,
 
       // ✅ Coupon States
       couponCode: null,
@@ -40,6 +41,7 @@ const useCartStore = create(
         const final = baseAmount + deliveryCharge + gstAmount;
 
         set((state) => {
+          state.subtotal=subtotal;
           state.totalAmount = total;
           state.discount = discount;
           state.totalItems = totalItems;

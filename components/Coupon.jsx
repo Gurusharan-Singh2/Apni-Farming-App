@@ -14,8 +14,11 @@ import axios from 'axios';
 import useCartStore from '../Store/CartStore';
 import Toast from 'react-native-toast-message';
 
+
 const Coupon = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisiblee, setModalVisiblee] = useState(false);
+  const [selectedCouponCode, setSelectedCouponCode] = useState(null); // Track which coupon is being applied
+
   const screenHeight = Dimensions.get('window').height;
   const modalHeight = screenHeight * 0.8;
 
@@ -32,23 +35,19 @@ const Coupon = () => {
       const res = await axios.get('https://api.apnifarming.com/user/coupon/getCouponlist.php');
       return res.data?.data ?? [];
     },
-    enabled: modalVisible,
+    enabled: modalVisiblee,
   });
-  
-  
 
   const ApplyCouponMutation = useMutation({
     mutationFn: async (payload) => {
       const res = await axios.post('https://api.apnifarming.com/user/coupon/apply.php', payload);
-      
-      
-      console.log(res.data);
-      
       return res.data;
     },
   });
 
   const handleApplyCoupon = (code) => {
+    setSelectedCouponCode(code); // Show loader immediately
+
     const payload = {
       code,
       cart_total: finalAmount,
@@ -56,38 +55,41 @@ const Coupon = () => {
 
     ApplyCouponMutation.mutate(payload, {
       onSuccess: (data) => {
+        setSelectedCouponCode(null); // Remove loader
         if (data.success) {
           applyCouponFromBackend(data);
-          setModalVisible(false);
+          setModalVisiblee(false);
           Toast.show({
             type: 'success',
             text1: 'Coupon applied successfully',
             visibilityTime: 800,
           });
         } else {
-          Toast.show({
+           Toast.show({
             type: 'error',
-            text1: data.error,
-            visibilityTime: 800,
-          });
-          setModalVisible(false);
+            text1: "Warrning",
+            text2:data.error
+
+           })
+         
         }
       },
       onError: (error) => {
         console.error('Error applying coupon:', error);
+        setSelectedCouponCode(null); // Remove loader
       },
     });
   };
 
   useEffect(() => {
-    if (modalVisible) refetch();
-  }, [modalVisible]);
+    if (modalVisiblee) refetch();
+  }, [modalVisiblee]);
 
   return (
     <>
       <TouchableOpacity
         className="flex-row items-center justify-between border border-gray-200 px-6 py-3 bg-white rounded-2xl shadow-sm my-2"
-        onPress={() => setModalVisible(true)}
+        onPress={() => setModalVisiblee(true)}
       >
         <View className="flex-row items-center justify-between">
           <View className="bg-orange-100 pt-2 rounded-full mr-3">
@@ -108,7 +110,7 @@ const Coupon = () => {
                 text1: 'Coupon removed successfully',
                 visibilityTime: 500,
               });
-              setModalVisible(false);
+              setModalVisiblee(false);
             }}
           >
             <Text className="text-white text-basic text-center">Remove</Text>
@@ -121,15 +123,15 @@ const Coupon = () => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        visible={modalVisiblee}
+        onRequestClose={() => setModalVisiblee(false)}
       >
         <View className="flex-1 justify-end">
           <View className="bg-white rounded-t-3xl p-4" style={{ height: modalHeight }}>
             <View className="items-center mb-4">
               <TouchableOpacity
                 className="bg-gray-200 p-3 rounded-full"
-                onPress={() => setModalVisible(false)}
+                onPress={() => setModalVisiblee(false)}
               >
                 <MaterialCommunityIcons name="close" size={24} color="black" />
               </TouchableOpacity>
@@ -152,6 +154,8 @@ const Coupon = () => {
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => {
                     const isCouponApplied = couponCode === item.code;
+                    const isApplyingThisCoupon = selectedCouponCode === item.code;
+
                     return (
                       <View className="border border-gray-200 p-4 rounded-xl mb-3 bg-gray-50">
                         <View className="flex-row items-center justify-between mb-2">
@@ -166,11 +170,15 @@ const Coupon = () => {
                             onPress={() => {
                               if (!isCouponApplied) handleApplyCoupon(item.code);
                             }}
-                            disabled={isCouponApplied || ApplyCouponMutation.isLoading}
+                            disabled={isCouponApplied || isApplyingThisCoupon}
                           >
-                            <Text className="text-center text-heading-small text-white font-semibold">
-                              {isCouponApplied ? 'Applied' : 'Apply'}
-                            </Text>
+                            {isApplyingThisCoupon ? (
+                              <ActivityIndicator color="#fff" size="small" />
+                            ) : (
+                              <Text className="text-center text-heading-small text-white font-semibold">
+                                {isCouponApplied ? 'Applied' : 'Apply'}
+                              </Text>
+                            )}
                           </TouchableOpacity>
                         </View>
 
@@ -193,7 +201,6 @@ const Coupon = () => {
           </View>
         </View>
       </Modal>
-      
     </>
   );
 };

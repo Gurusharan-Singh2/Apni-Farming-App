@@ -97,13 +97,13 @@ export default function SubscriptionScreen() {
   const userId = user?.userId;
 
   // Subscription products (for create)
-  const { data: subscriptionOrder, isLoading: productsLoading } = useQuery({
+  const { data: subscriptionOrder, isLoading: productsLoading, } = useQuery({
     queryKey: ['subscription-products'],
     queryFn: fetchSubscriptionProducts,
   });
 
   // Multiple subscriptions array now
-  const { data: subscriptions, isLoading } = useQuery({
+  const { data: subscriptions, isLoading:subcriptionLoading,isFetching:isSubscriptionFetching } = useQuery({
     queryKey: ['subscription-detail', userId],
     queryFn: () => fetchSubscription(userId),
     enabled: !!userId,
@@ -224,7 +224,7 @@ const upcomingDates = useMemo(() => {
     <SubcriptionItem item={item} />
   ), []);
 
-  if (isLoading || productsLoading) {
+  if (subcriptionLoading || productsLoading||isSubscriptionFetching) {
     return (
       <SafeAreaView className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#00C851" />
@@ -259,7 +259,7 @@ const upcomingDates = useMemo(() => {
                 if (!cart || cart.length === 0) {
                   Toast.show({ type: 'error', text1: 'Please select items' });
                 } else {
-                  router.push('/create-subscrition');
+                  router.replace('/create-subscrition');
                 }
               }}
               className={`mt-6 mx-6 p-4 rounded-full shadow-md ${
@@ -535,7 +535,7 @@ const upcomingDates = useMemo(() => {
           Toast.show({ type: 'error', text1: 'Please select items' });
           return;
         }
-        router.push('/create-subscrition');
+        router.replace('/create-subscrition');
       }}
       className={`mt-4 p-4 rounded-full shadow-md ${
         !cart || cart.length === 0 ? 'bg-gray-300' : 'bg-green-600'
