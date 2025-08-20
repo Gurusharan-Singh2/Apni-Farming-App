@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-// ✅ Memoized banner item with styling preserved
+// ✅ Memoized banner item
 const BannerItem = React.memo(({ item, width, onPress }) => (
   <View style={{ width }} className="items-center justify-center">
     <TouchableOpacity onPress={onPress}>
@@ -30,9 +30,6 @@ const BannerCarousel = ({ banners, isLoading, isError }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 
-
-
-  
   // Auto-scroll every 5 seconds
   useEffect(() => {
     if (!banners || banners.length === 0) return;
@@ -46,20 +43,20 @@ const BannerCarousel = ({ banners, isLoading, isError }) => {
     return () => clearInterval(interval);
   }, [currentIndex, banners]);
 
-  const handleScroll = useCallback((event) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / width);
-    setCurrentIndex(index);
-  }, [width]);
-
+  const handleScroll = useCallback(
+    (event) => {
+      const index = Math.round(event.nativeEvent.contentOffset.x / width);
+      setCurrentIndex(index);
+    },
+    [width]
+  );
 
   const renderItem = useCallback(
     ({ item }) => {
       const handlePress = () =>
         router.push({
           pathname: '/bannerView',
-          params: {
-           id: item.id,
-          },
+          params: { id: item.id },
         });
 
       return <BannerItem item={item} width={width} onPress={handlePress} />;
@@ -103,6 +100,18 @@ const BannerCarousel = ({ banners, isLoading, isError }) => {
         initialScrollIndex={0}
         windowSize={3}
       />
+
+      {/* ✅ Dot Indicator */}
+      <View className="flex-row justify-center mt-2">
+        {banners.map((_, index) => (
+          <View
+            key={index}
+            className={`h-2 w-2 mx-1 rounded-full ${
+              currentIndex === index ? 'bg-black' : 'bg-gray-400'
+            }`}
+          />
+        ))}
+      </View>
     </View>
   );
 };

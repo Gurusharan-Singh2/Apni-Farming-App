@@ -219,7 +219,7 @@ const {
     
     <View className=" p-2 -mt-4">
       {/* Title */}
-      <Text className="font-[700] text-sm text-gray-800 mb-1" numberOfLines={2}>
+      <Text className="font-[700] text-sm text-gray-800 mb-1 leading-4">
         {item?.name}
       </Text>
       <Text className="text-heading-small mb-1 text-green-600 font-bold ">
