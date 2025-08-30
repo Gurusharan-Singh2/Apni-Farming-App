@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 
 
 const fetchCategories = async () => {
-  // const { data } = await axios.get(`${BackendUrl}/api/categories`);
+ 
   const { data } = await axios.get(`${BackendUrl2}/user/categories/getAllCategories.php`);
   return [{ id: '0', name: 'All', image: 'https://jobdsco.s3.ap-south-1.amazonaws.com/public/s550_4xb7_231012.jpg' }, ...data]; 
 };
