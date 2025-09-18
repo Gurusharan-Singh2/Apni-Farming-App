@@ -14,10 +14,12 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { BackendUrl2 } from '../utils/Constants';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 
 const BannerProductCard = ({ item }) => {
   const { user, isAuthenticated } = useAuthStore();
   const customer_id = user?.userId;
+  const router = useRouter();
 
   const {
     wishlist,
@@ -165,7 +167,7 @@ const {
   };
 
   return (
-    <View className="bg-white ml-2 my-2 p-2 rounded-2xl w-[45%] shadow-md">
+    <TouchableOpacity onPress={()=>router.push(`product_details/${item?.id}`)} className="bg-white ml-2 my-2 p-2 rounded-2xl w-[45%] shadow-md">
       {/* Image */}
       <View className="relative mb-4">
         <Image
@@ -264,7 +266,7 @@ const {
           </View>
         </TouchableOpacity>
       </Modal>
-    </View>
+    </TouchableOpacity>
   );
 };
 

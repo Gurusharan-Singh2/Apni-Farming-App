@@ -10,7 +10,7 @@ const useAuthStore = create(
       token: null,
       phone: null,
 
-      // Set user and token
+      
       login: (data) => {
         set((state) => {
           state.user = {

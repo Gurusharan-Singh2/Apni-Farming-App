@@ -19,12 +19,15 @@ import useNotifications, {
 import useAuthStore from "../../Store/AuthStore";
 import { BackendUrl2 } from "../../utils/Constants";
 import { handleBackgroundNotificationNavigation } from "../../utils/notification";
+import FloatingCart from "../../components/FloatingCart";
+import useCartStore from "../../Store/CartStore";
 
 export default function Home() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("0");
+  const { totalItems } = useCartStore();
 
   useEffect(() => {
     registerNotifeeListeners();
@@ -118,6 +121,15 @@ export default function Home() {
         onRefresh={handleRefresh}
         ListHeaderComponent={headerComponent}
       />
+      {
+        totalItems > 0 && (
+          <FloatingCart
+        count={totalItems}
+        onPress={() => router.push("/cart")}
+      />
+        )
+      }
+      
     </SafeAreaView>
   );
 }
